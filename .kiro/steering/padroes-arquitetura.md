@@ -18,6 +18,12 @@ inclusion: always
 - Versionamento de APIs obrigatório (v1, v2, etc.)
 - Documentação automática com OpenAPI/Swagger
 
+### Microsserviços de Processamento (MCPs)
+- Certas APIs, como Autenticação e Notificação, operam como Microsserviços de Processamento (MCPs).
+- MCPs são serviços independentes, com seu próprio ciclo de vida e execução, otimizados para tarefas específicas.
+- A comunicação com MCPs é feita via chamadas diretas ou através de um API Gateway (futuro).
+
+
 ## Organização de Código
 
 ### Estrutura de Pastas
