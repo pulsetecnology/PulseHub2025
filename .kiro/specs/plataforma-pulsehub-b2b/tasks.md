@@ -84,7 +84,7 @@
   - _Requisitos: 3.1, 3.2, 3.3_
 
 - [ ] 4. Implementar serviços de negócio
-- [ ] 4.1 Implementar serviço de Autenticação
+- [x] 4.1 Implementar serviço de Autenticação
   - Codificar lógica de autenticação e autorização
   - Implementar geração e validação de tokens JWT
   - Escrever testes unitários para o serviço de autenticação
