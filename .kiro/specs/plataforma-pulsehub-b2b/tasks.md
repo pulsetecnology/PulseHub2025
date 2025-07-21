@@ -176,7 +176,7 @@
   - _Requisitos: 7.1, 7.2, 7.3, 7.4, 7.5_
 
 - [ ] 6. Desenvolver interface de usuário frontend
-- [ ] 6.1 Implementar componentes de autenticação
+- [x] 6.1 Implementar componentes de autenticação
   - Codificar telas de login, registro e redefinição de senha
   - Implementar gerenciamento de estado de autenticação
   - Escrever testes para componentes de autenticação
