@@ -24,21 +24,21 @@ inclusion: always
 - Organização de código por feature (feature-based folders)
 - Estrutura sugerida:
   ```
-  src/
-  ├── features/
-  │   ├── auth/
-  │   ├── products/
-  │   ├── orders/
-  │   ├── users/
-  │   └── notifications/
-  ├── shared/
-  │   ├── utils/
-  │   ├── types/
-  │   └── constants/
-  └── infrastructure/
-      ├── database/
-      ├── messaging/
-      └── external-apis/
+src/
+├── funcionalidades/           # Equivale a "features"
+│   ├── autenticacao/          # auth
+│   ├── produtos/              # products
+│   ├── pedidos/               # orders
+│   ├── usuarios/              # users
+│   └── notificacoes/          # notifications
+├── compartilhado/             # shared
+│   ├── utilitarios/           # utils
+│   ├── tipos/                 # types
+│   └── constantes/            # constants
+└── infraestrutura/            # infrastructure
+    ├── banco-de-dados/        # database
+    ├── mensageria/            # messaging
+    └── apis-externas/         # external-apis
   ```
 
 ### Tecnologias Obrigatórias

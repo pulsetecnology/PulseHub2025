@@ -10,69 +10,6 @@
       },
       "disabled": false,
       "autoApprove": ["autenticar", "registrar", "redefinirSenha"]
-    },
-    "pulsehub-api-fornecedores": {
-      "command": "node",
-      "args": ["./servidores-mcp/api-fornecedores.js"],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "disabled": false,
-      "autoApprove": ["listarFornecedores", "obterFornecedor", "criarFornecedor"]
-    },
-    "pulsehub-api-representantes": {
-      "command": "node",
-      "args": ["./servidores-mcp/api-representantes.js"],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "disabled": false,
-      "autoApprove": ["listarRepresentantes", "obterRepresentante", "criarRepresentante"]
-    },
-    "pulsehub-api-produtos": {
-      "command": "node",
-      "args": ["./servidores-mcp/api-produtos.js"],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "disabled": false,
-      "autoApprove": ["listarProdutos", "obterProduto", "criarProduto", "atualizarProduto"]
-    },
-    "pulsehub-api-pedidos": {
-      "command": "node",
-      "args": ["./servidores-mcp/api-pedidos.js"],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "disabled": false,
-      "autoApprove": ["listarPedidos", "obterPedido", "criarPedido", "atualizarStatusPedido"]
-    },
-    "pulsehub-api-chat": {
-      "command": "node",
-      "args": ["./servidores-mcp/api-chat.js"],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "disabled": false,
-      "autoApprove": ["enviarMensagem", "obterMensagens", "marcarComoLida"]
-    },
-    "pulsehub-api-notificacoes": {
-      "command": "node",
-      "args": ["./servidores-mcp/api-notificacoes.js"],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "disabled": false,
-      "autoApprove": ["obterNotificacoes", "marcarComoLida", "atualizarPreferencias"]
-    },
-    "pulsehub-api-comissoes": {
-      "command": "node",
-      "args": ["./servidores-mcp/api-comissoes.js"],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "disabled": false,
-      "autoApprove": ["obterComissoes", "criarComissao", "atualizarComissao"]
     }
   }
 }
