@@ -22,16 +22,16 @@ export class ServicoAutenticacao {
     }
 
     const senhaHash = await bcrypt.hash(usuario.senha, 10);
-    usuario.senha = senhaHash;
+    const usuarioParaCriar = { ...usuario, senha: senhaHash };
 
-    const novoUsuario = await this.repositorioUsuario.create(usuario);
+    const novoUsuario = await this.repositorioUsuario.create(usuarioParaCriar);
     return novoUsuario;
   }
 
   public async autenticar(email: string, senha: string): Promise<string | null> {
     const usuario = await this.repositorioUsuario.findByEmail(email);
-    if (!usuario) {
-      console.error('Usuário não encontrado.');
+    if (!usuario || !usuario.id) {
+      console.error('Usuário não encontrado ou ID ausente.');
       return null;
     }
 
