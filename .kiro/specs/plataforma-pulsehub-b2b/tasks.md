@@ -90,37 +90,37 @@
   - Escrever testes unitários para o serviço de autenticação
   - _Requisitos: 1.1, 1.2, 9.1, 9.3_
 
-- [ ] 4.2 Implementar serviço de Usuário
+- [x] 4.2 Implementar serviço de Usuário
   - Codificar lógica de gerenciamento de usuários
   - Implementar fluxo de convite e registro
   - Escrever testes unitários para o serviço de usuário
   - _Requisitos: 1.1, 1.6, 1.7_
 
-- [ ] 4.3 Implementar serviço de Produto
+- [x] 4.3 Implementar serviço de Produto
   - Codificar lógica de gerenciamento de produtos e variantes
   - Implementar otimização de imagens
   - Escrever testes unitários para o serviço de produto
   - _Requisitos: 2.1, 2.2, 2.3, 2.5_
 
-- [ ] 4.4 Implementar serviço de Pedido
+- [x] 4.4 Implementar serviço de Pedido
   - Codificar lógica de criação e gerenciamento de pedidos
   - Implementar validações de disponibilidade e preço
   - Escrever testes unitários para o serviço de pedido
   - _Requisitos: 4.1, 4.2, 4.3, 4.5_
 
-- [ ] 4.5 Implementar serviço de Comissão
+- [x] 4.5 Implementar serviço de Comissão
   - Codificar lógica de cálculo de comissões
   - Implementar regras de efetividade e prioridade
   - Escrever testes unitários para o serviço de comissão
   - _Requisitos: 3.1, 3.2, 3.3, 3.5_
 
-- [ ] 4.6 Implementar serviço de Cliente
+- [x] 4.6 Implementar serviço de Cliente
   - Codificar lógica de gerenciamento de clientes
   - Implementar segmentação e categorização
   - Escrever testes unitários para o serviço de cliente
   - _Requisitos: 5.1, 5.2, 5.5_
 
-- [ ] 4.7 Implementar serviço de Notificação
+- [x] 4.7 Implementar serviço de Notificação
   - Codificar lógica de envio de notificações
   - Implementar preferências de notificação
   - Escrever testes unitários para o serviço de notificação
