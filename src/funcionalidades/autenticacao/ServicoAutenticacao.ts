@@ -15,21 +15,23 @@ export class ServicoAutenticacao {
   }
 
   public async registrar(usuario: IUsuario): Promise<IUsuario | null> {
-    const usuarioExistente = await this.repositorioUsuario.findByEmail(usuario.email);
+    const emailNormalizado = usuario.email.toLowerCase();
+    const usuarioExistente = await this.repositorioUsuario.findByEmail(emailNormalizado);
     if (usuarioExistente) {
       console.error('Usuário com este e-mail já existe.');
       return null;
     }
 
     const senhaHash = await bcrypt.hash(usuario.senha, 10);
-    const usuarioParaCriar = { ...usuario, senha: senhaHash };
+    const usuarioParaCriar = { ...usuario, email: emailNormalizado, senha: senhaHash };
 
     const novoUsuario = await this.repositorioUsuario.create(usuarioParaCriar);
     return novoUsuario;
   }
 
   public async autenticar(email: string, senha: string): Promise<string | null> {
-    const usuario = await this.repositorioUsuario.findByEmail(email);
+    const emailNormalizado = email.toLowerCase();
+    const usuario = await this.repositorioUsuario.findByEmail(emailNormalizado);
     if (!usuario || !usuario.id) {
       console.error('Usuário não encontrado ou ID ausente.');
       return null;
