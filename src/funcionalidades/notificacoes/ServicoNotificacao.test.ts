@@ -1,5 +1,5 @@
 import { ServicoNotificacao } from './ServicoNotificacao';
-import { RepositorioNotificacaoPrisma } from '../../infraestrutura/banco-de-dados/RepositorioNotificacaoPrisma';
+import { RepositorioNotificacaoPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioNotificacaoPrisma';
 
 // Mock do RepositorioNotificacaoPrisma
 jest.mock('../../infraestrutura/banco-de-dados/RepositorioNotificacaoPrisma');

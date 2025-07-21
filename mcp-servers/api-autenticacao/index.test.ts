@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { ServicoAutenticacao } from '../../src/funcionalidades/autenticacao/ServicoAutenticacao';
+import { ServicoAutenticacao } from '@src/funcionalidades/autenticacao/ServicoAutenticacao';
 import { mock } from 'jest-mock-extended';
 
 // Mock do ServicoAutenticacao

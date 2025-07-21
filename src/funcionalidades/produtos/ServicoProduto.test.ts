@@ -1,5 +1,5 @@
 import { ServicoProduto } from './ServicoProduto';
-import { RepositorioProdutoPrisma } from '../../infraestrutura/banco-de-dados/RepositorioProdutoPrisma';
+import { RepositorioProdutoPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioProdutoPrisma';
 
 // Mock do RepositorioProdutoPrisma
 jest.mock('../../infraestrutura/banco-de-dados/RepositorioProdutoPrisma');

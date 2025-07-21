@@ -1,4 +1,4 @@
-import { IFornecedor } from '../../compartilhado/tipos/IFornecedor';
+import { IFornecedor } from '@src/compartilhado/tipos/IFornecedor';
 import { validarDados } from '../../compartilhado/utilitarios/validacao';
 
 export class Fornecedor implements IFornecedor {

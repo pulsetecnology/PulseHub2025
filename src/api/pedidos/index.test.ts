@@ -1,8 +1,9 @@
 import request from 'supertest';
 import express from 'express';
-import { ServicoPedido } from '../../../src/funcionalidades/pedidos/ServicoPedido';
+import { ServicoPedido } from '@src/funcionalidades/pedidos/ServicoPedido';
 import { mock } from 'jest-mock-extended';
 import pedidoRouter from './index';
+import { IPedido } from '@src/compartilhado/tipos/IPedido';
 
 // Mock do ServicoPedido
 jest.mock('../../../src/funcionalidades/pedidos/ServicoPedido');
@@ -26,7 +27,7 @@ describe('API de Pedidos', () => {
     mockServicoPedido.deletarPedido.mockReset();
   });
 
-  const mockPedido = {
+  const mockPedido: IPedido = {
     id: '1',
     clienteId: 'cliente1',
     dataPedido: new Date(),
@@ -54,7 +55,7 @@ describe('API de Pedidos', () => {
     });
 
     it('deve retornar 400 se a criação do pedido falhar', async () => {
-      mockServicoPedido.criarPedido.mockResolvedValue(null);
+      mockServicoPedido.criarPedido.mockRejectedValue(new Error('Erro de teste'));
 
       const res = await request(app)
         .post('/pedidos')
@@ -139,7 +140,7 @@ describe('API de Pedidos', () => {
 
   describe('PUT /pedidos/:id', () => {
     it('deve atualizar um pedido e retornar 200', async () => {
-      const dadosAtualizados = { status: 'enviado' };
+      const dadosAtualizados: Partial<IPedido> = { status: 'enviado' };
       const pedidoAtualizado = { ...mockPedido, ...dadosAtualizados };
       mockServicoPedido.atualizarPedido.mockResolvedValue(pedidoAtualizado);
 

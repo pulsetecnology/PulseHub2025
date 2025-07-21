@@ -1,6 +1,6 @@
 import request from 'supertest';
 import express from 'express';
-import { ServicoNotificacao } from '../../../src/funcionalidades/notificacoes/ServicoNotificacao';
+import { ServicoNotificacao } from '@src/funcionalidades/notificacoes/ServicoNotificacao';
 import { mock } from 'jest-mock-extended';
 import notificacaoRouter from './index';
 
@@ -51,7 +51,7 @@ describe('API de Notificações', () => {
     });
 
     it('deve retornar 400 se o envio da notificação falhar', async () => {
-      mockServicoNotificacao.enviarNotificacao.mockResolvedValue(null);
+      mockServicoNotificacao.enviarNotificacao.mockRejectedValue(new Error('Erro de teste'));
 
       const res = await request(app)
         .post('/notificacoes')

@@ -1,5 +1,6 @@
 import { ServicoPedido } from './ServicoPedido';
-import { RepositorioPedidoPrisma } from '../../infraestrutura/banco-de-dados/RepositorioPedidoPrisma';
+import { RepositorioPedidoPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioPedidoPrisma';
+import { IPedido } from '@src/compartilhado/tipos/IPedido';
 
 // Mock do RepositorioPedidoPrisma
 jest.mock('../../infraestrutura/banco-de-dados/RepositorioPedidoPrisma');
@@ -14,7 +15,7 @@ describe('ServicoPedido', () => {
     jest.clearAllMocks();
   });
 
-  const mockPedido = {
+  const mockPedido: IPedido = {
     id: '1',
     clienteId: 'cliente1',
     dataPedido: new Date(),
@@ -58,7 +59,7 @@ describe('ServicoPedido', () => {
 
   describe('atualizarPedido', () => {
     it('deve atualizar um pedido existente', async () => {
-      const dadosAtualizados = { status: 'enviado' };
+      const dadosAtualizados: Partial<IPedido> = { status: 'enviado' };
       const pedidoAtualizado = { ...mockPedido, ...dadosAtualizados };
       mockRepositorioPedido.update.mockResolvedValue(pedidoAtualizado);
 

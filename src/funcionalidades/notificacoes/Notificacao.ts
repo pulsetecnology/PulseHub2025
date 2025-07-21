@@ -1,4 +1,4 @@
-import { INotificacao } from '../../compartilhado/tipos/INotificacao';
+import { INotificacao } from '@src/compartilhado/tipos/INotificacao';
 import { validarDados } from '../../compartilhado/utilitarios/validacao';
 
 export class Notificacao implements INotificacao {

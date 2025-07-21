@@ -180,6 +180,26 @@ exports.Prisma.ComissaoScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ClienteScalarFieldEnum = {
+  id: 'id',
+  nome: 'nome',
+  email: 'email',
+  cpfCnpj: 'cpfCnpj',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.NotificacaoScalarFieldEnum = {
+  id: 'id',
+  destinatarioId: 'destinatarioId',
+  mensagem: 'mensagem',
+  dataEnvio: 'dataEnvio',
+  lida: 'lida',
+  tipo: 'tipo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -207,7 +227,9 @@ exports.Prisma.ModelName = {
   VarianteProduto: 'VarianteProduto',
   Pedido: 'Pedido',
   ItemPedido: 'ItemPedido',
-  Comissao: 'Comissao'
+  Comissao: 'Comissao',
+  Cliente: 'Cliente',
+  Notificacao: 'Notificacao'
 };
 
 /**

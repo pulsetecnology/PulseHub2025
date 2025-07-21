@@ -1,4 +1,4 @@
-import { ICliente } from '../../compartilhado/tipos/ICliente';
+import { ICliente } from '@src/compartilhado/tipos/ICliente';
 import { validarDados } from '../../compartilhado/utilitarios/validacao';
 
 export class Cliente implements ICliente {

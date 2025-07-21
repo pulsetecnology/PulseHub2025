@@ -1,5 +1,5 @@
-import { IPedido } from '../../compartilhado/tipos/IPedido';
-import { RepositorioPedidoPrisma } from '../../infraestrutura/banco-de-dados/RepositorioPedidoPrisma';
+import { IPedido } from '@src/compartilhado/tipos/IPedido';
+import { RepositorioPedidoPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioPedidoPrisma';
 
 export class ServicoPedido {
   private repositorioPedido: RepositorioPedidoPrisma;

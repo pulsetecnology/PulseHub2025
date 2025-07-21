@@ -1,6 +1,6 @@
 import request from 'supertest';
 import express from 'express';
-import { ServicoProduto } from '../../../src/funcionalidades/produtos/ServicoProduto';
+import { ServicoProduto } from '@src/funcionalidades/produtos/ServicoProduto';
 import { mock } from 'jest-mock-extended';
 import produtoRouter from './index';
 
@@ -53,7 +53,7 @@ describe('API de Produtos', () => {
     });
 
     it('deve retornar 400 se a criação do produto falhar', async () => {
-      mockServicoProduto.criarProduto.mockResolvedValue(null);
+      mockServicoProduto.criarProduto.mockRejectedValue(new Error('Erro de teste'));
 
       const res = await request(app)
         .post('/produtos')

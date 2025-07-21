@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ServicoNotificacao } from '../../funcionalidades/notificacoes/ServicoNotificacao';
+import { ServicoNotificacao } from '@src/funcionalidades/notificacoes/ServicoNotificacao';
 
 const router = Router();
 const servicoNotificacao = new ServicoNotificacao();

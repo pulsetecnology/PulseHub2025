@@ -1,5 +1,5 @@
-import { ICliente } from '../../compartilhado/tipos/ICliente';
-import { RepositorioClientePrisma } from '../../infraestrutura/banco-de-dados/RepositorioClientePrisma';
+import { ICliente } from '@src/compartilhado/tipos/ICliente';
+import { RepositorioClientePrisma } from '@src/infraestrutura/banco-de-dados/RepositorioClientePrisma';
 
 export class ServicoCliente {
   private repositorioCliente: RepositorioClientePrisma;

@@ -1,6 +1,6 @@
 import request from 'supertest';
 import express from 'express';
-import { ServicoCliente } from '../../../src/funcionalidades/clientes/ServicoCliente';
+import { ServicoCliente } from '@src/funcionalidades/clientes/ServicoCliente';
 import { mock } from 'jest-mock-extended';
 import clienteRouter from './index';
 
@@ -51,7 +51,7 @@ describe('API de Clientes', () => {
     });
 
     it('deve retornar 400 se a criação do cliente falhar', async () => {
-      mockServicoCliente.criarCliente.mockResolvedValue(null);
+      mockServicoCliente.criarCliente.mockRejectedValue(new Error('Erro de teste'));
 
       const res = await request(app)
         .post('/clientes')

@@ -1,7 +1,7 @@
-import { IUsuario } from '../../compartilhado/tipos/IUsuario';
-import { RepositorioUsuarioPrisma } from '../../infraestrutura/banco-de-dados/RepositorioUsuarioPrisma';
+import { IUsuario } from '@src/compartilhado/tipos/IUsuario';
+import { RepositorioUsuarioPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioUsuarioPrisma';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 
 export class ServicoAutenticacao {
   private repositorioUsuario: RepositorioUsuarioPrisma;
@@ -43,7 +43,7 @@ export class ServicoAutenticacao {
       return null;
     }
 
-    const token = jwt.sign({ id: usuario.id, email: usuario.email }, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
+    const token = jwt.sign({ id: usuario.id, email: usuario.email }, this.jwtSecret, { expiresIn: this.jwtExpiresIn } as SignOptions);
     return token;
   }
 }

@@ -1,6 +1,6 @@
 import request from 'supertest';
 import express from 'express';
-import { ServicoComissao } from '../../../src/funcionalidades/comissoes/ServicoComissao';
+import { ServicoComissao } from '@src/funcionalidades/comissoes/ServicoComissao';
 import { mock } from 'jest-mock-extended';
 import comissaoRouter from './index';
 
@@ -55,7 +55,7 @@ describe('API de Comissões', () => {
     });
 
     it('deve retornar 400 se a criação da comissão falhar', async () => {
-      mockServicoComissao.criarComissao.mockResolvedValue(null);
+      mockServicoComissao.criarComissao.mockRejectedValue(new Error('Erro de teste'));
 
       const res = await request(app)
         .post('/comissoes')

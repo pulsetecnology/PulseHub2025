@@ -1,4 +1,4 @@
-import { IRepresentante } from '../../compartilhado/tipos/IRepresentante';
+import { IRepresentante } from '@src/compartilhado/tipos/IRepresentante';
 import { validarDados } from '../../compartilhado/utilitarios/validacao';
 
 export class Representante implements IRepresentante {

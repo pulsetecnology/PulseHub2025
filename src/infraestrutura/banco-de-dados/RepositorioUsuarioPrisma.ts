@@ -1,5 +1,5 @@
 import { BaseRepositorioPrisma } from './BaseRepositorioPrisma';
-import { IUsuario } from '../../compartilhado/tipos/IUsuario';
+import { IUsuario } from '@src/compartilhado/tipos/IUsuario';
 
 export class RepositorioUsuarioPrisma extends BaseRepositorioPrisma<IUsuario> {
   constructor() {

@@ -1,5 +1,8 @@
 import { Router } from 'express';
-// Importar serviços de negócio relevantes para relatórios (ex: ServicoPedido, ServicoComissao)
+import { ServicoPedido } from '@src/funcionalidades/pedidos/ServicoPedido';
+import { ServicoComissao } from '@src/funcionalidades/comissoes/ServicoComissao';
+import { ServicoProduto } from '@src/funcionalidades/produtos/ServicoProduto';
+import { ServicoCliente } from '@src/funcionalidades/clientes/ServicoCliente';
 
 const router = Router();
 

@@ -1,5 +1,5 @@
 import { BaseRepositorioPrisma } from './BaseRepositorioPrisma';
-import { IPedido } from '../../compartilhado/tipos/IPedido';
+import { IPedido } from '@src/compartilhado/tipos/IPedido';
 import prisma from './prismaClient';
 
 export class RepositorioPedidoPrisma extends BaseRepositorioPrisma<IPedido> {
@@ -8,12 +8,12 @@ export class RepositorioPedidoPrisma extends BaseRepositorioPrisma<IPedido> {
   }
 
   async create(item: IPedido): Promise<IPedido> {
-    const { itens, ...orderData } = item;
+    const { itens, ...orderData } = item as any;
     const createdOrder = await prisma.pedido.create({
       data: {
         ...orderData,
         itens: {
-          create: itens.map(i => ({
+          create: itens.map((i: any) => ({
             produtoId: i.produto.id!,
             quantidade: i.quantidade,
             precoUnitario: i.precoUnitario,
@@ -26,7 +26,7 @@ export class RepositorioPedidoPrisma extends BaseRepositorioPrisma<IPedido> {
   }
 
   async update(id: string, item: Partial<IPedido>): Promise<IPedido | null> {
-    const { itens, ...orderData } = item;
+    const { itens, ...orderData } = item as any;
     const updatedOrder = await prisma.pedido.update({
       where: { id },
       data: {
@@ -34,7 +34,7 @@ export class RepositorioPedidoPrisma extends BaseRepositorioPrisma<IPedido> {
         ...(itens && { // Atualiza itens apenas se fornecidos
           itens: {
             deleteMany: { orderId: id }, // Remove os itens existentes
-            create: itens.map(i => ({
+            create: itens.map((i: any) => ({
               produtoId: i.produto.id!,
               quantidade: i.quantidade,
               precoUnitario: i.precoUnitario,

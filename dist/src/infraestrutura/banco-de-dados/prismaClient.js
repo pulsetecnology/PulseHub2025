@@ -1,0 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const prisma_1 = require("../../gerado/prisma");
+const prisma = new prisma_1.PrismaClient();
+exports.default = prisma;
+//# sourceMappingURL=prismaClient.js.map

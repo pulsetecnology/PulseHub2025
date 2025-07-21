@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { ServicoAutenticacao } from '../../src/funcionalidades/autenticacao/ServicoAutenticacao';
+import { ServicoAutenticacao } from '@src/funcionalidades/autenticacao/ServicoAutenticacao';
 
 dotenv.config();
 
@@ -66,3 +66,5 @@ app.get('/protegido', autenticarToken, (req, res) => {
 app.listen(PORT, () => {
   console.log(`MCP de Autenticação rodando na porta ${PORT}`);
 });
+
+export default app;

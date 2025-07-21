@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ServicoProduto } from '../../funcionalidades/produtos/ServicoProduto';
+import { ServicoProduto } from '@src/funcionalidades/produtos/ServicoProduto';
 
 const router = Router();
 const servicoProduto = new ServicoProduto();

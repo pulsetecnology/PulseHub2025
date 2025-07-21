@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ServicoComissao } from '../../funcionalidades/comissoes/ServicoComissao';
+import { ServicoComissao } from '@src/funcionalidades/comissoes/ServicoComissao';
 
 const router = Router();
 const servicoComissao = new ServicoComissao();

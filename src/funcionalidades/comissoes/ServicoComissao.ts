@@ -1,5 +1,5 @@
-import { IComissao } from '../../compartilhado/tipos/IComissao';
-import { RepositorioComissaoPrisma } from '../../infraestrutura/banco-de-dados/RepositorioComissaoPrisma';
+import { IComissao } from '@src/compartilhado/tipos/IComissao';
+import { RepositorioComissaoPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioComissaoPrisma';
 
 export class ServicoComissao {
   private repositorioComissao: RepositorioComissaoPrisma;

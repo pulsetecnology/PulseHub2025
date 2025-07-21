@@ -1,5 +1,5 @@
 import { ServicoUsuario } from './ServicoUsuario';
-import { RepositorioUsuarioPrisma } from '../../infraestrutura/banco-de-dados/RepositorioUsuarioPrisma';
+import { RepositorioUsuarioPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioUsuarioPrisma';
 
 // Mock do RepositorioUsuarioPrisma
 jest.mock('../../infraestrutura/banco-de-dados/RepositorioUsuarioPrisma');

@@ -1,4 +1,4 @@
-import { IComissao } from '../../compartilhado/tipos/IComissao';
+import { IComissao } from '@src/compartilhado/tipos/IComissao';
 import { validarDados } from '../../compartilhado/utilitarios/validacao';
 
 export class Comissao implements IComissao {

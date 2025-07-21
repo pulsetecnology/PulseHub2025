@@ -13,10 +13,10 @@ jest.mock('./prismaClient', () => ({
 }));
 
 describe('RepositorioComissaoPrisma', () => {
-  let repository: PrismaCommissionRepository;
+  let repository: RepositorioComissaoPrisma;
 
   beforeEach(() => {
-    repository = new PrismaCommissionRepository();
+    repository = new RepositorioComissaoPrisma();
     jest.clearAllMocks();
   });
 
@@ -38,14 +38,14 @@ describe('RepositorioComissaoPrisma', () => {
   });
 
   it('deve chamar findUnique no modelo Prisma', async () => {
-    (prisma.commission.findUnique as jest.Mock).mockResolvedValue(mockCommission);
+    (prisma.comissao.findUnique as jest.Mock).mockResolvedValue(mockCommission);
     const result = await repository.findById('comm1');
     expect(prisma.comissao.findUnique).toHaveBeenCalledWith({ where: { id: 'comm1' } });
     expect(result).toEqual(mockCommission);
   });
 
   it('deve chamar findMany no modelo Prisma', async () => {
-    (prisma.commission.findMany as jest.Mock).mockResolvedValue([mockCommission]);
+    (prisma.comissao.findMany as jest.Mock).mockResolvedValue([mockCommission]);
     const result = await repository.findAll();
     expect(prisma.comissao.findMany).toHaveBeenCalledTimes(1);
     expect(result).toEqual([mockCommission]);
@@ -54,14 +54,14 @@ describe('RepositorioComissaoPrisma', () => {
   it('deve chamar update no modelo Prisma', async () => {
     const updatedData = { percentual: 12.0 };
     const updatedCommission = { ...mockCommission, ...updatedData };
-    (prisma.commission.update as jest.Mock).mockResolvedValue(updatedCommission);
+    (prisma.comissao.update as jest.Mock).mockResolvedValue(updatedCommission);
     const result = await repository.update('comm1', updatedData as any);
     expect(prisma.comissao.update).toHaveBeenCalledWith({ where: { id: 'comm1' }, data: updatedData });
     expect(result).toEqual(updatedCommission);
   });
 
   it('deve chamar delete no modelo Prisma', async () => {
-    (prisma.commission.delete as jest.Mock).mockResolvedValue(undefined);
+    (prisma.comissao.delete as jest.Mock).mockResolvedValue(undefined);
     const result = await repository.delete('comm1');
     expect(prisma.comissao.delete).toHaveBeenCalledWith({ where: { id: 'comm1' } });
     expect(result).toBe(true);

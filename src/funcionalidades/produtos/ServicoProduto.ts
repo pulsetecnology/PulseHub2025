@@ -1,5 +1,5 @@
-import { IProduto } from '../../compartilhado/tipos/IProduto';
-import { RepositorioProdutoPrisma } from '../../infraestrutura/banco-de-dados/RepositorioProdutoPrisma';
+import { IProduto } from '@src/compartilhado/tipos/IProduto';
+import { RepositorioProdutoPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioProdutoPrisma';
 
 export class ServicoProduto {
   private repositorioProduto: RepositorioProdutoPrisma;

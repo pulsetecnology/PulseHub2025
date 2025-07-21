@@ -1,5 +1,5 @@
-import { IUsuario } from '../../compartilhado/tipos/IUsuario';
-import { RepositorioUsuarioPrisma } from '../../infraestrutura/banco-de-dados/RepositorioUsuarioPrisma';
+import { IUsuario } from '@src/compartilhado/tipos/IUsuario';
+import { RepositorioUsuarioPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioUsuarioPrisma';
 
 export class ServicoUsuario {
   private repositorioUsuario: RepositorioUsuarioPrisma;

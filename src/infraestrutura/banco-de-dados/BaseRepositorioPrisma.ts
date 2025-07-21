@@ -1,8 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-import { IRepositorioBase } from '../../compartilhado/tipos/IRepositorioBase';
+import { PrismaClient } from '@src/gerado/prisma';
+import { IBaseRepository } from '@src/compartilhado/tipos/IRepositorioBase';
 import prisma from './prismaClient';
 
-export abstract class BaseRepositorioPrisma<T> implements IRepositorioBase<T> {
+export abstract class BaseRepositorioPrisma<T> implements IBaseRepository<T> {
   protected prisma: PrismaClient;
   protected model: any; // Representa o modelo Prisma (e.g., prisma.user)
 

@@ -1,5 +1,5 @@
 import { Pedido } from './Pedido';
-import { Produto } from '../produtos/Produto';
+import { Produto } from '@src/funcionalidades/produtos/Produto';
 
 describe('Pedido', () => {
   const produto1 = new Produto('Produto A', 'Descrição A', 10.00, [{ sku: 'PA1', preco: 10.00, estoque: 100, atributos: {} }]);

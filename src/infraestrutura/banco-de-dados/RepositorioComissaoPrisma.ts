@@ -1,5 +1,5 @@
 import { BaseRepositorioPrisma } from './BaseRepositorioPrisma';
-import { IComissao } from '../../compartilhado/tipos/IComissao';
+import { IComissao } from '@src/compartilhado/tipos/IComissao';
 
 export class RepositorioComissaoPrisma extends BaseRepositorioPrisma<IComissao> {
   constructor() {

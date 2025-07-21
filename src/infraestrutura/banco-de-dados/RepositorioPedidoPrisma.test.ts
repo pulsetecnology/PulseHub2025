@@ -16,10 +16,10 @@ jest.mock('./prismaClient', () => ({
 }));
 
 describe('RepositorioPedidoPrisma', () => {
-  let repository: PrismaOrderRepository;
+  let repository: RepositorioPedidoPrisma;
 
   beforeEach(() => {
-    repository = new PrismaOrderRepository();
+    repository = new RepositorioPedidoPrisma();
     jest.clearAllMocks();
   });
 
@@ -94,21 +94,21 @@ describe('RepositorioPedidoPrisma', () => {
   });
 
   it('deve chamar findUnique no modelo Prisma com inclusão de itens', async () => {
-    (prisma.order.findUnique as jest.Mock).mockResolvedValue(mockOrder);
+    (prisma.pedido.findUnique as jest.Mock).mockResolvedValue(mockOrder);
     const result = await repository.findById('order1');
     expect(prisma.pedido.findUnique).toHaveBeenCalledWith({ where: { id: 'order1' }, include: { itens: true } });
     expect(result).toEqual(mockOrder);
   });
 
   it('deve chamar findMany no modelo Prisma com inclusão de itens', async () => {
-    (prisma.order.findMany as jest.Mock).mockResolvedValue([mockOrder]);
+    (prisma.pedido.findMany as jest.Mock).mockResolvedValue([mockOrder]);
     const result = await repository.findAll();
     expect(prisma.pedido.findMany).toHaveBeenCalledWith({ include: { itens: true } });
     expect(result).toEqual([mockOrder]);
   });
 
   it('deve chamar delete no modelo Prisma', async () => {
-    (prisma.order.delete as jest.Mock).mockResolvedValue(undefined);
+    (prisma.pedido.delete as jest.Mock).mockResolvedValue(undefined);
     const result = await repository.delete('order1');
     expect(prisma.pedido.delete).toHaveBeenCalledWith({ where: { id: 'order1' } });
     expect(result).toBe(true);

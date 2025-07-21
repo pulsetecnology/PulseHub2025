@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ServicoCliente } from '../../funcionalidades/clientes/ServicoCliente';
+import { ServicoCliente } from '@src/funcionalidades/clientes/ServicoCliente';
 
 const router = Router();
 const servicoCliente = new ServicoCliente();

@@ -1,4 +1,4 @@
-import { IProduto } from '../../compartilhado/tipos/IProduto';
+import { IProduto } from '@src/compartilhado/tipos/IProduto';
 import { validarDados } from '../../compartilhado/utilitarios/validacao';
 
 interface IVarianteProduto {

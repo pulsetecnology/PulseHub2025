@@ -1,4 +1,4 @@
-import { IUsuario } from '../../compartilhado/tipos/IUsuario';
+import { IUsuario } from '@src/compartilhado/tipos/IUsuario';
 import { validarDados } from '../../compartilhado/utilitarios/validacao';
 
 export class Usuario implements IUsuario {

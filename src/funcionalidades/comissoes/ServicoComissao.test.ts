@@ -1,5 +1,5 @@
 import { ServicoComissao } from './ServicoComissao';
-import { RepositorioComissaoPrisma } from '../../infraestrutura/banco-de-dados/RepositorioComissaoPrisma';
+import { RepositorioComissaoPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioComissaoPrisma';
 
 // Mock do RepositorioComissaoPrisma
 jest.mock('../../infraestrutura/banco-de-dados/RepositorioComissaoPrisma');

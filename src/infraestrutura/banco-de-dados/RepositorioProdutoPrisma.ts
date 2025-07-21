@@ -1,5 +1,5 @@
 import { BaseRepositorioPrisma } from './BaseRepositorioPrisma';
-import { IProduto } from '../../compartilhado/tipos/IProduto';
+import { IProduto } from '@src/compartilhado/tipos/IProduto';
 import prisma from './prismaClient';
 
 export class RepositorioProdutoPrisma extends BaseRepositorioPrisma<IProduto> {
@@ -8,12 +8,12 @@ export class RepositorioProdutoPrisma extends BaseRepositorioPrisma<IProduto> {
   }
 
   async create(item: IProduto): Promise<IProduto> {
-    const { variantes, ...productData } = item;
+    const { variantes, ...productData } = item as any;
     const createdProduct = await prisma.produto.create({
       data: {
         ...productData,
         variantes: {
-          create: variantes.map(v => ({
+          create: variantes.map((v: any) => ({
             sku: v.sku,
             preco: v.preco,
             estoque: v.estoque,
@@ -27,7 +27,7 @@ export class RepositorioProdutoPrisma extends BaseRepositorioPrisma<IProduto> {
   }
 
   async update(id: string, item: Partial<IProduto>): Promise<IProduto | null> {
-    const { variantes, ...productData } = item;
+    const { variantes, ...productData } = item as any;
     const updatedProduct = await prisma.produto.update({
       where: { id },
       data: {
@@ -35,7 +35,7 @@ export class RepositorioProdutoPrisma extends BaseRepositorioPrisma<IProduto> {
         ...(variantes && { // Atualiza variantes apenas se fornecidas
           variantes: {
             deleteMany: { productId: id }, // Remove as variantes existentes
-            create: variantes.map(v => ({
+            create: variantes.map((v: any) => ({
               sku: v.sku,
               preco: v.preco,
               estoque: v.estoque,

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ServicoPedido } from '../../funcionalidades/pedidos/ServicoPedido';
+import { ServicoPedido } from '@src/funcionalidades/pedidos/ServicoPedido';
 
 const router = Router();
 const servicoPedido = new ServicoPedido();

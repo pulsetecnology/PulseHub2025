@@ -1,6 +1,6 @@
 import request from 'supertest';
 import express from 'express';
-import { ServicoUsuario } from '../../../src/funcionalidades/usuarios/ServicoUsuario';
+import { ServicoUsuario } from '@src/funcionalidades/usuarios/ServicoUsuario';
 import { mock } from 'jest-mock-extended';
 import usuarioRouter from './index';
 

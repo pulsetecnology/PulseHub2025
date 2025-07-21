@@ -1,5 +1,5 @@
 import { ServicoAutenticacao } from './ServicoAutenticacao';
-import { RepositorioUsuarioPrisma } from '../../infraestrutura/banco-de-dados/RepositorioUsuarioPrisma';
+import { RepositorioUsuarioPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioUsuarioPrisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 

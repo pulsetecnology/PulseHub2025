@@ -1,5 +1,5 @@
-import { INotificacao } from '../../compartilhado/tipos/INotificacao';
-import { RepositorioNotificacaoPrisma } from '../../infraestrutura/banco-de-dados/RepositorioNotificacaoPrisma';
+import { INotificacao } from '@src/compartilhado/tipos/INotificacao';
+import { RepositorioNotificacaoPrisma } from '@src/infraestrutura/banco-de-dados/RepositorioNotificacaoPrisma';
 
 export class ServicoNotificacao {
   private repositorioNotificacao: RepositorioNotificacaoPrisma;
