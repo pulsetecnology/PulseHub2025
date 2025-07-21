@@ -112,58 +112,58 @@ graph TD
 
 O sistema irá expor os seguintes endpoints principais da API:
 
-1. **API de Autenticação**
-   - POST /api/auth/login
-   - POST /api/auth/register
-   - POST /api/auth/reset-password
-   - GET /api/auth/me
+1. API de Autenticação
+POST /api/autenticacao/login – Fazer login
+POST /api/autenticacao/registro – Registrar novo usuário
+POST /api/autenticacao/redefinir-senha – Redefinir senha
+GET /api/autenticacao/eu – Obter dados do usuário autenticado
 
-2. **API de Gestão de Usuários**
-   - GET /api/users
-   - POST /api/users
-   - GET /api/users/:id
-   - PUT /api/users/:id
-   - DELETE /api/users/:id
+2. API de Gestão de Usuários
+GET /api/usuarios – Listar usuários
+POST /api/usuarios – Criar usuário
+GET /api/usuarios/:id – Obter detalhes de um usuário
+PUT /api/usuarios/:id – Atualizar usuário
+DELETE /api/usuarios/:id – Deletar usuário
 
-3. **API de Produtos**
-   - GET /api/products
-   - POST /api/products
-   - GET /api/products/:id
-   - PUT /api/products/:id
-   - DELETE /api/products/:id
-   - GET /api/products/:id/variants
+3. API de Produtos
+GET /api/produtos – Listar produtos
+POST /api/produtos – Criar produto
+GET /api/produtos/:id – Obter detalhes de um produto
+PUT /api/produtos/:id – Atualizar produto
+DELETE /api/produtos/:id – Deletar produto
+GET /api/produtos/:id/variacoes – Listar variações do produto
 
-4. **API de Pedidos**
-   - GET /api/orders
-   - POST /api/orders
-   - GET /api/orders/:id
-   - PUT /api/orders/:id
-   - DELETE /api/orders/:id
-   - PUT /api/orders/:id/status
+4. API de Pedidos
+GET /api/pedidos – Listar pedidos
+POST /api/pedidos – Criar pedido
+GET /api/pedidos/:id – Obter detalhes de um pedido
+PUT /api/pedidos/:id – Atualizar pedido
+DELETE /api/pedidos/:id – Deletar pedido
+PUT /api/pedidos/:id/status – Atualizar status do pedido
 
-5. **API de Clientes**
-   - GET /api/clients
-   - POST /api/clients
-   - GET /api/clients/:id
-   - PUT /api/clients/:id
-   - DELETE /api/clients/:id
+5. API de Clientes
+GET /api/clientes – Listar clientes
+POST /api/clientes – Criar cliente
+GET /api/clientes/:id – Obter detalhes de um cliente
+PUT /api/clientes/:id – Atualizar cliente
+DELETE /api/clientes/:id – Deletar cliente
 
-6. **API de Comissões**
-   - GET /api/commissions
-   - POST /api/commissions
-   - GET /api/commissions/:id
-   - PUT /api/commissions/:id
+6. API de Comissões
+GET /api/comissoes – Listar comissões
+POST /api/comissoes – Criar comissão
+GET /api/comissoes/:id – Obter detalhes de uma comissão
+PUT /api/comissoes/:id – Atualizar comissão
 
-7. **API de Relatórios**
-   - GET /api/reports/sales
-   - GET /api/reports/products
-   - GET /api/reports/representatives
-   - GET /api/reports/clients
+7. API de Relatórios
+GET /api/relatorios/vendas – Relatório de vendas
+GET /api/relatorios/produtos – Relatório de produtos
+GET /api/relatorios/representantes – Relatório de representantes
+GET /api/relatorios/clientes – Relatório de clientes
 
-8. **API de Notificações**
-   - GET /api/notifications
-   - PUT /api/notifications/:id/read
-   - PUT /api/notifications/preferences
+8. API de Notificações
+GET /api/notificacoes – Listar notificações
+PUT /api/notificacoes/:id/ler – Marcar como lida
+PUT /api/notificacoes/preferencias – Atualizar preferências de notificação
 
 ## Modelos de Dados
 
@@ -173,28 +173,29 @@ O sistema irá expor os seguintes endpoints principais da API:
 {
   "id": "uuid",
   "email": "string",
-  "passwordHash": "string",
-  "name": "string",
-  "role": "enum(ADMIN, SUPPLIER, REPRESENTATIVE)",
-  "company": "string",
-  "phone": "string",
-  "address": {
-    "street": "string",
-    "city": "string",
-    "state": "string",
-    "postalCode": "string",
-    "country": "string"
+  "hashSenha": "string",
+  "nome": "string",
+  "papel": "enum(ADMINISTRADOR, FORNECEDOR, REPRESENTANTE)",
+  "empresa": "string",
+  "telefone": "string",
+  "endereco": {
+    "rua": "string",
+    "cidade": "string",
+    "estado": "string",
+    "cep": "string",
+    "pais": "string"
   },
-  "status": "enum(ACTIVE, INACTIVE, PENDING)",
-  "createdAt": "datetime",
-  "updatedAt": "datetime",
-  "lastLogin": "datetime",
-  "notificationPreferences": {
+  "status": "enum(ATIVO, INATIVO, PENDENTE)",
+  "criadoEm": "datetime",
+  "atualizadoEm": "datetime",
+  "ultimoAcesso": "datetime",
+  "preferenciasNotificacao": {
     "email": "boolean",
-    "inApp": "boolean",
+    "noSistema": "boolean",
     "push": "boolean"
   }
 }
+
 ```
 
 ### Modelo de Fornecedor
@@ -202,19 +203,20 @@ O sistema irá expor os seguintes endpoints principais da API:
 ```json
 {
   "id": "uuid",
-  "userId": "uuid",
-  "companyName": "string",
+  "usuarioId": "uuid",
+  "razaoSocial": "string",
   "logo": "string",
-  "description": "string",
-  "taxId": "string",
-  "paymentTerms": "string",
-  "minimumOrderValue": "decimal",
-  "defaultCommissionRate": "decimal",
-  "representatives": ["uuid"],
-  "categories": ["string"],
-  "createdAt": "datetime",
-  "updatedAt": "datetime"
+  "descricao": "string",
+  "cnpj": "string",
+  "condicoesPagamento": "string",
+  "valorMinimoPedido": "decimal",
+  "percentualComissaoPadrao": "decimal",
+  "representantes": ["uuid"],
+  "categorias": ["string"],
+  "criadoEm": "datetime",
+  "atualizadoEm": "datetime"
 }
+
 ```
 
 ### Modelo de Representante
@@ -222,14 +224,14 @@ O sistema irá expor os seguintes endpoints principais da API:
 ```json
 {
   "id": "uuid",
-  "userId": "uuid",
-  "suppliers": ["uuid"],
-  "territory": "string",
-  "specialties": ["string"],
-  "clients": ["uuid"],
-  "defaultCommissionRate": "decimal",
-  "createdAt": "datetime",
-  "updatedAt": "datetime"
+  "usuarioId": "uuid",
+  "fornecedores": ["uuid"],
+  "territorio": "string",
+  "especialidades": ["string"],
+  "clientes": ["uuid"],
+  "percentualComissaoPadrao": "decimal",
+  "criadoEm": "datetime",
+  "atualizadoEm": "datetime"
 }
 ```
 
@@ -238,30 +240,31 @@ O sistema irá expor os seguintes endpoints principais da API:
 ```json
 {
   "id": "uuid",
-  "supplierId": "uuid",
-  "name": "string",
-  "description": "string",
+  "fornecedorId": "uuid",
+  "nome": "string",
+  "descricao": "string",
   "sku": "string",
-  "category": "string",
-  "subcategory": "string",
-  "images": ["string"],
-  "basePrice": "decimal",
-  "cost": "decimal",
-  "status": "enum(ACTIVE, INACTIVE, DISCONTINUED)",
-  "attributes": {
+  "categoria": "string",
+  "subcategoria": "string",
+  "imagens": ["string"],
+  "precoBase": "decimal",
+  "custo": "decimal",
+  "status": "enum(ATIVO, INATIVO, DESCONTINUADO)",
+  "atributos": {
     "material": "string",
-    "weight": "decimal",
-    "dimensions": {
-      "length": "decimal",
-      "width": "decimal",
-      "height": "decimal"
+    "peso": "decimal",
+    "dimensoes": {
+      "comprimento": "decimal",
+      "largura": "decimal",
+      "altura": "decimal"
     },
-    "customAttributes": "object"
+    "atributosPersonalizados": "object"
   },
-  "variants": ["uuid"],
-  "createdAt": "datetime",
-  "updatedAt": "datetime"
+  "variantes": ["uuid"],
+  "criadoEm": "datetime",
+  "atualizadoEm": "datetime"
 }
+
 ```
 
 ### Modelo de Variante de Produto
@@ -269,24 +272,24 @@ O sistema irá expor os seguintes endpoints principais da API:
 ```json
 {
   "id": "uuid",
-  "productId": "uuid",
+  "produtoId": "uuid",
   "sku": "string",
-  "attributes": {
-    "size": "string",
-    "color": "string",
-    "style": "string",
-    "customAttributes": "object"
+  "atributos": {
+    "tamanho": "string",
+    "cor": "string",
+    "estilo": "string",
+    "atributosPersonalizados": "object"
   },
-  "price": "decimal",
-  "inventory": {
-    "available": "integer",
-    "reserved": "integer",
-    "incoming": "integer"
+  "preco": "decimal",
+  "estoque": {
+    "disponivel": "integer",
+    "reservado": "integer",
+    "entrada": "integer"
   },
-  "images": ["string"],
-  "status": "enum(ACTIVE, INACTIVE, DISCONTINUED)",
-  "createdAt": "datetime",
-  "updatedAt": "datetime"
+  "imagens": ["string"],
+  "status": "enum(ATIVO, INATIVO, DESCONTINUADO)",
+  "criadoEm": "datetime",
+  "atualizadoEm": "datetime"
 }
 ```
 
@@ -295,27 +298,28 @@ O sistema irá expor os seguintes endpoints principais da API:
 ```json
 {
   "id": "uuid",
-  "representativeId": "uuid",
-  "name": "string",
-  "businessName": "string",
-  "taxId": "string",
-  "contactPerson": "string",
+  "representanteId": "uuid",
+  "nome": "string",
+  "nomeFantasia": "string",
+  "cnpj": "string",
+  "contato": "string",
   "email": "string",
-  "phone": "string",
-  "address": {
-    "street": "string",
-    "city": "string",
-    "state": "string",
-    "postalCode": "string",
-    "country": "string"
+  "telefone": "string",
+  "endereco": {
+    "rua": "string",
+    "cidade": "string",
+    "estado": "string",
+    "cep": "string",
+    "pais": "string"
   },
-  "paymentTerms": "string",
-  "creditLimit": "decimal",
-  "notes": "string",
-  "tags": ["string"],
-  "createdAt": "datetime",
-  "updatedAt": "datetime"
+  "condicoesPagamento": "string",
+  "limiteCredito": "decimal",
+  "observacoes": "string",
+  "etiquetas": ["string"],
+  "criadoEm": "datetime",
+  "atualizadoEm": "datetime"
 }
+
 ```
 
 ### Modelo de Pedido
@@ -323,52 +327,53 @@ O sistema irá expor os seguintes endpoints principais da API:
 ```json
 {
   "id": "uuid",
-  "orderNumber": "string",
-  "representativeId": "uuid",
-  "supplierId": "uuid",
-  "clientId": "uuid",
-  "status": "enum(DRAFT, SUBMITTED, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED)",
-  "items": [
+  "numeroPedido": "string",
+  "representanteId": "uuid",
+  "fornecedorId": "uuid",
+  "clienteId": "uuid",
+  "status": "enum(RASCUNHO, ENVIADO, CONFIRMADO, PROCESSANDO, ENVIADO_PEDIDO, ENTREGUE, CANCELADO)",
+  "itens": [
     {
-      "productId": "uuid",
-      "variantId": "uuid",
-      "quantity": "integer",
-      "unitPrice": "decimal",
-      "discount": "decimal",
+      "produtoId": "uuid",
+      "varianteId": "uuid",
+      "quantidade": "integer",
+      "precoUnitario": "decimal",
+      "desconto": "decimal",
       "total": "decimal"
     }
   ],
   "subtotal": "decimal",
-  "tax": "decimal",
-  "shipping": "decimal",
-  "discount": "decimal",
+  "impostos": "decimal",
+  "frete": "decimal",
+  "desconto": "decimal",
   "total": "decimal",
-  "commissionRate": "decimal",
-  "commissionAmount": "decimal",
-  "notes": "string",
-  "shippingAddress": {
-    "street": "string",
-    "city": "string",
-    "state": "string",
-    "postalCode": "string",
-    "country": "string"
+  "percentualComissao": "decimal",
+  "valorComissao": "decimal",
+  "observacoes": "string",
+  "enderecoEntrega": {
+    "rua": "string",
+    "cidade": "string",
+    "estado": "string",
+    "cep": "string",
+    "pais": "string"
   },
-  "billingAddress": {
-    "street": "string",
-    "city": "string",
-    "state": "string",
-    "postalCode": "string",
-    "country": "string"
+  "enderecoCobranca": {
+    "rua": "string",
+    "cidade": "string",
+    "estado": "string",
+    "cep": "string",
+    "pais": "string"
   },
-  "paymentTerms": "string",
-  "paymentStatus": "enum(PENDING, PARTIAL, PAID)",
-  "createdAt": "datetime",
-  "updatedAt": "datetime",
-  "submittedAt": "datetime",
-  "confirmedAt": "datetime",
-  "shippedAt": "datetime",
-  "deliveredAt": "datetime"
+  "condicoesPagamento": "string",
+  "statusPagamento": "enum(PENDENTE, PARCIAL, PAGO)",
+  "criadoEm": "datetime",
+  "atualizadoEm": "datetime",
+  "enviadoEm": "datetime",
+  "confirmadoEm": "datetime",
+  "enviadoPedidoEm": "datetime",
+  "entregueEm": "datetime"
 }
+
 ```
 
 ### Modelo de Comissão
@@ -376,17 +381,18 @@ O sistema irá expor os seguintes endpoints principais da API:
 ```json
 {
   "id": "uuid",
-  "supplierId": "uuid",
-  "representativeId": "uuid",
-  "productId": "uuid",
-  "categoryId": "uuid",
-  "rate": "decimal",
-  "effectiveFrom": "date",
-  "effectiveTo": "date",
-  "isDefault": "boolean",
-  "createdAt": "datetime",
-  "updatedAt": "datetime"
+  "fornecedorId": "uuid",
+  "representanteId": "uuid",
+  "produtoId": "uuid",
+  "categoriaId": "uuid",
+  "percentual": "decimal",
+  "vigenteDe": "date",
+  "vigenteAte": "date",
+  "padrao": "boolean",
+  "criadoEm": "datetime",
+  "atualizadoEm": "datetime"
 }
+
 ```
 
 ### Modelo de Notificação
@@ -394,16 +400,17 @@ O sistema irá expor os seguintes endpoints principais da API:
 ```json
 {
   "id": "uuid",
-  "userId": "uuid",
-  "type": "enum(ORDER_STATUS, PRODUCT_UPDATE, COMMISSION_UPDATE, SYSTEM)",
-  "title": "string",
-  "message": "string",
-  "referenceId": "uuid",
-  "referenceType": "string",
-  "isRead": "boolean",
-  "createdAt": "datetime",
-  "readAt": "datetime"
+  "usuarioId": "uuid",
+  "tipo": "enum(STATUS_PEDIDO, ATUALIZACAO_PRODUTO, ATUALIZACAO_COMISSAO, SISTEMA)",
+  "titulo": "string",
+  "mensagem": "string",
+  "referenciaId": "uuid",
+  "tipoReferencia": "string",
+  "lida": "boolean",
+  "criadoEm": "datetime",
+  "lidoEm": "datetime"
 }
+
 ```
 
 ## Tratamento de Erros
@@ -414,13 +421,14 @@ Todos os erros da API seguirão um formato consistente:
 
 ```json
 {
-  "status": "integer",
-  "code": "string",
-  "message": "string",
-  "details": "object",
-  "timestamp": "datetime",
-  "path": "string"
+  "status": "inteiro",                  // Código HTTP de status (ex: 404, 500)
+  "code": "texto",                     // Código interno de erro (ex: USUARIO_NAO_ENCONTRADO)
+  "message": "texto",                  // Mensagem amigável descrevendo o erro
+  "details": "objeto",                 // Detalhes técnicos adicionais, se houver
+  "timestamp": "data-hora",           // Data e hora em que o erro ocorreu
+  "path": "texto"                      // Caminho da requisição que gerou o erro
 }
+
 ```
 
 ### Tipos de Erros
