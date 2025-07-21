@@ -52,7 +52,7 @@
   - _Requisitos: 7.6_
 
 - [ ] 3. Criar mecanismo de armazenamento
-- [ ] 3.1 Implementar utilitários de conexão com banco de dados
+- [x] 3.1 Implementar utilitários de conexão com banco de dados
   - Escrever código de gerenciamento de conexão
   - Criar utilitários de tratamento de erros para operações de banco de dados
   - _Requisitos: 9.1, 9.2_

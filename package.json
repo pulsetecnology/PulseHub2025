@@ -1,0 +1,23 @@
+{
+  "name": "pulsehub",
+  "version": "1.0.0",
+  "description": "## Visão Geral",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pulsetecnology/PulseHub2025.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pulsetecnology/PulseHub2025/issues"
+  },
+  "homepage": "https://github.com/pulsetecnology/PulseHub2025#readme",
+  "devDependencies": {
+    "prisma": "^6.12.0"
+  }
+}
