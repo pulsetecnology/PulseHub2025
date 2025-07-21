@@ -133,43 +133,43 @@
   - Escrever testes de integração para a API de autenticação
   - _Requisitos: 1.1, 1.2, 1.7_
 
-- [ ] 5.2 Implementar API de Usuário
+- [x] 5.2 Implementar API de Usuário
   - Codificar endpoints CRUD para usuários
   - Implementar controle de acesso baseado em funções
   - Escrever testes de integração para a API de usuário
   - _Requisitos: 1.3, 1.4, 1.5_
 
-- [ ] 5.3 Implementar API de Produto
+- [x] 5.3 Implementar API de Produto
   - Codificar endpoints CRUD para produtos e variantes
   - Implementar upload e otimização de imagens
   - Escrever testes de integração para a API de produto
   - _Requisitos: 2.1, 2.2, 2.3, 2.5_
 
-- [ ] 5.4 Implementar API de Pedido
+- [x] 5.4 Implementar API de Pedido
   - Codificar endpoints CRUD para pedidos
   - Implementar gerenciamento de status de pedido
   - Escrever testes de integração para a API de pedido
   - _Requisitos: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
 
-- [ ] 5.5 Implementar API de Cliente
+- [x] 5.5 Implementar API de Cliente
   - Codificar endpoints CRUD para clientes
   - Implementar histórico de pedidos e preferências
   - Escrever testes de integração para a API de cliente
   - _Requisitos: 5.1, 5.2, 5.4, 5.5_
 
-- [ ] 5.6 Implementar API de Comissão
+- [x] 5.6 Implementar API de Comissão
   - Codificar endpoints CRUD para comissões
   - Implementar regras de efetividade e prioridade
   - Escrever testes de integração para a API de comissão
   - _Requisitos: 3.1, 3.2, 3.3, 3.5_
 
-- [ ] 5.7 Implementar API de Relatórios
+- [x] 5.7 Implementar API de Relatórios
   - Codificar endpoints para diferentes tipos de relatórios
   - Implementar filtros e agregações
   - Escrever testes de integração para a API de relatórios
   - _Requisitos: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 5.8 Implementar API de Notificação
+- [x] 5.8 Implementar API de Notificação
   - Codificar endpoints para gerenciamento de notificações
   - Implementar preferências de notificação
   - Escrever testes de integração para a API de notificação
