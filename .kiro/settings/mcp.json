@@ -2,7 +2,7 @@
   "mcpServers": {
     "pulsehub-api-autenticacao": {
       "command": "node",
-      "args": ["./servidores-mcp/api-autenticacao.js"],
+      "args": ["./api-autenticacao/index.js"],
       "env": {
         "NODE_ENV": "development",
         "JWT_SECRET": "sua-chave-secreta-jwt",
@@ -10,6 +10,15 @@
       },
       "disabled": false,
       "autoApprove": ["autenticar", "registrar", "redefinirSenha"]
+    },
+    "pulsehub-api-notificacao": {
+      "command": "node",
+      "args": ["./api-notificacao/index.js"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "disabled": false,
+      "autoApprove": ["enviarNotificacao", "marcarComoLida"]
     }
   }
 }

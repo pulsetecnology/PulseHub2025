@@ -15,7 +15,7 @@ A estrutura do repositório está organizada da seguinte forma:
   - `specs/`: Documentação de design, requisitos e tarefas.
   - `steering/`: Diretrizes de arquitetura e regras de negócio.
 
-- **`mcp-servers/`**: Contém as implementações dos servidores e microsserviços que compõem a plataforma operacional. Atualmente, inclui o MCP de Autenticação.
+- **`mcp-servers/`**: Contém as implementações dos servidores e microsserviços que compõem a plataforma operacional. Atualmente, inclui o MCP de Autenticação e o MCP de Notificação.
 
 - **`src/`**: Contém o código-fonte principal da aplicação, organizado por domínios e camadas.
   - `src/funcionalidades/`: Módulos de negócio (e.g., `usuarios`, `produtos`, `pedidos`, `autenticacao`, `comissoes`, `clientes`, `notificacoes`), onde a lógica de negócio é implementada através de serviços.
@@ -51,6 +51,15 @@ Esta seção detalha os passos para configurar e executar o projeto localmente.
     ```bash
     # Navegue até a pasta do MCP de Autenticação
     cd mcp-servers/api-autenticacao
+    # Compile o TypeScript (se necessário, dependendo da configuração do tsconfig)
+    # npx tsc
+    # Inicie o servidor
+    node index.js # ou node dist/index.js se compilado
+    ```
+    Para iniciar o MCP de Notificação:
+    ```bash
+    # Navegue até a pasta do MCP de Notificação
+    cd mcp-servers/api-notificacao
     # Compile o TypeScript (se necessário, dependendo da configuração do tsconfig)
     # npx tsc
     # Inicie o servidor

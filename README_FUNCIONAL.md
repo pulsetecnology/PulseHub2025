@@ -31,6 +31,7 @@ Até o momento, as seguintes funcionalidades foram implementadas, incluindo suas
 
 ### APIs RESTful (Tarefa 5.x)
 - **API de Autenticação (MCP)**: Endpoints para registro e login de usuários.
+- **API de Notificação (MCP)**: Endpoints para envio e gerenciamento de notificações.
 - **API de Usuário**: Endpoints CRUD para gerenciamento de usuários.
 - **API de Produto**: Endpoints CRUD para gerenciamento de produtos.
 - **API de Pedido**: Endpoints CRUD para gerenciamento de pedidos.

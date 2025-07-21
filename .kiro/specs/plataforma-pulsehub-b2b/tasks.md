@@ -169,7 +169,7 @@
   - Escrever testes de integração para a API de relatórios
   - _Requisitos: 6.1, 6.2, 6.3, 6.4_
 
-- [x] 5.8 Implementar API de Notificação
+- [x] 5.8 Implementar API de Notificação (MCP)
   - Codificar endpoints para gerenciamento de notificações
   - Implementar preferências de notificação
   - Escrever testes de integração para a API de notificação
