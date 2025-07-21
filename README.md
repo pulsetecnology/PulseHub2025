@@ -17,6 +17,8 @@ A estrutura do repositório está organizada da seguinte forma:
 
 - **`mcp-servers/`**: Contém as implementações dos servidores e microsserviços que compõem a plataforma operacional. Atualmente, inclui o MCP de Autenticação e o MCP de Notificação.
 
+- **`dist/`**: Contém os arquivos JavaScript compilados a partir do código TypeScript, prontos para execução.
+
 - **`src/`**: Contém o código-fonte principal da aplicação, organizado por domínios e camadas.
   - `src/funcionalidades/`: Módulos de negócio (e.g., `usuarios`, `produtos`, `pedidos`, `autenticacao`, `comissoes`, `clientes`, `notificacoes`), onde a lógica de negócio é implementada através de serviços.
   - `src/compartilhado/`: Código compartilhado, como tipos, utilitários e constantes.
@@ -46,29 +48,24 @@ Esta seção detalha os passos para configurar e executar o projeto localmente.
     npx prisma migrate dev --name initial_migration
     ```
 
-3.  **Executando os Servidores:**
-    Para iniciar o MCP de Autenticação (que é um servidor independente):
+3.  **Compilação e Execução:**
+    Primeiro, compile o projeto TypeScript:
     ```bash
-    # Navegue até a pasta do MCP de Autenticação
-    cd mcp-servers/api-autenticacao
-    # Compile o TypeScript (se necessário, dependendo da configuração do tsconfig)
-    # npx tsc
-    # Inicie o servidor
-    node index.js # ou node dist/index.js se compilado
+    npm run build
     ```
-    Para iniciar o MCP de Notificação:
-    ```bash
-    # Navegue até a pasta do MCP de Notificação
-    cd mcp-servers/api-notificacao
-    # Compile o TypeScript (se necessário, dependendo da configuração do tsconfig)
-    # npx tsc
-    # Inicie o servidor
-    node index.js # ou node dist/index.js se compilado
-    ```
-    Para iniciar a API principal (que conterá as demais APIs):
-    ```bash
-    # Comando para iniciar a API principal (a ser implementado)
-    ```
+    Após a compilação, você pode iniciar os servidores:
+    - **MCP de Autenticação:**
+      ```bash
+      node dist/mcp-servers/api-autenticacao/index.js
+      ```
+    - **MCP de Notificação:**
+      ```bash
+      node dist/mcp-servers/api-notificacao/index.js
+      ```
+    - **APIs Principais:**
+      ```bash
+      # Comando para iniciar a API principal (a ser implementado)
+      ```
 
 ## Próximos Passos
 

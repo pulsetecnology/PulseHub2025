@@ -38,7 +38,10 @@ Até o momento, as seguintes funcionalidades foram implementadas, incluindo suas
 - **API de Cliente**: Endpoints CRUD para gerenciamento de clientes.
 - **API de Comissão**: Endpoints CRUD para gerenciamento de comissões.
 - **API de Relatórios**: Endpoints para geração de relatórios (vendas, comissões).
-- **API de Notificação**: Endpoints para envio e gerenciamento de notificações.
+
+### Configuração e Ambiente de Desenvolvimento
+- **`tsconfig.json`**: Configuração do compilador TypeScript para garantir a correta transpilação e verificação de tipos.
+- **`package.json` e `package-lock.json`**: Gerenciamento de dependências e scripts de projeto, incluindo scripts para build (`npm run build`) e testes (`npm test`).
 
 ## Funcionalidades Planejadas (Próximos Passos)
 

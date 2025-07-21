@@ -13,6 +13,8 @@ Os requisitos não funcionais são cruciais para garantir a qualidade, a robuste
 - **Tecnologias**: Utilização de TypeScript, Node.js e PostgreSQL com Prisma, estabelecendo uma base tecnológica robusta.
 - **Padrão de Repositório**: Implementação de um padrão de repositório base com Prisma para abstração do acesso a dados, promovendo a testabilidade e a troca de tecnologias de persistência.
 - **APIs RESTful**: Implementação de endpoints para diversas funcionalidades, seguindo padrões REST para comunicação.
+- **Configuração de Compilação**: Utilização de `tsconfig.json` para configuração detalhada do compilador TypeScript, garantindo a integridade e a qualidade do código.
+- **Processo de Build**: Definição de um script de build (`npm run build`) para compilar o código TypeScript em JavaScript, otimizando o processo de desenvolvimento e deploy.
 
 ### Segurança e Privacidade de Dados (Tarefa 8.x - Base Estabelecida)
 - **Criptografia de Dados Sensíveis**: A base para a criptografia de senhas foi estabelecida no serviço de autenticação (bcryptjs).
