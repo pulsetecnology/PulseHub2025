@@ -127,7 +127,7 @@
   - _Requisitos: 7.1, 7.2, 7.3, 7.4, 7.5_
 
 - [ ] 5. Implementar APIs RESTful
-- [ ] 5.1 Implementar API de Autenticação
+- [x] 5.1 Implementar API de Autenticação
   - Codificar endpoints de login, registro e redefinição de senha
   - Implementar middleware de autenticação
   - Escrever testes de integração para a API de autenticação
