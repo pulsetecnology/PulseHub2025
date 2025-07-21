@@ -1,6 +1,6 @@
 # Plano de Implementação
 
-- [ ] 1. Configurar a estrutura do projeto e interfaces principais
+- [x] 1. Configurar a estrutura do projeto e interfaces principais
   - Criar estrutura de diretórios para modelos, serviços, repositórios e componentes de API
   - Definir interfaces que estabelecem os limites do sistema
   - _Requisitos: 1.1_
