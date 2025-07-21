@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/gerado/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        String   @id @default(uuid())
+  nome      String
+  email     String   @unique
+  senha     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Produto {
+  id        String            @id @default(uuid())
+  nome      String
+  descricao String
+  precoBase Float
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  variantes VarianteProduto[]
+}
+
+model VarianteProduto {
+  id        String   @id @default(uuid())
+  sku       String   @unique
+  preco     Float
+  estoque   Int
+  atributos Json
+  productId String
+  product   Produto  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pedido {
+  id         String       @id @default(uuid())
+  clienteId  String
+  dataPedido DateTime     @default(now())
+  status     String
+  valorTotal Float
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  itens      ItemPedido[]
+}
+
+model ItemPedido {
+  id            String   @id @default(uuid())
+  produtoId     String
+  quantidade    Int
+  precoUnitario Float
+  orderId       String
+  order         Pedido   @relation(fields: [orderId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Comissao {
+  id              String   @id @default(uuid())
+  representanteId String
+  pedidoId        String
+  percentual      Float
+  valorCalculado  Float
+  dataEfetivacao  DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

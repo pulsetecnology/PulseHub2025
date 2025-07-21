@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+  output   = "../src/gerado/prisma"
 }
 
 datasource db {
@@ -14,7 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Usuario {
   id        String   @id @default(uuid())
   nome      String
   email     String   @unique
@@ -23,29 +23,29 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-model Product {
+model Produto {
   id          String         @id @default(uuid())
   nome        String
   descricao   String
   precoBase   Float
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  variantes   ProductVariant[]
+  variantes   VarianteProduto[]
 }
 
-model ProductVariant {
+model VarianteProduto {
   id        String   @id @default(uuid())
   sku       String   @unique
   preco     Float
   estoque   Int
   atributos Json
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Produto  @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Order {
+model Pedido {
   id         String     @id @default(uuid())
   clienteId  String
   dataPedido DateTime   @default(now())
@@ -53,21 +53,21 @@ model Order {
   valorTotal Float
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
-  itens      OrderItem[]
+  itens      ItemPedido[]
 }
 
-model OrderItem {
+model ItemPedido {
   id            String  @id @default(uuid())
   produtoId     String
   quantidade    Int
   precoUnitario Float
   orderId       String
-  order         Order   @relation(fields: [orderId], references: [id])
+  order         Pedido   @relation(fields: [orderId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
-model Commission {
+model Comissao {
   id              String   @id @default(uuid())
   representanteId String
   pedidoId        String
