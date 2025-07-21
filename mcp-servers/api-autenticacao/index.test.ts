@@ -11,7 +11,7 @@ const mockServicoAutenticacao = mock<ServicoAutenticacao>();
 jest.mocked(ServicoAutenticacao).mockImplementation(() => mockServicoAutenticacao);
 
 // Importar o app *depois* de mockar o serviço para garantir que o mock seja usado
-import app from '../index'; // Assumindo que o index.ts exporta o app
+import app from './index'; // Assumindo que o index.ts exporta o app
 
 describe('API de Autenticação (MCP)', () => {
   beforeEach(() => {
