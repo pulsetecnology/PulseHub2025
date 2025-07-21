@@ -100,6 +100,7 @@ O PulseHub é uma plataforma B2B projetada para conectar fornecedores de moda e 
 4. QUANDO um usuário recebe notificações ENTÃO o sistema DEVE fornecer opções de entrega no aplicativo e por e-mail
 5. QUANDO um usuário configura preferências de notificação ENTÃO o sistema DEVE respeitar essas configurações
 6. SE uma ação crítica requer atenção ENTÃO o sistema DEVE usar métodos de notificação prioritários
+7. QUANDO o sistema envia uma notificação ENTÃO o sistema DEVE registrar a notificação em um modelo de dados persistente.
 
 ### Requisito 8: Acessibilidade Móvel
 

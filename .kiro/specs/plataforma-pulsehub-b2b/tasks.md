@@ -6,45 +6,50 @@
   - _Requisitos: 1.1_
 
 - [ ] 2. Implementar modelos de dados e validação
-- [ ] 2.1 Criar interfaces e tipos de modelos de dados principais
+- [x] 2.1 Criar interfaces e tipos de modelos de dados principais
   - Escrever interfaces TypeScript para todos os modelos de dados
   - Implementar funções de validação para integridade de dados
   - _Requisitos: 2.1, 3.3, 1.2_
 
-- [ ] 2.2 Implementar modelo de Usuário com validação
+- [x] 2.2 Implementar modelo de Usuário com validação
   - Escrever classe de Usuário com métodos de validação
   - Criar testes unitários para validação do modelo de Usuário
   - _Requisitos: 1.2_
 
-- [ ] 2.3 Implementar modelo de Fornecedor com validação
+- [x] 2.3 Implementar modelo de Fornecedor com validação
   - Escrever classe de Fornecedor com métodos de validação
   - Criar testes unitários para validação do modelo de Fornecedor
   - _Requisitos: 1.3_
 
-- [ ] 2.4 Implementar modelo de Representante com validação
+- [x] 2.4 Implementar modelo de Representante com validação
   - Escrever classe de Representante com métodos de validação
   - Criar testes unitários para validação do modelo de Representante
   - _Requisitos: 1.4_
 
-- [ ] 2.5 Implementar modelo de Produto com variantes
+- [x] 2.5 Implementar modelo de Produto com variantes
   - Codificar classe de Produto com gerenciamento de variantes
   - Escrever testes unitários para gerenciamento de variantes
   - _Requisitos: 2.1, 2.3_
 
-- [ ] 2.6 Implementar modelo de Cliente com validação
+- [x] 2.6 Implementar modelo de Cliente com validação
   - Escrever classe de Cliente com métodos de validação
   - Criar testes unitários para validação do modelo de Cliente
   - _Requisitos: 5.1_
 
-- [ ] 2.7 Implementar modelo de Pedido com itens
+- [x] 2.7 Implementar modelo de Pedido com itens
   - Codificar classe de Pedido com gerenciamento de itens
   - Escrever testes unitários para cálculos de pedidos
   - _Requisitos: 4.1, 4.2_
 
-- [ ] 2.8 Implementar modelo de Comissão com regras de negócio
+- [x] 2.8 Implementar modelo de Comissão com regras de negócio
   - Codificar classe de Comissão com regras de efetividade
   - Escrever testes unitários para cálculos de comissão
   - _Requisitos: 3.1, 3.2, 3.3_
+
+- [ ] 2.9 Implementar modelo de Notificação com validação
+  - Escrever classe de Notificação com métodos de validação
+  - Criar testes unitários para validação do modelo de Notificação
+  - _Requisitos: 7.6_
 
 - [ ] 3. Criar mecanismo de armazenamento
 - [ ] 3.1 Implementar utilitários de conexão com banco de dados
