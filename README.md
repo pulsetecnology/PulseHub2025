@@ -18,9 +18,9 @@ A estrutura do repositório está organizada da seguinte forma:
 - **`mcp-servers/`**: Contém as implementações dos servidores e microsserviços que compõem a plataforma operacional.
 
 - **`src/`**: Contém o código-fonte principal da aplicação, organizado por domínios e camadas.
-  - `src/funcionalidades/`: Módulos de negócio (e.g., `usuarios`, `produtos`, `pedidos`).
+  - `src/funcionalidades/`: Módulos de negócio (e.g., `usuarios`, `produtos`, `pedidos`, `autenticacao`, `comissoes`, `clientes`, `notificacoes`), onde a lógica de negócio é implementada através de serviços.
   - `src/compartilhado/`: Código compartilhado, como tipos, utilitários e constantes.
-  - `src/infraestrutura/`: Implementações de infraestrutura, como acesso a banco de dados e integrações com APIs externas.
+  - `src/infraestrutura/`: Implementações de infraestrutura, como acesso a banco de dados (com repositórios Prisma) e integrações com APIs externas.
   - `src/gerado/prisma/`: Cliente Prisma gerado automaticamente para interação com o banco de dados.
 
 ## Como Começar
