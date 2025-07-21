@@ -1,0 +1,28 @@
+{
+  "name": "Catálogo Atualizado",
+  "description": "Hook acionado quando um fornecedor atualiza seu catálogo de produtos",
+  "trigger": {
+    "type": "database_change",
+    "table": "produtos",
+    "operations": ["INSERT", "UPDATE", "DELETE"]
+  },
+  "action": {
+    "type": "agent_execution",
+    "prompt": "O catálogo de produtos foi atualizado pelo fornecedor. Sincronize os dados com todos os representantes vinculados, limpe o cache local, e notifique os representantes sobre as mudanças. Verifique se há produtos com pedidos em andamento e aplique as restrições necessárias.",
+    "context": [
+      "Dados dos produtos alterados",
+      "Lista de representantes vinculados",
+      "Pedidos em andamento relacionados",
+      "Configurações de sincronização",
+      "Cache atual do catálogo"
+    ]
+  },
+  "conditions": [
+    {
+      "field": "user.role",
+      "operator": "equals",
+      "value": "SUPPLIER"
+    }
+  ],
+  "enabled": true
+}

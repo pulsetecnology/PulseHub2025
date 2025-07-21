@@ -1,0 +1,27 @@
+{
+  "name": "Pedido Criado",
+  "description": "Hook acionado quando um representante cria um novo pedido",
+  "trigger": {
+    "type": "api_call",
+    "endpoint": "/api/pedidos",
+    "method": "POST"
+  },
+  "action": {
+    "type": "agent_execution",
+    "prompt": "Um novo pedido foi criado pelo representante. Analise os dados do pedido, crie um registro temporário no banco de dados e exiba uma confirmação detalhada para o usuário. Verifique se todos os produtos estão disponíveis e se as comissões estão calculadas corretamente.",
+    "context": [
+      "Dados do pedido recém-criado",
+      "Informações do representante",
+      "Catálogo de produtos do fornecedor",
+      "Regras de comissão aplicáveis"
+    ]
+  },
+  "conditions": [
+    {
+      "field": "user.role",
+      "operator": "equals",
+      "value": "REPRESENTATIVE"
+    }
+  ],
+  "enabled": true
+}

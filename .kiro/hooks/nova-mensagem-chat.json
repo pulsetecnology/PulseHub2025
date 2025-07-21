@@ -1,0 +1,27 @@
+{
+  "name": "Nova Mensagem no Chat",
+  "description": "Hook acionado quando uma nova mensagem é enviada no chat interno",
+  "trigger": {
+    "type": "api_call",
+    "endpoint": "/api/chat",
+    "method": "POST"
+  },
+  "action": {
+    "type": "agent_execution",
+    "prompt": "Uma nova mensagem foi enviada no chat interno. Registre a mensagem no banco de dados, identifique o destinatário, e dispare uma notificação push apropriada. Verifique se a mensagem requer ação imediata e marque como prioritária se necessário.",
+    "context": [
+      "Conteúdo da mensagem",
+      "Remetente e destinatário",
+      "Contexto da conversa",
+      "Preferências de notificação do destinatário",
+      "Histórico de mensagens relacionadas"
+    ]
+  },
+  "conditions": [
+    {
+      "field": "message.content",
+      "operator": "not_empty"
+    }
+  ],
+  "enabled": true
+}

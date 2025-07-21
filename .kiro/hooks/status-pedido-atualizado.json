@@ -1,0 +1,28 @@
+{
+  "name": "Status do Pedido Atualizado",
+  "description": "Hook acionado quando um fornecedor atualiza o status de um pedido",
+  "trigger": {
+    "type": "api_call",
+    "endpoint": "/api/pedidos/:id/status",
+    "method": "PUT"
+  },
+  "action": {
+    "type": "agent_execution",
+    "prompt": "O status de um pedido foi atualizado pelo fornecedor. Atualize o registro no banco de dados, notifique o representante responsável via notificação no app e email, e registre a alteração no log de auditoria. Inclua detalhes sobre a mudança de status e próximos passos.",
+    "context": [
+      "Dados do pedido atualizado",
+      "Status anterior e novo status",
+      "Informações do fornecedor",
+      "Dados de contato do representante",
+      "Histórico de mudanças do pedido"
+    ]
+  },
+  "conditions": [
+    {
+      "field": "user.role",
+      "operator": "equals",
+      "value": "SUPPLIER"
+    }
+  ],
+  "enabled": true
+}
