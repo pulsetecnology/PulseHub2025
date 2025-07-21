@@ -6,9 +6,9 @@ Este documento descreve as funcionalidades do sistema PulseHub, dividindo-as ent
 
 O PulseHub é uma plataforma B2B projetada para conectar fornecedores de moda e representantes comerciais, permitindo a gestão digital de catálogos, pedidos e relacionamentos comerciais. O objetivo é modernizar e otimizar o processo de vendas por atacado no setor de moda.
 
-## Funcionalidades Implementadas (Modelos de Dados e Serviços de Negócio)
+## Funcionalidades Implementadas
 
-Até o momento, os seguintes modelos de dados e serviços de negócio foram implementados, incluindo suas validações e testes unitários:
+Até o momento, as seguintes funcionalidades foram implementadas, incluindo suas validações e testes unitários:
 
 ### Modelos de Dados (Tarefa 2.x)
 - **Usuário**: Gestão de informações básicas de usuários.
@@ -29,11 +29,20 @@ Até o momento, os seguintes modelos de dados e serviços de negócio foram impl
 - **Serviço de Cliente**: Operações CRUD para gerenciamento de clientes.
 - **Serviço de Notificação**: Lógica para envio e gerenciamento de notificações.
 
+### APIs RESTful (Tarefa 5.x)
+- **API de Autenticação (MCP)**: Endpoints para registro e login de usuários.
+- **API de Usuário**: Endpoints CRUD para gerenciamento de usuários.
+- **API de Produto**: Endpoints CRUD para gerenciamento de produtos.
+- **API de Pedido**: Endpoints CRUD para gerenciamento de pedidos.
+- **API de Cliente**: Endpoints CRUD para gerenciamento de clientes.
+- **API de Comissão**: Endpoints CRUD para gerenciamento de comissões.
+- **API de Relatórios**: Endpoints para geração de relatórios (vendas, comissões).
+- **API de Notificação**: Endpoints para envio e gerenciamento de notificações.
+
 ## Funcionalidades Planejadas (Próximos Passos)
 
 As seguintes funcionalidades estão planejadas para futuras etapas de desenvolvimento:
 
-- **Implementação de APIs RESTful (Tarefa 5.x)**: Exposição dos serviços de negócio através de endpoints RESTful para autenticação, usuários, produtos, pedidos, clientes, comissões, relatórios e notificações.
 - **Desenvolvimento da Interface de Usuário Frontend (Tarefa 6.x)**: Criação de componentes de autenticação, painéis para fornecedores, representantes e administradores, visualização de catálogo, interface de criação de pedidos e dashboards de relatórios.
 - **Otimizações para Dispositivos Móveis (Tarefa 7.x)**: Implementação de design responsivo, otimização de imagens e funcionalidade offline.
 - **Implementação de Pontos de Integração (Tarefa 9.x)**: Desenvolvimento de API Gateway, formatos padronizados para integração e webhooks para notificações.

@@ -15,12 +15,13 @@ A estrutura do repositório está organizada da seguinte forma:
   - `specs/`: Documentação de design, requisitos e tarefas.
   - `steering/`: Diretrizes de arquitetura e regras de negócio.
 
-- **`mcp-servers/`**: Contém as implementações dos servidores e microsserviços que compõem a plataforma operacional.
+- **`mcp-servers/`**: Contém as implementações dos servidores e microsserviços que compõem a plataforma operacional. Atualmente, inclui o MCP de Autenticação.
 
 - **`src/`**: Contém o código-fonte principal da aplicação, organizado por domínios e camadas.
   - `src/funcionalidades/`: Módulos de negócio (e.g., `usuarios`, `produtos`, `pedidos`, `autenticacao`, `comissoes`, `clientes`, `notificacoes`), onde a lógica de negócio é implementada através de serviços.
   - `src/compartilhado/`: Código compartilhado, como tipos, utilitários e constantes.
   - `src/infraestrutura/`: Implementações de infraestrutura, como acesso a banco de dados (com repositórios Prisma) e integrações com APIs externas.
+  - `src/api/`: Contém as implementações das APIs RESTful para os diferentes módulos de negócio (e.g., `usuarios`, `produtos`, `pedidos`, `clientes`, `comissoes`, `relatorios`, `notificacoes`).
   - `src/gerado/prisma/`: Cliente Prisma gerado automaticamente para interação com o banco de dados.
 
 ## Como Começar
@@ -46,13 +47,22 @@ Esta seção detalha os passos para configurar e executar o projeto localmente.
     ```
 
 3.  **Executando os Servidores:**
-    Esta seção será atualizada conforme os servidores forem implementados.
+    Para iniciar o MCP de Autenticação (que é um servidor independente):
     ```bash
-    # Comando para iniciar a plataforma
+    # Navegue até a pasta do MCP de Autenticação
+    cd mcp-servers/api-autenticacao
+    # Compile o TypeScript (se necessário, dependendo da configuração do tsconfig)
+    # npx tsc
+    # Inicie o servidor
+    node index.js # ou node dist/index.js se compilado
+    ```
+    Para iniciar a API principal (que conterá as demais APIs):
+    ```bash
+    # Comando para iniciar a API principal (a ser implementado)
     ```
 
 ## Próximos Passos
 
-- [ ] Detalhar as instruções na seção "Executando os Servidores".
+- [ ] Detalhar as instruções na seção "Executando os Servidores" para a API principal.
 - [ ] Adicionar documentação sobre os endpoints da API.
 - [ ] Descrever o fluxo de dados e a interação entre os microsserviços.

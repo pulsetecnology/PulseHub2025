@@ -12,6 +12,7 @@ Os requisitos não funcionais são cruciais para garantir a qualidade, a robuste
 - **Estrutura de Projeto**: Organização em `funcionalidades`, `compartilhado` e `infraestrutura` para modularidade e manutenibilidade.
 - **Tecnologias**: Utilização de TypeScript, Node.js e PostgreSQL com Prisma, estabelecendo uma base tecnológica robusta.
 - **Padrão de Repositório**: Implementação de um padrão de repositório base com Prisma para abstração do acesso a dados, promovendo a testabilidade e a troca de tecnologias de persistência.
+- **APIs RESTful**: Implementação de endpoints para diversas funcionalidades, seguindo padrões REST para comunicação.
 
 ### Segurança e Privacidade de Dados (Tarefa 8.x - Base Estabelecida)
 - **Criptografia de Dados Sensíveis**: A base para a criptografia de senhas foi estabelecida no serviço de autenticação (bcryptjs).
