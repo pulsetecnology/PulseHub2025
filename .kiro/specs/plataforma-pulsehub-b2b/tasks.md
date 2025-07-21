@@ -57,7 +57,7 @@
   - Criar utilitários de tratamento de erros para operações de banco de dados
   - _Requisitos: 9.1, 9.2_
 
-- [ ] 3.2 Implementar padrão de repositório para acesso a dados
+- [x] 3.2 Implementar padrão de repositório para acesso a dados
   - Codificar interface de repositório base
   - Implementar repositórios concretos com operações CRUD
   - Escrever testes unitários para operações de repositório
