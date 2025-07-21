@@ -63,22 +63,22 @@
   - Escrever testes unitários para operações de repositório
   - _Requisitos: 10.1, 10.2_
 
-- [ ] 3.3 Implementar repositório de Usuário
+- [x] 3.3 Implementar repositório de Usuário
   - Codificar repositório de Usuário com operações específicas
   - Escrever testes de integração para o repositório de Usuário
   - _Requisitos: 1.1, 1.2_
 
-- [ ] 3.4 Implementar repositório de Produto
+- [x] 3.4 Implementar repositório de Produto
   - Codificar repositório de Produto com suporte a variantes
   - Escrever testes de integração para o repositório de Produto
   - _Requisitos: 2.1, 2.2, 2.3_
 
-- [ ] 3.5 Implementar repositório de Pedido
+- [x] 3.5 Implementar repositório de Pedido
   - Codificar repositório de Pedido com relacionamentos
   - Escrever testes de integração para o repositório de Pedido
   - _Requisitos: 4.1, 4.2, 4.3_
 
-- [ ] 3.6 Implementar repositório de Comissão
+- [x] 3.6 Implementar repositório de Comissão
   - Codificar repositório de Comissão com regras de efetividade
   - Escrever testes de integração para o repositório de Comissão
   - _Requisitos: 3.1, 3.2, 3.3_

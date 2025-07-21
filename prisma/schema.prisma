@@ -13,3 +13,67 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String   @id @default(uuid())
+  nome      String
+  email     String   @unique
+  senha     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  nome        String
+  descricao   String
+  precoBase   Float
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  variantes   ProductVariant[]
+}
+
+model ProductVariant {
+  id        String   @id @default(uuid())
+  sku       String   @unique
+  preco     Float
+  estoque   Int
+  atributos Json
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id         String     @id @default(uuid())
+  clienteId  String
+  dataPedido DateTime   @default(now())
+  status     String
+  valorTotal Float
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  itens      OrderItem[]
+}
+
+model OrderItem {
+  id            String  @id @default(uuid())
+  produtoId     String
+  quantidade    Int
+  precoUnitario Float
+  orderId       String
+  order         Order   @relation(fields: [orderId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Commission {
+  id              String   @id @default(uuid())
+  representanteId String
+  pedidoId        String
+  percentual      Float
+  valorCalculado  Float
+  dataEfetivacao  DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
