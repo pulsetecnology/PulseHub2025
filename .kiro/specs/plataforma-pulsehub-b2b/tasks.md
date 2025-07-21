@@ -46,7 +46,7 @@
   - Escrever testes unitários para cálculos de comissão
   - _Requisitos: 3.1, 3.2, 3.3_
 
-- [ ] 2.9 Implementar modelo de Notificação com validação
+- [x] 2.9 Implementar modelo de Notificação com validação
   - Escrever classe de Notificação com métodos de validação
   - Criar testes unitários para validação do modelo de Notificação
   - _Requisitos: 7.6_
