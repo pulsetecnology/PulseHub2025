@@ -15,9 +15,9 @@
     "baseUrl": ".",
     "paths": {
       "@src/*": ["./src/*"],
-      "@frontend/*": ["./src/frontend/*"]
+      "@frontend/*": ["src/front-end/*"]
     }
   },
-  "include": ["src/**/*.ts", "mcp-servers/**/*.ts", "jest.config.js", "src/frontend/**/*.ts", "src/frontend/**/*.tsx"],
+  "include": ["src/**/*.ts", "mcp-servers/**/*.ts", "jest.config.js", "src/front-end/**/*.ts", "src/front-end/**/*.tsx"],
   "exclude": ["node_modules", "dist"]
 }
