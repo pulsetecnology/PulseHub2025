@@ -45,22 +45,85 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Middleware de autenticação (exemplo básico)
+// Rota para solicitar recuperação de senha
+app.post('/recuperar-senha', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    // Verificar se o email existe
+    const usuario = await servicoAutenticacao.buscarUsuarioPorEmail(email);
+    
+    if (!usuario) {
+      // Por segurança, não informamos se o email existe ou não
+      res.status(200).json({ 
+        message: 'Se o e-mail estiver cadastrado, enviaremos instruções para recuperação de senha.' 
+      });
+      return;
+    }
+    
+    // Gerar token de recuperação de senha
+    const token = await servicoAutenticacao.gerarTokenRecuperacaoSenha(email);
+    
+    // Em um ambiente real, enviaríamos um e-mail com o link para redefinição de senha
+    // Por simplicidade, apenas retornamos o token
+    console.log(`Token de recuperação para ${email}: ${token}`);
+    
+    res.status(200).json({ 
+      message: 'Se o e-mail estiver cadastrado, enviaremos instruções para recuperação de senha.',
+      // Em ambiente de desenvolvimento, retornamos o token para facilitar os testes
+      token: process.env.NODE_ENV === 'development' ? token : undefined
+    });
+  } catch (error) {
+    console.error('Erro na recuperação de senha:', error);
+    res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+});
+
+// Rota para redefinir senha
+app.post('/redefinir-senha', async (req, res) => {
+  try {
+    const { senha, token } = req.body;
+    
+    if (!senha || !token) {
+      res.status(400).json({ message: 'Senha e token são obrigatórios.' });
+      return;
+    }
+    
+    const sucesso = await servicoAutenticacao.redefinirSenha(token, senha);
+    
+    if (sucesso) {
+      res.status(200).json({ message: 'Senha redefinida com sucesso!' });
+    } else {
+      res.status(400).json({ message: 'Token inválido ou expirado.' });
+    }
+  } catch (error) {
+    console.error('Erro na redefinição de senha:', error);
+    res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+});
+
+// Middleware de autenticação
 const autenticarToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
   if (token == null) return res.sendStatus(401); // Unauthorized
 
-  // Aqui você precisaria de uma chave secreta para verificar o token
-  // Por simplicidade, vamos apenas passar para o próximo middleware
-  // Em um ambiente real, você usaria jwt.verify(token, process.env.JWT_SECRET as string, (err, user) => { ... });
-  next();
+  try {
+    const usuario = servicoAutenticacao.verificarToken(token);
+    (req as any).usuario = usuario;
+    next();
+  } catch (error) {
+    return res.status(403).json({ message: 'Token inválido ou expirado.' });
+  }
 };
 
-// Exemplo de rota protegida
-app.get('/protegido', autenticarToken, (req, res) => {
-  res.json({ message: 'Você acessou uma rota protegida!' });
+// Rota protegida para verificar autenticação
+app.get('/verificar', autenticarToken, (req, res) => {
+  res.json({ 
+    message: 'Autenticação válida!',
+    usuario: (req as any).usuario
+  });
 });
 
 app.listen(PORT, () => {
