@@ -49,26 +49,26 @@ app.post('/login', async (req, res) => {
 app.post('/recuperar-senha', async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     // Verificar se o email existe
     const usuario = await servicoAutenticacao.buscarUsuarioPorEmail(email);
-    
+
     if (!usuario) {
       // Por segurança, não informamos se o email existe ou não
-      res.status(200).json({ 
-        message: 'Se o e-mail estiver cadastrado, enviaremos instruções para recuperação de senha.' 
+      res.status(200).json({
+        message: 'Se o e-mail estiver cadastrado, enviaremos instruções para recuperação de senha.'
       });
       return;
     }
-    
+
     // Gerar token de recuperação de senha
     const token = await servicoAutenticacao.gerarTokenRecuperacaoSenha(email);
-    
+
     // Em um ambiente real, enviaríamos um e-mail com o link para redefinição de senha
     // Por simplicidade, apenas retornamos o token
     console.log(`Token de recuperação para ${email}: ${token}`);
-    
-    res.status(200).json({ 
+
+    res.status(200).json({
       message: 'Se o e-mail estiver cadastrado, enviaremos instruções para recuperação de senha.',
       // Em ambiente de desenvolvimento, retornamos o token para facilitar os testes
       token: process.env.NODE_ENV === 'development' ? token : undefined
@@ -83,14 +83,14 @@ app.post('/recuperar-senha', async (req, res) => {
 app.post('/redefinir-senha', async (req, res) => {
   try {
     const { senha, token } = req.body;
-    
+
     if (!senha || !token) {
       res.status(400).json({ message: 'Senha e token são obrigatórios.' });
       return;
     }
-    
+
     const sucesso = await servicoAutenticacao.redefinirSenha(token, senha);
-    
+
     if (sucesso) {
       res.status(200).json({ message: 'Senha redefinida com sucesso!' });
     } else {
@@ -120,7 +120,7 @@ const autenticarToken = (req: express.Request, res: express.Response, next: expr
 
 // Rota protegida para verificar autenticação
 app.get('/verificar', autenticarToken, (req, res) => {
-  res.json({ 
+  res.json({
     message: 'Autenticação válida!',
     usuario: (req as any).usuario
   });
