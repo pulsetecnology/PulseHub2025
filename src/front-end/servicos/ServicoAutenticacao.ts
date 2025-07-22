@@ -11,8 +11,8 @@ export class ServicoAutenticacao {
     // URL base do MCP de autenticação
     this.baseUrl = process.env.NEXT_PUBLIC_AUTH_API_URL || 'http://localhost:3001';
     
-    // Verificar se devemos usar o modo de simulação (quando o servidor não está disponível)
-    this.modoSimulacao = process.env.NEXT_PUBLIC_MODO_SIMULACAO === 'true' || true;
+    // Por padrão, não usar o modo de simulação, apenas se explicitamente configurado ou se o servidor não estiver disponível
+    this.modoSimulacao = process.env.NEXT_PUBLIC_MODO_SIMULACAO === 'true' || false;
     
     // Usuários simulados para testes
     this.usuariosSimulados = {
@@ -20,6 +20,47 @@ export class ServicoAutenticacao {
       'fornecedor@exemplo.com': { nome: 'Fornecedor Teste', email: 'fornecedor@exemplo.com', senha: 'senha123' },
       'representante@exemplo.com': { nome: 'Representante Teste', email: 'representante@exemplo.com', senha: 'senha123' }
     };
+    
+    // Verificar se o MCP está disponível ao inicializar
+    this.verificarDisponibilidadeMCP();
+  }
+  
+  /**
+   * Verifica se o MCP de autenticação está disponível
+   * @returns Promise<boolean> true se o MCP estiver disponível, false caso contrário
+   */
+  public async verificarDisponibilidadeMCP(): Promise<boolean> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000); // Timeout de 2 segundos
+      
+      const resposta = await fetch(`${this.baseUrl}/verificar`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      // Se conseguir conectar, desativar o modo de simulação
+      if (resposta.ok) {
+        console.log('MCP de Autenticação disponível. Usando modo normal.');
+        this.modoSimulacao = false;
+        return true;
+      }
+      
+      // Se não conseguir conectar, ativar o modo de simulação
+      console.log('MCP de Autenticação indisponível. Usando modo de simulação.');
+      this.modoSimulacao = true;
+      return false;
+    } catch (erro) {
+      console.log('Erro ao verificar disponibilidade do MCP:', erro);
+      console.log('Usando modo de simulação como fallback.');
+      this.modoSimulacao = true;
+      return false;
+    }
   }
 
   /**
@@ -80,6 +121,17 @@ export class ServicoAutenticacao {
       // Armazenar o token no localStorage
       localStorage.setItem('token', dados.token);
       
+      // Buscar informações do usuário usando o token
+      try {
+        const usuarioInfo = await this.obterInformacoesUsuario(dados.token);
+        if (usuarioInfo) {
+          localStorage.setItem('usuario', JSON.stringify(usuarioInfo));
+        }
+      } catch (erroUsuario) {
+        console.error('Erro ao obter informações do usuário:', erroUsuario);
+        // Continuar mesmo se não conseguir obter informações do usuário
+      }
+      
       return dados.token;
     } catch (erro) {
       console.error('Erro no login:', erro);
@@ -92,6 +144,34 @@ export class ServicoAutenticacao {
       }
       
       throw erro;
+    }
+  }
+  
+  /**
+   * Obtém informações do usuário autenticado usando o token JWT
+   * @param token Token JWT
+   * @returns Informações do usuário ou null em caso de falha
+   */
+  private async obterInformacoesUsuario(token: string): Promise<any> {
+    try {
+      const resposta = await fetch(`${this.baseUrl}/verificar`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(dados.message || 'Erro ao obter informações do usuário');
+      }
+
+      return dados.usuario;
+    } catch (erro) {
+      console.error('Erro ao obter informações do usuário:', erro);
+      return null;
     }
   }
 

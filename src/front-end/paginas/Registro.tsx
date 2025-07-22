@@ -42,14 +42,10 @@ export default function Registro() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center mb-8">
         <Logotipo tamanho="lg" />
-        <h1 className="mt-4 text-3xl font-extrabold text-gray-900 dark:text-white">
-          PulseHub B2B
-        </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
           Crie sua conta para acessar a plataforma
         </p>
       </div>
-      
       <FormularioRegistro 
         aoSubmeter={handleRegistro} 
         erro={erro} 
