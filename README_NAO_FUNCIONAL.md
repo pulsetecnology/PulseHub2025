@@ -43,6 +43,12 @@ As seguintes áreas representam requisitos não funcionais que ainda precisam se
 - **Documentação da API**: Documentação OpenAPI/Swagger e exemplos de uso.
 - **Monitoramento e Métricas**: Coleta de métricas de desempenho, dashboards de monitoramento e configuração de alertas.
 
+### Front-end e Interface de Usuário
+- **Estrutura Organizada**: Implementação de uma estrutura de pastas clara e organizada para o front-end (`componentes`, `paginas`, `estilos`, `hooks`, `utils`, `configuracao`).
+- **Configuração de Estilo**: Utilização do Tailwind CSS para estilização consistente e responsiva.
+- **Padrões de Código**: Implementação de padrões de código consistentes com ESLint e TypeScript.
+- **Componentes Reutilizáveis**: Desenvolvimento de componentes React reutilizáveis e tipados.
+
 ### Otimizações para Dispositivos Móveis (Tarefa 7.x - Pendente)
 - **Design Responsivo**: Adaptação de layouts para diferentes tamanhos de tela e otimização para interações touch.
 - **Otimização de Imagens para Mobile**: Carregamento adaptativo de imagens e lazy loading.
@@ -51,9 +57,39 @@ As seguintes áreas representam requisitos não funcionais que ainda precisam se
 ## Tecnologias e Padrões (Revisão)
 
 - **Backend**: TypeScript com Node.js.
+- **Frontend**: TypeScript com React e Tailwind CSS.
 - **Banco de Dados**: PostgreSQL para dados relacionais, Redis para cache (a ser implementado).
 - **ORM**: Prisma.
 - **Testes**: Jest.
 - **Padrões de Implementação**: Tratamento de erros, validação de dados, autenticação e autorização (em progresso).
 - **Padrões de Banco de Dados**: Modelagem, performance (em progresso).
 - **Monitoramento e Observabilidade**: Logs, métricas, tracing (a ser implementado).
+
+## Padrões de Desenvolvimento Frontend
+
+### Estrutura de Pastas Frontend
+```
+src/front-end/
+├── componentes/       # Componentes React reutilizáveis
+├── paginas/           # Páginas/telas da aplicação
+├── estilos/           # Arquivos CSS e configurações de estilo
+├── configuracao/      # Arquivos de configuração do frontend
+├── utils/             # Utilitários e funções auxiliares
+└── hooks/             # Custom hooks React
+```
+
+### Nomenclatura Frontend
+- Todo o código deve ser escrito em português (pt-BR)
+- Componentes: PascalCase (ex: `Botao.tsx`, `CartaoProduto.tsx`)
+- Páginas: PascalCase (ex: `PaginaInicial.tsx`, `DetalhesProduto.tsx`)
+- Hooks: camelCase com prefixo "usar" (ex: `usarAutenticacao.ts`, `usarCarrinho.ts`)
+
+### Boas Práticas Frontend
+- Componentes devem ser pequenos e focados em uma única responsabilidade
+- Utilizar React Hooks para gerenciamento de estado
+- Evitar props drilling, preferindo Context API ou bibliotecas de gerenciamento de estado
+- Implementar lazy loading para componentes pesados
+- Garantir acessibilidade (WCAG) em todos os componentes
+- Utilizar Tailwind CSS para estilização
+- Classes personalizadas devem ser definidas em `estilos/globais.css`
+- Evitar CSS inline, exceto para valores dinâmicos

@@ -13,6 +13,7 @@
     "sourceMap": true,
     "declaration": true,
     "baseUrl": ".",
+    "jsx": "react-jsx",
     "paths": {
       "@src/*": ["./src/*"],
       "@frontend/*": ["src/front-end/*"]

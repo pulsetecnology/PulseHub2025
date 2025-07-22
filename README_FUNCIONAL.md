@@ -43,10 +43,52 @@ Até o momento, as seguintes funcionalidades foram implementadas, incluindo suas
 - **`tsconfig.json`**: Configuração do compilador TypeScript para garantir a correta transpilação e verificação de tipos.
 - **`package.json` e `package-lock.json`**: Gerenciamento de dependências e scripts de projeto, incluindo scripts para build (`npm run build`) e testes (`npm test`).
 
+## Frontend (Em Desenvolvimento)
+
+O desenvolvimento do frontend está em andamento, com os seguintes componentes já iniciados:
+
+### Componentes e Estrutura
+- **Componentes Base**: Componentes reutilizáveis como Logotipo e outros elementos de UI.
+- **Páginas**: Estrutura inicial de páginas como Painel.
+- **Hooks**: Hooks personalizados como `usarAutenticacao` para gerenciamento de estado de autenticação.
+- **Utilitários**: Funções auxiliares como validadores e formatadores.
+
+### Configuração Frontend
+- **Tailwind CSS**: Configuração personalizada para estilização consistente.
+- **Estrutura de Pastas**: Organização em componentes, páginas, estilos, configuração, utils e hooks.
+
 ## Funcionalidades Planejadas (Próximos Passos)
 
 As seguintes funcionalidades estão planejadas para futuras etapas de desenvolvimento:
 
-- **Desenvolvimento da Interface de Usuário Frontend (Tarefa 6.x)**: Criação de componentes de autenticação, painéis para fornecedores, representantes e administradores, visualização de catálogo, interface de criação de pedidos e dashboards de relatórios.
-- **Otimizações para Dispositivos Móveis (Tarefa 7.x)**: Implementação de design responsivo, otimização de imagens e funcionalidade offline.
-- **Implementação de Pontos de Integração (Tarefa 9.x)**: Desenvolvimento de API Gateway, formatos padronizados para integração e webhooks para notificações.
+### Desenvolvimento da Interface de Usuário Frontend (Tarefa 6.x)
+- **Componentes de Autenticação**: Telas de login, registro e redefinição de senha.
+- **Painéis de Usuário**: Interfaces específicas para fornecedores, representantes e administradores.
+- **Visualização de Catálogo**: Interface para navegação e visualização de produtos.
+- **Interface de Criação de Pedidos**: Fluxo completo para criação e gerenciamento de pedidos.
+- **Dashboards de Relatórios**: Visualizações de dados e gráficos para análise de negócios.
+
+#### Estrutura do Front-end
+A estrutura do front-end está organizada da seguinte forma:
+- **Componentes**: Componentes React reutilizáveis (ex: `Botao.tsx`, `CartaoProduto.tsx`).
+- **Páginas**: Páginas/telas da aplicação (ex: `PaginaInicial.tsx`, `DetalhesProduto.tsx`).
+- **Estilos**: Arquivos CSS e configurações de estilo, incluindo estilos globais.
+- **Hooks**: Hooks personalizados com prefixo "usar" (ex: `usarAutenticacao.ts`, `usarCarrinho.ts`).
+- **Utils**: Utilitários para formatação, validação e outras funções auxiliares.
+- **Configuração**: Arquivos de configuração do front-end (Tailwind, ESLint, TypeScript).
+
+#### Padrões de Desenvolvimento do Front-end
+- **Nomenclatura**: Todo o código em português (pt-BR), seguindo convenções específicas.
+- **Componentes**: Cada componente em seu próprio arquivo, tipado com TypeScript.
+- **Estilos**: Utilização de Tailwind CSS para estilização.
+- **Boas Práticas**: Componentes pequenos e focados, uso de React Hooks, lazy loading e acessibilidade.
+
+### Otimizações para Dispositivos Móveis (Tarefa 7.x)
+- **Design Responsivo**: Adaptação de layouts para diferentes tamanhos de tela.
+- **Otimização de Imagens**: Carregamento adaptativo e lazy loading.
+- **Funcionalidade Offline**: Armazenamento local de dados e sincronização.
+
+### Implementação de Pontos de Integração (Tarefa 9.x)
+- **API Gateway**: Desenvolvimento de roteamento, autenticação e limitação de taxa.
+- **Formatos Padronizados**: Criação de formatos para integração com sistemas externos.
+- **Webhooks**: Sistema de notificações via webhooks para eventos importantes.

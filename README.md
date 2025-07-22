@@ -25,6 +25,13 @@ A estrutura do repositório está organizada da seguinte forma:
   - `src/infraestrutura/`: Implementações de infraestrutura, como acesso a banco de dados (com repositórios Prisma) e integrações com APIs externas.
   - `src/api/`: Contém as implementações das APIs RESTful para os diferentes módulos de negócio (e.g., `usuarios`, `produtos`, `pedidos`, `clientes`, `comissoes`, `relatorios`, `notificacoes`).
   - `src/gerado/prisma/`: Cliente Prisma gerado automaticamente para interação com o banco de dados.
+  - `src/front-end/`: Contém o código-fonte do front-end da aplicação, organizado em:
+    - `componentes/`: Componentes React reutilizáveis.
+    - `paginas/`: Páginas/telas da aplicação.
+    - `estilos/`: Arquivos CSS e configurações de estilo.
+    - `hooks/`: Hooks personalizados do React.
+    - `utils/`: Utilitários para o front-end.
+    - `configuracao/`: Arquivos de configuração do front-end (Tailwind, ESLint, TypeScript).
 
 ## Como Começar
 
