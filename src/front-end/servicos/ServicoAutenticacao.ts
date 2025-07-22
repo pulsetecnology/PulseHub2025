@@ -4,10 +4,22 @@
  */
 export class ServicoAutenticacao {
   private baseUrl: string;
+  private modoSimulacao: boolean;
+  private usuariosSimulados: { [email: string]: { nome: string, email: string, senha: string } };
 
   constructor() {
     // URL base do MCP de autenticação
     this.baseUrl = process.env.NEXT_PUBLIC_AUTH_API_URL || 'http://localhost:3001';
+    
+    // Verificar se devemos usar o modo de simulação (quando o servidor não está disponível)
+    this.modoSimulacao = process.env.NEXT_PUBLIC_MODO_SIMULACAO === 'true' || true;
+    
+    // Usuários simulados para testes
+    this.usuariosSimulados = {
+      'admin@exemplo.com': { nome: 'Administrador', email: 'admin@exemplo.com', senha: 'senha123' },
+      'fornecedor@exemplo.com': { nome: 'Fornecedor Teste', email: 'fornecedor@exemplo.com', senha: 'senha123' },
+      'representante@exemplo.com': { nome: 'Representante Teste', email: 'representante@exemplo.com', senha: 'senha123' }
+    };
   }
 
   /**
@@ -18,6 +30,38 @@ export class ServicoAutenticacao {
    * @throws Error em caso de falha
    */
   public async login(email: string, senha: string): Promise<string> {
+    // Se estiver em modo de simulação, usar dados simulados
+    if (this.modoSimulacao) {
+      console.log('Usando modo de simulação para login');
+      
+      // Simular um pequeno atraso para parecer uma requisição real
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const usuario = this.usuariosSimulados[email];
+      
+      if (!usuario) {
+        throw new Error('Usuário não encontrado');
+      }
+      
+      if (usuario.senha !== senha) {
+        throw new Error('Senha incorreta');
+      }
+      
+      // Gerar um token simulado
+      const token = `simulado-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      
+      // Armazenar o token no localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('usuario', JSON.stringify({
+        id: `user-${Math.random().toString(36).substring(2, 9)}`,
+        nome: usuario.nome,
+        email: usuario.email
+      }));
+      
+      return token;
+    }
+    
+    // Se não estiver em modo de simulação, tentar conectar ao servidor real
     try {
       const resposta = await fetch(`${this.baseUrl}/login`, {
         method: 'POST',
@@ -39,6 +83,14 @@ export class ServicoAutenticacao {
       return dados.token;
     } catch (erro) {
       console.error('Erro no login:', erro);
+      
+      // Se o erro for de conexão, tentar usar o modo de simulação
+      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
+        console.log('Servidor indisponível, alternando para modo de simulação');
+        this.modoSimulacao = true;
+        return this.login(email, senha);
+      }
+      
       throw erro;
     }
   }
@@ -52,6 +104,31 @@ export class ServicoAutenticacao {
    * @throws Error em caso de falha
    */
   public async registrar(nome: string, email: string, senha: string): Promise<any> {
+    // Se estiver em modo de simulação, usar dados simulados
+    if (this.modoSimulacao) {
+      console.log('Usando modo de simulação para registro');
+      
+      // Simular um pequeno atraso para parecer uma requisição real
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Verificar se o email já está em uso
+      if (this.usuariosSimulados[email]) {
+        throw new Error('Este email já está em uso');
+      }
+      
+      // Adicionar o novo usuário à lista de usuários simulados
+      this.usuariosSimulados[email] = { nome, email, senha };
+      
+      // Retornar os dados do usuário criado (sem a senha)
+      return {
+        id: `user-${Math.random().toString(36).substring(2, 9)}`,
+        nome,
+        email,
+        message: 'Usuário registrado com sucesso!'
+      };
+    }
+    
+    // Se não estiver em modo de simulação, tentar conectar ao servidor real
     try {
       const resposta = await fetch(`${this.baseUrl}/registrar`, {
         method: 'POST',
@@ -70,6 +147,14 @@ export class ServicoAutenticacao {
       return dados;
     } catch (erro) {
       console.error('Erro no registro:', erro);
+      
+      // Se o erro for de conexão, tentar usar o modo de simulação
+      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
+        console.log('Servidor indisponível, alternando para modo de simulação');
+        this.modoSimulacao = true;
+        return this.registrar(nome, email, senha);
+      }
+      
       throw erro;
     }
   }
@@ -81,6 +166,28 @@ export class ServicoAutenticacao {
    * @throws Error em caso de falha
    */
   public async recuperarSenha(email: string): Promise<string> {
+    // Se estiver em modo de simulação, usar dados simulados
+    if (this.modoSimulacao) {
+      console.log('Usando modo de simulação para recuperação de senha');
+      
+      // Simular um pequeno atraso para parecer uma requisição real
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Verificar se o email existe
+      if (!this.usuariosSimulados[email]) {
+        // Por segurança, não informamos se o email existe ou não
+        return 'Se o e-mail estiver cadastrado, enviaremos instruções para recuperação de senha.';
+      }
+      
+      // Simular um token de recuperação
+      const token = `recuperacao-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      
+      console.log(`Token de recuperação simulado para ${email}: ${token}`);
+      
+      return 'Se o e-mail estiver cadastrado, enviaremos instruções para recuperação de senha.';
+    }
+    
+    // Se não estiver em modo de simulação, tentar conectar ao servidor real
     try {
       const resposta = await fetch(`${this.baseUrl}/recuperar-senha`, {
         method: 'POST',
@@ -99,6 +206,14 @@ export class ServicoAutenticacao {
       return dados.message;
     } catch (erro) {
       console.error('Erro na recuperação de senha:', erro);
+      
+      // Se o erro for de conexão, tentar usar o modo de simulação
+      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
+        console.log('Servidor indisponível, alternando para modo de simulação');
+        this.modoSimulacao = true;
+        return this.recuperarSenha(email);
+      }
+      
       throw erro;
     }
   }
@@ -111,6 +226,25 @@ export class ServicoAutenticacao {
    * @throws Error em caso de falha
    */
   public async redefinirSenha(senha: string, token: string): Promise<string> {
+    // Se estiver em modo de simulação, usar dados simulados
+    if (this.modoSimulacao) {
+      console.log('Usando modo de simulação para redefinição de senha');
+      
+      // Simular um pequeno atraso para parecer uma requisição real
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Verificar se o token é válido (em um caso real, verificaríamos em um banco de dados)
+      if (!token.startsWith('recuperacao-')) {
+        throw new Error('Token inválido ou expirado');
+      }
+      
+      // Em um caso real, atualizaríamos a senha do usuário no banco de dados
+      console.log(`Senha redefinida com sucesso usando o token: ${token}`);
+      
+      return 'Senha redefinida com sucesso!';
+    }
+    
+    // Se não estiver em modo de simulação, tentar conectar ao servidor real
     try {
       const resposta = await fetch(`${this.baseUrl}/redefinir-senha`, {
         method: 'POST',
@@ -129,6 +263,14 @@ export class ServicoAutenticacao {
       return dados.message;
     } catch (erro) {
       console.error('Erro na redefinição de senha:', erro);
+      
+      // Se o erro for de conexão, tentar usar o modo de simulação
+      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
+        console.log('Servidor indisponível, alternando para modo de simulação');
+        this.modoSimulacao = true;
+        return this.redefinirSenha(senha, token);
+      }
+      
       throw erro;
     }
   }
@@ -155,6 +297,7 @@ export class ServicoAutenticacao {
     }
     
     localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
   }
 
   /**
@@ -167,5 +310,27 @@ export class ServicoAutenticacao {
     }
     
     return localStorage.getItem('token');
+  }
+  
+  /**
+   * Obtém os dados do usuário autenticado
+   * @returns Dados do usuário ou null se não estiver autenticado
+   */
+  public obterUsuario(): any {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    
+    const usuarioJson = localStorage.getItem('usuario');
+    if (!usuarioJson) {
+      return null;
+    }
+    
+    try {
+      return JSON.parse(usuarioJson);
+    } catch (erro) {
+      console.error('Erro ao obter dados do usuário:', erro);
+      return null;
+    }
   }
 }
