@@ -291,6 +291,42 @@ const autenticarToken = (req: express.Request, res: express.Response, next: expr
   }
 };
 
+// Rota para login com Google
+app.post('/login-google', (req, res) => {
+  try {
+    // Em um cenário real, aqui seria implementada a validação do token do Google
+    // Por enquanto, vamos simular uma resposta bem-sucedida
+    
+    // Gerar um token JWT
+    const token = jwt.sign(
+      { 
+        id: `google-user-${Math.random().toString(36).substring(2, 9)}`,
+        nome: 'Usuário Google',
+        email: 'usuario@gmail.com',
+        papel: 'REPRESENTANTE',
+        provider: 'google'
+      }, 
+      JWT_SECRET, 
+      { expiresIn: '24h' }
+    );
+    
+    res.status(200).json({
+      message: 'Autenticação com Google bem-sucedida!',
+      token,
+      usuario: {
+        id: `google-user-${Math.random().toString(36).substring(2, 9)}`,
+        nome: 'Usuário Google',
+        email: 'usuario@gmail.com',
+        papel: 'REPRESENTANTE',
+        fotoUrl: 'https://lh3.googleusercontent.com/a/default-user'
+      }
+    });
+  } catch (error) {
+    console.error('Erro no login com Google:', error);
+    res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+});
+
 // Rota pública para verificar se o servidor está online
 app.get('/verificar', (req, res) => {
   res.json({

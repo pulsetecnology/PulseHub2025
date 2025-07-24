@@ -5,7 +5,7 @@
 export class ServicoAutenticacao {
   private baseUrl: string;
   private modoSimulacao: boolean;
-  private usuariosSimulados: { [email: string]: { nome: string, email: string, senha: string } };
+  private usuariosSimulados: { [email: string]: { nome: string, email: string, senha: string, papel?: string } };
 
   constructor() {
     // URL base do MCP de autenticação
@@ -16,9 +16,10 @@ export class ServicoAutenticacao {
     
     // Usuários simulados para testes
     this.usuariosSimulados = {
-      'admin@exemplo.com': { nome: 'Administrador', email: 'admin@exemplo.com', senha: 'senha123' },
-      'fornecedor@exemplo.com': { nome: 'Fornecedor Teste', email: 'fornecedor@exemplo.com', senha: 'senha123' },
-      'representante@exemplo.com': { nome: 'Representante Teste', email: 'representante@exemplo.com', senha: 'senha123' }
+      'admin@exemplo.com': { nome: 'Administrador', email: 'admin@exemplo.com', senha: 'senha123', papel: 'ADMINISTRADOR' },
+      'fornecedor@exemplo.com': { nome: 'Fornecedor Teste', email: 'fornecedor@exemplo.com', senha: 'senha123', papel: 'FORNECEDOR' },
+      'representante@exemplo.com': { nome: 'Representante Teste', email: 'representante@exemplo.com', senha: 'senha123', papel: 'REPRESENTANTE' },
+      'usuario@gmail.com': { nome: 'Usuário Google', email: 'usuario@gmail.com', senha: 'google-auth', papel: 'REPRESENTANTE' }
     };
     
     // Verificar se o MCP está disponível ao inicializar
@@ -411,6 +412,75 @@ export class ServicoAutenticacao {
     } catch (erro) {
       console.error('Erro ao obter dados do usuário:', erro);
       return null;
+    }
+  }
+  
+  /**
+   * Realiza o login do usuário com o Google
+   * @returns Token JWT em caso de sucesso
+   * @throws Error em caso de falha
+   */
+  public async loginComGoogle(): Promise<string> {
+    // Se estiver em modo de simulação, usar dados simulados
+    if (this.modoSimulacao) {
+      console.log('Usando modo de simulação para login com Google');
+      
+      // Simular um pequeno atraso para parecer uma requisição real
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const usuario = this.usuariosSimulados['usuario@gmail.com'];
+      
+      // Gerar um token simulado
+      const token = `google-simulado-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      
+      // Armazenar o token no localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('usuario', JSON.stringify({
+        id: `google-user-${Math.random().toString(36).substring(2, 9)}`,
+        nome: usuario.nome,
+        email: usuario.email,
+        papel: usuario.papel,
+        fotoUrl: 'https://lh3.googleusercontent.com/a/default-user'
+      }));
+      
+      return token;
+    }
+    
+    // Se não estiver em modo de simulação, tentar conectar ao servidor real
+    try {
+      // Em um cenário real, aqui seria implementada a integração com a API do Google
+      // Por enquanto, vamos simular uma resposta bem-sucedida
+      
+      const resposta = await fetch(`${this.baseUrl}/login-google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ provider: 'google' }),
+      });
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(dados.message || 'Erro ao realizar login com Google');
+      }
+
+      // Armazenar o token no localStorage
+      localStorage.setItem('token', dados.token);
+      localStorage.setItem('usuario', JSON.stringify(dados.usuario));
+      
+      return dados.token;
+    } catch (erro) {
+      console.error('Erro no login com Google:', erro);
+      
+      // Se o erro for de conexão, tentar usar o modo de simulação
+      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
+        console.log('Servidor indisponível, alternando para modo de simulação');
+        this.modoSimulacao = true;
+        return this.loginComGoogle();
+      }
+      
+      throw erro;
     }
   }
 }
