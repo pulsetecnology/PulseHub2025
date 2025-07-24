@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ServicoAutenticacao } from '../servicos/ServicoAutenticacao';
+import Logotipo from '../componentes/Logotipo';
 
 export default function LoginTailwind() {
   const [email, setEmail] = useState('');
@@ -52,19 +53,17 @@ export default function LoginTailwind() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-800 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md relative overflow-hidden">
         {/* Barra colorida no topo */}
-        <div className="h-2 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+        <div className="h-2 bg-gradient-to-r from-purple-600 to-indigo-600"></div>
         
         <div className="p-8">
           {/* Seção do logo */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mx-auto mb-4 flex items-center justify-center relative">
-              <div className="w-8 h-8 bg-white rounded-full absolute"></div>
-              <div className="absolute inset-0 rounded-full bg-blue-600 opacity-30 animate-ping-slow"></div>
+            <div className="flex justify-center mb-4">
+              <Logotipo tamanho="lg" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">PulseHub</h1>
             <p className="text-sm text-gray-500 mt-1">Plataforma B2B para fornecedores e representantes</p>
           </div>
           
@@ -139,7 +138,7 @@ export default function LoginTailwind() {
               <input
                 id="email"
                 type="email"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
                 placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -152,14 +151,14 @@ export default function LoginTailwind() {
                 <label className="block text-sm font-medium text-gray-700" htmlFor="senha">
                   Senha
                 </label>
-                <a href="/recuperar-senha" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                <a href="/recuperar-senha" className="text-sm text-purple-600 hover:text-purple-800 transition-colors">
                   Esqueceu?
                 </a>
               </div>
               <input
                 id="senha"
                 type="password"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
                 placeholder="Digite sua senha"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
@@ -169,7 +168,7 @@ export default function LoginTailwind() {
             
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg hover:shadow-lg transition duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg hover:shadow-lg transition duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
               disabled={carregando}
             >
               {carregando ? (
@@ -186,7 +185,7 @@ export default function LoginTailwind() {
           <div className="text-center mt-8">
             <p className="text-sm text-gray-600">
               Não tem uma conta?{' '}
-              <a href="/registrar" className="text-blue-600 font-semibold hover:text-blue-800 transition-colors">
+              <a href="/registrar" className="text-purple-600 font-semibold hover:text-purple-800 transition-colors">
                 Criar conta gratuita
               </a>
             </p>

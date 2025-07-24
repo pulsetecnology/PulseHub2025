@@ -2,10 +2,17 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Logotipo from '../Logotipo';
+import { ServicoAutenticacao } from '../../servicos/ServicoAutenticacao';
 
 export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuario = 'Fornecedor' }) {
   const router = useRouter();
+  const servicoAutenticacao = new ServicoAutenticacao();
   const isActive = (path) => router.pathname === path;
+  
+  const handleLogout = () => {
+    servicoAutenticacao.logout();
+    window.location.href = '/login';
+  };
 
   return (
     <div className={`w-64 min-h-screen flex flex-col fixed left-0 top-0 ${temaSidebar === 'escuro' ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'} shadow-lg`}>
@@ -110,6 +117,7 @@ export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuar
             )}
           </button>
           <button 
+            onClick={handleLogout}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             aria-label="Sair"
           >

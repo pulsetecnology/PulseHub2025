@@ -23,9 +23,6 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
     const dadosUsuario = servicoAutenticacao.obterUsuario();
     if (dadosUsuario) {
       setUsuario(dadosUsuario);
-    } else {
-      // Redirecionar para login se não estiver autenticado
-      window.location.href = '/login';
     }
   }, []);
 

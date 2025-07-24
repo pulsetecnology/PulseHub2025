@@ -92,12 +92,14 @@ export class ServicoAutenticacao {
       // Gerar um token simulado
       const token = `simulado-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
       
-      // Armazenar o token no localStorage
+      // Armazenar o token no localStorage e em cookies
       localStorage.setItem('token', token);
+      document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 dias
       localStorage.setItem('usuario', JSON.stringify({
         id: `user-${Math.random().toString(36).substring(2, 9)}`,
         nome: usuario.nome,
-        email: usuario.email
+        email: usuario.email,
+        papel: usuario.papel || 'FORNECEDOR'
       }));
       
       return token;
@@ -119,8 +121,9 @@ export class ServicoAutenticacao {
         throw new Error(dados.message || 'Erro ao realizar login');
       }
 
-      // Armazenar o token no localStorage
+      // Armazenar o token no localStorage e em cookies
       localStorage.setItem('token', dados.token);
+      document.cookie = `token=${dados.token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 dias
       
       // Buscar informações do usuário usando o token
       try {
@@ -377,8 +380,12 @@ export class ServicoAutenticacao {
       return;
     }
     
+    // Remover do localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
+    
+    // Remover dos cookies
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
   }
 
   /**
@@ -433,8 +440,9 @@ export class ServicoAutenticacao {
       // Gerar um token simulado
       const token = `google-simulado-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
       
-      // Armazenar o token no localStorage
+      // Armazenar o token no localStorage e em cookies
       localStorage.setItem('token', token);
+      document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 dias
       localStorage.setItem('usuario', JSON.stringify({
         id: `google-user-${Math.random().toString(36).substring(2, 9)}`,
         nome: usuario.nome,
@@ -465,8 +473,9 @@ export class ServicoAutenticacao {
         throw new Error(dados.message || 'Erro ao realizar login com Google');
       }
 
-      // Armazenar o token no localStorage
+      // Armazenar o token no localStorage e em cookies
       localStorage.setItem('token', dados.token);
+      document.cookie = `token=${dados.token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 dias
       localStorage.setItem('usuario', JSON.stringify(dados.usuario));
       
       return dados.token;
