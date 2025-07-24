@@ -3,9 +3,10 @@ import React from 'react';
 interface LogotipoProps {
   tamanho?: 'sm' | 'md' | 'lg';
   className?: string;
+  mostrarTexto?: boolean;
 }
 
-export default function Logotipo({ tamanho = 'md', className = '' }: LogotipoProps) {
+export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto = true }: LogotipoProps) {
   // Definindo tamanhos com base no parâmetro tamanho
   const tamanhos = {
     sm: {
@@ -28,7 +29,7 @@ export default function Logotipo({ tamanho = 'md', className = '' }: LogotipoPro
   return (
     <div className={`flex items-center ${className}`}>
       {/* Círculo com efeito pulsante */}
-      <div className={`relative ${tamanhos[tamanho].container} aspect-square bg-blue-600 rounded-full flex items-center justify-center`}>
+      <div className={`relative ${tamanhos[tamanho].container} aspect-square bg-purple-600 rounded-full flex items-center justify-center`}>
         {/* Ondas de áudio/pulso */}
         <div className="flex items-center h-1/2 space-x-0.5">
           <div className="w-1 h-1/3 bg-white rounded-full"></div>
@@ -39,15 +40,16 @@ export default function Logotipo({ tamanho = 'md', className = '' }: LogotipoPro
         </div>
 
         {/* Círculos pulsantes animados */}
-        <div className="absolute inset-0 rounded-full bg-blue-600 opacity-30 animate-ping-slow"></div>
-        <div className="absolute inset-0 rounded-full bg-blue-600 opacity-20 animate-ping"></div>
+        <div className="absolute inset-0 rounded-full bg-purple-600 opacity-30 animate-ping-slow"></div>
+        <div className="absolute inset-0 rounded-full bg-purple-600 opacity-20 animate-ping"></div>
       </div>
 
       {/* Texto do logo */}
-      <div className={`ml-2 font-bold ${tamanhos[tamanho].texto}`}>
-        <span className="text-blue-600">Pulse</span>
-        <span className="text-green-500">Hub</span>
-      </div>
+      {mostrarTexto && (
+        <div className={`ml-2 font-bold ${tamanhos[tamanho].texto}`}>
+          <span className="text-purple-600">PulseHub</span>
+        </div>
+      )}
     </div>
   );
 }
