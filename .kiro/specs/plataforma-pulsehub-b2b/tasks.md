@@ -194,7 +194,7 @@
   - Escrever testes para componentes do painel do representante
   - _Requisitos: 1.4, 4.1, 4.2, 4.3, 4.4, 5.1, 5.2, 5.3_
 
-- [ ] 6.4 Implementar painel administrativo
+- [x] 6.4 Implementar painel administrativo
   - Codificar interface de gerenciamento de usuários
   - Implementar configuração do sistema
   - Escrever testes para componentes do painel administrativo

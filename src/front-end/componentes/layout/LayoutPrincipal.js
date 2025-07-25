@@ -6,6 +6,7 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
   const [tema, setTema] = useState('claro');
   const [usuario, setUsuario] = useState(null);
   const [mostrarDropdownUsuario, setMostrarDropdownUsuario] = useState(false);
+  const [sidebarRecolhido, setSidebarRecolhido] = useState(false);
   const servicoAutenticacao = new ServicoAutenticacao();
 
   useEffect(() => {
@@ -56,12 +57,13 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
       <Sidebar 
         temaSidebar={tema} 
         alternarTema={alternarTema} 
-        tipoUsuario={usuario?.papel || 'Fornecedor'} 
+        tipoUsuario={usuario?.papel || 'Fornecedor'}
+        onToggleRecolhido={setSidebarRecolhido}
       />
       
-      <div className="flex-1 ml-56">
+      <div className={`flex-1 transition-all duration-300 ${sidebarRecolhido ? 'ml-16' : 'ml-56'}`}>
         {/* Header fixo no topo alinhado com a área do logo */}
-        <div className="fixed top-0 right-0 left-56 z-10 flex justify-between items-center bg-white dark:bg-gray-800 p-4 h-16" style={{boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'}}>
+        <div className={`fixed top-0 right-0 z-10 flex justify-between items-center bg-white dark:bg-gray-800 p-4 h-16 transition-all duration-300 ${sidebarRecolhido ? 'left-16' : 'left-56'}`} style={{boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'}}>
           <div>
             <h1 className="text-xl font-semibold text-gray-800 dark:text-white">{titulo}</h1>
             {subtitulo && <p className="text-sm text-gray-500 dark:text-gray-400">{subtitulo}</p>}

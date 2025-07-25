@@ -16,9 +16,13 @@ export class ServicoAutenticacao {
     
     // Usuários simulados para testes
     this.usuariosSimulados = {
+      // Usuários de demonstração principais
+      'admin@pulsehub.com': { nome: 'Carlos Oliveira', email: 'admin@pulsehub.com', senha: 'admin123', papel: 'ADMINISTRADOR' },
+      'fornecedor@exemplo.com': { nome: 'João Silva', email: 'fornecedor@exemplo.com', senha: 'fornecedor123', papel: 'FORNECEDOR' },
+      'representante@exemplo.com': { nome: 'Maria Santos', email: 'representante@exemplo.com', senha: 'representante123', papel: 'REPRESENTANTE' },
+      
+      // Usuários antigos para compatibilidade
       'admin@exemplo.com': { nome: 'Administrador', email: 'admin@exemplo.com', senha: 'senha123', papel: 'ADMINISTRADOR' },
-      'fornecedor@exemplo.com': { nome: 'Fornecedor Teste', email: 'fornecedor@exemplo.com', senha: 'senha123', papel: 'FORNECEDOR' },
-      'representante@exemplo.com': { nome: 'Representante Teste', email: 'representante@exemplo.com', senha: 'senha123', papel: 'REPRESENTANTE' },
       'usuario@gmail.com': { nome: 'Usuário Google', email: 'usuario@gmail.com', senha: 'google-auth', papel: 'REPRESENTANTE' }
     };
     
@@ -89,8 +93,17 @@ export class ServicoAutenticacao {
         throw new Error('Senha incorreta');
       }
       
-      // Gerar um token simulado
-      const token = `simulado-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      // Gerar um token simulado que inclui o papel do usuário e email
+      const papel = usuario.papel || 'FORNECEDOR';
+      const emailHash = btoa(email).substring(0, 8); // Base64 do email para identificação
+      const token = `simulado-${papel}-${emailHash}-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      
+      // Debug apenas em desenvolvimento
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Token gerado:', token);
+        console.log('Papel do usuário:', papel);
+        console.log('Email do usuário:', email);
+      }
       
       // Armazenar o token no localStorage e em cookies
       localStorage.setItem('token', token);
@@ -99,7 +112,7 @@ export class ServicoAutenticacao {
         id: `user-${Math.random().toString(36).substring(2, 9)}`,
         nome: usuario.nome,
         email: usuario.email,
-        papel: usuario.papel || 'FORNECEDOR'
+        papel: papel
       }));
       
       return token;

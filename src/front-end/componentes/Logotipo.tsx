@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface LogotipoProps {
-  tamanho?: 'sm' | 'md' | 'lg';
+  tamanho?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   mostrarTexto?: boolean;
 }
@@ -24,12 +24,20 @@ export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto 
       logo: 'h-12',
       texto: 'text-3xl',
     },
+    xl: {
+      container: 'h-16',
+      logo: 'h-16',
+      texto: 'text-4xl',
+    },
   };
+
+  // Garantir que o tamanho existe, senão usar 'md' como fallback
+  const tamanhoAtual = tamanhos[tamanho] ? tamanho : 'md';
 
   return (
     <div className={`flex items-center ${className}`}>
       {/* Círculo com efeito pulsante */}
-      <div className={`relative ${tamanhos[tamanho].container} aspect-square bg-purple-600 rounded-full flex items-center justify-center`}>
+      <div className={`relative ${tamanhos[tamanhoAtual].container} aspect-square bg-purple-600 rounded-full flex items-center justify-center`}>
         {/* Ondas de áudio/pulso */}
         <div className="flex items-center h-1/2 space-x-0.5">
           <div className="w-1 h-1/3 bg-white rounded-full"></div>
@@ -46,7 +54,7 @@ export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto 
 
       {/* Texto do logo */}
       {mostrarTexto && (
-        <div className={`ml-2 font-bold ${tamanhos[tamanho].texto}`}>
+        <div className={`ml-2 font-bold ${tamanhos[tamanhoAtual].texto}`}>
           <span className="text-purple-600">PulseHub</span>
         </div>
       )}
