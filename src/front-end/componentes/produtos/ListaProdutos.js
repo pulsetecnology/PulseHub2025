@@ -7,6 +7,11 @@ export default function ListaProdutos() {
   const [carregando, setCarregando] = useState(true);
   const [filtro, setFiltro] = useState('');
   const [categoriaFiltro, setCategoriaFiltro] = useState('');
+  // const [statusFiltro, setStatusFiltro] = useState('');
+  // const [ordenacao, setOrdenacao] = useState('nome');
+  // const [visualizacao, setVisualizacao] = useState('grid'); // 'grid' ou 'lista'
+  // const [paginaAtual, setPaginaAtual] = useState(1);
+  // const [itensPorPagina] = useState(12);
 
   // Dados simulados para demonstração - Segmento de Moda
   useEffect(() => {

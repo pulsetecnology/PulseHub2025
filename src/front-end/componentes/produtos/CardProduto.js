@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function CardProduto({ produto }) {
+export default function CardProduto({ produto, visualizacao = 'grid' }) {
   const formatarPreco = (preco) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',

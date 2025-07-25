@@ -200,7 +200,7 @@
   - Escrever testes para componentes do painel administrativo
   - _Requisitos: 1.5, 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 6.5 Implementar visualização de catálogo de produtos
+- [x] 6.5 Implementar visualização de catálogo de produtos
   - Codificar interface de navegação de produtos
   - Implementar visualização de detalhes do produto
   - Escrever testes para componentes de catálogo
@@ -218,7 +218,7 @@
   - Escrever testes para componentes de relatórios
   - _Requisitos: 6.1, 6.2, 6.3, 6.4, 6.5, 6.7_
 
-- [ ] 6.8 Implementar sistema de notificações no frontend
+- [x] 6.8 Implementar sistema de notificações no frontend
   - Codificar componente de notificações
   - Implementar preferências de notificação
   - Escrever testes para componentes de notificação
