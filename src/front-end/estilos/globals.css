@@ -58,3 +58,41 @@ html {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Ocultar completamente os overlays de desenvolvimento do Next.js/Turbopack */
+#__next-build-watcher,
+.__next-dev-overlay,
+.__next-dev-overlay-backdrop,
+[data-nextjs-toast],
+[data-nextjs-dialog-overlay],
+.__turbopack_dev_overlay,
+.__turbopack_build_indicator,
+[id*="turbopack"],
+[class*="turbopack"],
+[data-turbopack],
+div[style*="position: fixed"][style*="bottom"][style*="right"],
+div[style*="position:fixed"][style*="bottom"][style*="right"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+}
+
+/* Ocultar qualquer elemento flutuante no canto inferior direito */
+body > div:last-child[style*="position: fixed"][style*="bottom"][style*="right"],
+body > div:last-child[style*="position:fixed"][style*="bottom"][style*="right"],
+body > div[style*="position: fixed"][style*="bottom: 16px"][style*="right: 16px"],
+body > div[style*="position: fixed"][style*="bottom: 20px"][style*="right: 20px"],
+body > div[style*="position:fixed"][style*="bottom:16px"][style*="right:16px"],
+body > div[style*="position:fixed"][style*="bottom:20px"][style*="right:20px"] {
+  display: none !important;
+}
+
+/* Força ocultar elementos com texto específico do Turbopack */
+div:contains("Turbopack"),
+div:contains("turbopack"),
+div[title*="turbopack"],
+div[title*="Turbopack"] {
+  display: none !important;
+}

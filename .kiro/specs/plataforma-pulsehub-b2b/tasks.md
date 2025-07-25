@@ -182,13 +182,13 @@
   - Escrever testes para componentes de autenticação
   - _Requisitos: 1.1, 1.2, 1.7_
 
-- [ ] 6.2 Implementar painel do fornecedor
+- [x] 6.2 Implementar painel do fornecedor
   - Codificar interface de gerenciamento de produtos
   - Implementar monitoramento de pedidos
   - Escrever testes para componentes do painel do fornecedor
   - _Requisitos: 1.3, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
-- [ ] 6.3 Implementar painel do representante
+- [x] 6.3 Implementar painel do representante
   - Codificar interface de gerenciamento de clientes
   - Implementar criação e gerenciamento de pedidos
   - Escrever testes para componentes do painel do representante
