@@ -27,7 +27,7 @@ export default function LoginCSS() {
   return (
     <div className="container" style={{ maxWidth: '400px', marginTop: '50px' }}>
       <div className="text-center mb-4">
-        <h1 style={{ color: '#2563eb' }}>PulseHub B2B</h1>
+        <h1 style={{ color: '#2563eb' }}>PulseHub</h1>
         <p>Plataforma de integração para fornecedores e representantes</p>
       </div>
       

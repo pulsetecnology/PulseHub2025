@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CardProdutoCatalogo from './CardProdutoCatalogo';
+import ServicoProdutos from '../../servicos/ServicoProdutos';
+import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
 
 export default function CatalogoProdutos() {
   const [produtos, setProdutos] = useState([]);
@@ -12,111 +14,43 @@ export default function CatalogoProdutos() {
   });
   const [ordenacao, setOrdenacao] = useState('nome');
   const [visualizacao, setVisualizacao] = useState('grid'); // grid ou lista
+  const [papelUsuario, setPapelUsuario] = useState(PAPEIS.REPRESENTANTE);
 
-  // Simular carregamento de produtos
+  // Carregar produtos reais do ServicoProdutos
   useEffect(() => {
     const carregarProdutos = async () => {
       setCarregando(true);
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const produtosSimulados = [
-        {
-          id: 1,
-          nome: 'Vestido Floral Primavera',
-          categoria: 'Vestidos',
-          preco: 89.90,
-          precoOriginal: 120.00,
-          descricao: 'Vestido floral perfeito para a primavera, tecido leve e confortável.',
-          imagem: '/api/placeholder/300/400',
-          disponivel: true,
-          estoque: 15,
-          cores: ['Rosa', 'Azul', 'Verde'],
-          tamanhos: ['P', 'M', 'G', 'GG'],
-          fornecedor: 'Moda Feminina Ltda',
-          avaliacoes: 4.5,
-          totalAvaliacoes: 23
-        },
-        {
-          id: 2,
-          nome: 'Calça Jeans Skinny',
-          categoria: 'Calças',
-          preco: 129.90,
-          descricao: 'Calça jeans skinny de alta qualidade, modelagem perfeita.',
-          imagem: '/api/placeholder/300/400',
-          disponivel: true,
-          estoque: 8,
-          cores: ['Azul Escuro', 'Azul Claro', 'Preto'],
-          tamanhos: ['36', '38', '40', '42', '44'],
-          fornecedor: 'Jeans & Co',
-          avaliacoes: 4.2,
-          totalAvaliacoes: 18
-        },
-        {
-          id: 3,
-          nome: 'Blusa Social Branca',
-          categoria: 'Blusas',
-          preco: 69.90,
-          precoOriginal: 89.90,
-          descricao: 'Blusa social elegante, ideal para ambiente corporativo.',
-          imagem: '/api/placeholder/300/400',
-          disponivel: true,
-          estoque: 25,
-          cores: ['Branco', 'Azul Claro', 'Rosa Claro'],
-          tamanhos: ['P', 'M', 'G'],
-          fornecedor: 'Elegance Fashion',
-          avaliacoes: 4.7,
-          totalAvaliacoes: 31
-        },
-        {
-          id: 4,
-          nome: 'Saia Midi Plissada',
-          categoria: 'Saias',
-          preco: 79.90,
-          descricao: 'Saia midi plissada versátil, combina com diversas ocasiões.',
-          imagem: '/api/placeholder/300/400',
-          disponivel: false,
-          estoque: 0,
-          cores: ['Preto', 'Marinho', 'Vinho'],
-          tamanhos: ['P', 'M', 'G'],
-          fornecedor: 'Style Collection',
-          avaliacoes: 4.3,
-          totalAvaliacoes: 12
-        },
-        {
-          id: 5,
-          nome: 'Blazer Estruturado',
-          categoria: 'Blazers',
-          preco: 189.90,
-          descricao: 'Blazer estruturado premium, corte moderno e sofisticado.',
-          imagem: '/api/placeholder/300/400',
-          disponivel: true,
-          estoque: 5,
-          cores: ['Preto', 'Marinho', 'Cinza'],
-          tamanhos: ['P', 'M', 'G'],
-          fornecedor: 'Executive Wear',
-          avaliacoes: 4.8,
-          totalAvaliacoes: 27
-        },
-        {
-          id: 6,
-          nome: 'Tênis Casual Feminino',
-          categoria: 'Calçados',
-          preco: 159.90,
-          precoOriginal: 199.90,
-          descricao: 'Tênis casual confortável para o dia a dia, design moderno.',
-          imagem: '/api/placeholder/300/400',
-          disponivel: true,
-          estoque: 12,
-          cores: ['Branco', 'Rosa', 'Preto'],
-          tamanhos: ['35', '36', '37', '38', '39'],
-          fornecedor: 'Comfort Shoes',
-          avaliacoes: 4.4,
-          totalAvaliacoes: 19
-        }
-      ];
+      // Obter papel do usuário
+      const papel = obterPapelUsuario();
+      setPapelUsuario(papel);
       
-      setProdutos(produtosSimulados);
+      // Simular delay de carregamento
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Carregar produtos do serviço
+      let produtosCarregados = ServicoProdutos.filtrar({});
+      
+      // Filtrar produtos baseado no papel do usuário
+      if (papel === PAPEIS.FORNECEDOR) {
+        // Fornecedor vê apenas seus próprios produtos
+        const usuarioAtual = JSON.parse(localStorage.getItem('usuario') || '{}');
+        produtosCarregados = produtosCarregados.filter(produto => 
+          produto.fornecedor === usuarioAtual.nome || produto.fornecedor === usuarioAtual.empresa
+        );
+      }
+      // Representantes e Administradores veem todos os produtos
+      
+      // Converter formato para compatibilidade com o catálogo
+      const produtosFormatados = produtosCarregados.map(produto => ({
+        ...produto,
+        avaliacoes: produto.avaliacoes || 4.0 + Math.random() * 1, // Simular avaliações
+        totalAvaliacoes: produto.totalAvaliacoes || Math.floor(Math.random() * 50) + 5,
+        cores: produto.cores || ['Padrão'],
+        tamanhos: produto.tamanhos || ['Único']
+      }));
+      
+      setProdutos(produtosFormatados);
       setCarregando(false);
     };
 
@@ -134,8 +68,13 @@ export default function CatalogoProdutos() {
     return matchBusca && matchCategoria && matchPrecoMin && matchPrecoMax;
   });
 
-  // Ordenar produtos
+  // Ordenar produtos (produtos em destaque sempre primeiro)
   const produtosOrdenados = [...produtosFiltrados].sort((a, b) => {
+    // Primeiro critério: produtos em destaque
+    if (a.destaque && !b.destaque) return -1;
+    if (!a.destaque && b.destaque) return 1;
+    
+    // Segundo critério: ordenação selecionada
     switch (ordenacao) {
       case 'nome':
         return a.nome.localeCompare(b.nome);
@@ -150,7 +89,7 @@ export default function CatalogoProdutos() {
     }
   });
 
-  const categorias = [...new Set(produtos.map(p => p.categoria))];
+  const categorias = ServicoProdutos.obterCategorias();
 
   const handleFiltroChange = (campo, valor) => {
     setFiltros(prev => ({
@@ -179,7 +118,7 @@ export default function CatalogoProdutos() {
   return (
     <div className="space-y-6">
       {/* Barra de busca e filtros */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           {/* Busca */}
           <div>
@@ -309,11 +248,18 @@ export default function CatalogoProdutos() {
       </div>
 
       {/* Resultados */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-            Produtos ({produtosOrdenados.length})
-          </h2>
+          <div>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+              {papelUsuario === PAPEIS.FORNECEDOR ? 'Meus Produtos no Catálogo' : 'Catálogo de Produtos'} ({produtosOrdenados.length})
+            </h2>
+            {papelUsuario === PAPEIS.FORNECEDOR && (
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Visualização de como seus produtos aparecem para os representantes
+              </p>
+            )}
+          </div>
           {filtros.busca && (
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Resultados para "{filtros.busca}"

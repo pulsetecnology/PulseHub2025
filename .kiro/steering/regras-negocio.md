@@ -2,7 +2,7 @@
 inclusion: always
 ---
 
-# Regras de Negócio - PulseHub B2B
+# Regras de Negócio - PulseHub
 
 ## Controle de Acesso e Permissões
 

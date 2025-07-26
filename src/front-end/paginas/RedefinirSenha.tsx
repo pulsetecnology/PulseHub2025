@@ -57,7 +57,7 @@ export default function RedefinirSenha() {
       <div className="flex flex-col items-center mb-8">
         <Logotipo tamanho="lg" />
         <h1 className="mt-4 text-3xl font-extrabold text-gray-900 dark:text-white">
-          PulseHub B2B
+          PulseHub
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
           Redefina sua senha

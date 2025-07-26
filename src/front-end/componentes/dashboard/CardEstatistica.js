@@ -1,16 +1,8 @@
 import React from 'react';
+import { usarCorTema } from '../../utils/coresTema';
 
-export default function CardEstatistica({ titulo, valor, variacao, icone, cor = 'purple' }) {
-  const getCorClasses = (cor) => {
-    const cores = {
-      purple: 'bg-purple-50 dark:bg-purple-900/20',
-      green: 'bg-green-50 dark:bg-green-900/20',
-      blue: 'bg-blue-50 dark:bg-blue-900/20',
-      orange: 'bg-orange-50 dark:bg-orange-900/20',
-      red: 'bg-red-50 dark:bg-red-900/20'
-    };
-    return cores[cor] || cores.purple;
-  };
+export default function CardEstatistica({ titulo, valor, variacao, icone, usarCorTemaAtual = true }) {
+  const { classes } = usarCorTema();
 
   const getVariacaoColor = (variacao) => {
     if (variacao > 0) return 'text-green-600 dark:text-green-400';
@@ -62,7 +54,7 @@ export default function CardEstatistica({ titulo, valor, variacao, icone, cor = 
             </div>
           )}
         </div>
-        <div className={`flex-shrink-0 p-3 rounded-lg ${getCorClasses(cor)}`}>
+        <div className={`flex-shrink-0 p-3 rounded-lg ${usarCorTemaAtual ? `${classes.bgLight} ${classes.bgLightDark}` : 'bg-gray-50 dark:bg-gray-700'}`}>
           {icone}
         </div>
       </div>

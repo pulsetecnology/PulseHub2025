@@ -1,194 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import CardProduto from './CardProduto';
-import { imagensProdutosMockados } from '../../utils/imagensProdutos';
+import ServicoProdutos from '../../servicos/ServicoProdutos';
 
 export default function ListaProdutos() {
   const [produtos, setProdutos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [filtro, setFiltro] = useState('');
   const [categoriaFiltro, setCategoriaFiltro] = useState('');
+  const [visualizacao, setVisualizacao] = useState('grid'); // 'grid' ou 'lista'
+  const [ordenacao, setOrdenacao] = useState('data'); // 'nome', 'preco-asc', 'preco-desc', 'data'
   // const [statusFiltro, setStatusFiltro] = useState('');
   // const [ordenacao, setOrdenacao] = useState('nome');
   // const [visualizacao, setVisualizacao] = useState('grid'); // 'grid' ou 'lista'
   // const [paginaAtual, setPaginaAtual] = useState(1);
   // const [itensPorPagina] = useState(12);
 
-  // Dados simulados para demonstração - Segmento de Moda
+  // Carregar produtos do serviço
   useEffect(() => {
-    const produtosSimulados = [
-      {
-        id: 1,
-        nome: 'Vestido Floral Primavera',
-        descricao: 'Vestido midi com estampa floral delicada, perfeito para ocasiões especiais',
-        preco: 189.90,
-        categoria: 'Roupas Femininas',
-        estoque: 25,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[1],
-        sku: 'VES-001',
-        dataAtualizacao: '2024-01-15',
-        tamanhos: ['P', 'M', 'G', 'GG'],
-        cores: ['Rosa', 'Azul', 'Verde']
-      },
-      {
-        id: 2,
-        nome: 'Tênis Esportivo Premium',
-        descricao: 'Tênis de corrida com tecnologia de amortecimento avançada',
-        preco: 299.90,
-        categoria: 'Calçados',
-        estoque: 42,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[2],
-        sku: 'TEN-002',
-        dataAtualizacao: '2024-01-14',
-        tamanhos: ['36', '37', '38', '39', '40', '41', '42', '43'],
-        cores: ['Preto', 'Branco', 'Azul']
-      },
-      {
-        id: 3,
-        nome: 'Bolsa de Couro Clássica',
-        descricao: 'Bolsa de couro legítimo com design atemporal e compartimentos organizadores',
-        preco: 249.90,
-        categoria: 'Acessórios',
-        estoque: 18,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[3],
-        sku: 'BOL-003',
-        dataAtualizacao: '2024-01-13',
-        cores: ['Marrom', 'Preto', 'Caramelo']
-      },
-      {
-        id: 4,
-        nome: 'Camisa Social Masculina',
-        descricao: 'Camisa social de algodão premium com corte slim fit',
-        preco: 129.90,
-        categoria: 'Roupas Masculinas',
-        estoque: 35,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[4],
-        sku: 'CAM-004',
-        dataAtualizacao: '2024-01-12',
-        tamanhos: ['P', 'M', 'G', 'GG', 'XG'],
-        cores: ['Branco', 'Azul Claro', 'Rosa']
-      },
-      {
-        id: 5,
-        nome: 'Jaqueta Jeans Vintage',
-        descricao: 'Jaqueta jeans com lavagem especial e detalhes vintage',
-        preco: 179.90,
-        categoria: 'Roupas Unissex',
-        estoque: 8,
-        status: 'inativo',
-        imagem: imagensProdutosMockados[5],
-        sku: 'JAQ-005',
-        dataAtualizacao: '2024-01-10',
-        tamanhos: ['P', 'M', 'G', 'GG'],
-        cores: ['Azul Escuro', 'Azul Claro']
-      },
-      {
-        id: 6,
-        nome: 'Sandália Feminina Elegante',
-        descricao: 'Sandália de salto médio com tiras delicadas, ideal para ocasiões especiais',
-        preco: 159.90,
-        categoria: 'Calçados',
-        estoque: 28,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[6],
-        sku: 'SAN-006',
-        dataAtualizacao: '2024-01-09',
-        tamanhos: ['34', '35', '36', '37', '38', '39', '40'],
-        cores: ['Nude', 'Preto', 'Dourado']
-      },
-      {
-        id: 7,
-        nome: 'Relógio Masculino Clássico',
-        descricao: 'Relógio de pulso com pulseira de couro e mostrador analógico',
-        preco: 299.90,
-        categoria: 'Acessórios',
-        estoque: 15,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[7],
-        sku: 'REL-007',
-        dataAtualizacao: '2024-01-08',
-        cores: ['Marrom', 'Preto']
-      },
-      {
-        id: 8,
-        nome: 'Blusa Feminina Estampada',
-        descricao: 'Blusa de manga longa com estampa floral moderna e tecido fluido',
-        preco: 89.90,
-        categoria: 'Roupas Femininas',
-        estoque: 32,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[8],
-        sku: 'BLU-008',
-        dataAtualizacao: '2024-01-07',
-        tamanhos: ['P', 'M', 'G', 'GG'],
-        cores: ['Rosa', 'Azul', 'Verde', 'Branco']
-      },
-      {
-        id: 9,
-        nome: 'Calça Jeans Masculina Slim',
-        descricao: 'Calça jeans com modelagem slim fit e lavagem moderna',
-        preco: 149.90,
-        categoria: 'Roupas Masculinas',
-        estoque: 22,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[9],
-        sku: 'CAL-009',
-        dataAtualizacao: '2024-01-06',
-        tamanhos: ['38', '40', '42', '44', '46'],
-        cores: ['Azul Escuro', 'Azul Médio', 'Preto']
-      },
-      {
-        id: 10,
-        nome: 'Óculos de Sol Unissex',
-        descricao: 'Óculos de sol com proteção UV400 e armação moderna',
-        preco: 199.90,
-        categoria: 'Acessórios',
-        estoque: 19,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[10],
-        sku: 'OCU-010',
-        dataAtualizacao: '2024-01-05',
-        cores: ['Preto', 'Marrom', 'Dourado']
-      },
-      {
-        id: 11,
-        nome: 'Vestido Longo Festa',
-        descricao: 'Vestido longo para festas com tecido acetinado e corte elegante',
-        preco: 259.90,
-        categoria: 'Roupas Femininas',
-        estoque: 12,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[11],
-        sku: 'VES-011',
-        dataAtualizacao: '2024-01-04',
-        tamanhos: ['P', 'M', 'G', 'GG'],
-        cores: ['Preto', 'Azul Marinho', 'Vinho']
-      },
-      {
-        id: 12,
-        nome: 'Sapato Social Masculino',
-        descricao: 'Sapato social de couro legítimo com solado antiderrapante',
-        preco: 219.90,
-        categoria: 'Calçados',
-        estoque: 16,
-        status: 'ativo',
-        imagem: imagensProdutosMockados[12],
-        sku: 'SAP-012',
-        dataAtualizacao: '2024-01-03',
-        tamanhos: ['39', '40', '41', '42', '43', '44'],
-        cores: ['Preto', 'Marrom']
-      }
-    ];
+    const carregarProdutos = () => {
+      setCarregando(true);
+      
+      // Simular delay de carregamento
+      setTimeout(() => {
+        const produtosCarregados = ServicoProdutos.filtrar({
+          busca: filtro,
+          categoria: categoriaFiltro,
+          ordenacao: 'data' // Ordenar por data de atualização
+        });
+        
+        setProdutos(produtosCarregados);
+        setCarregando(false);
+      }, 500);
+    };
 
-    // Simular carregamento
-    setTimeout(() => {
-      setProdutos(produtosSimulados);
-      setCarregando(false);
-    }, 1000);
-  }, []);
+    carregarProdutos();
+  }, [filtro, categoriaFiltro]);
 
   const produtosFiltrados = produtos.filter(produto => {
     const matchNome = produto.nome.toLowerCase().includes(filtro.toLowerCase());
@@ -196,7 +42,28 @@ export default function ListaProdutos() {
     return matchNome && matchCategoria;
   });
 
-  const categorias = [...new Set(produtos.map(produto => produto.categoria))];
+  // Ordenar produtos (produtos em destaque sempre primeiro)
+  const produtosOrdenados = [...produtosFiltrados].sort((a, b) => {
+    // Primeiro critério: produtos em destaque
+    if (a.destaque && !b.destaque) return -1;
+    if (!a.destaque && b.destaque) return 1;
+    
+    // Segundo critério: ordenação selecionada
+    switch (ordenacao) {
+      case 'nome':
+        return a.nome.localeCompare(b.nome);
+      case 'preco-asc':
+        return a.preco - b.preco;
+      case 'preco-desc':
+        return b.preco - a.preco;
+      case 'data':
+        return new Date(b.dataAtualizacao) - new Date(a.dataAtualizacao);
+      default:
+        return 0;
+    }
+  });
+
+  const categorias = ServicoProdutos.obterCategorias();
 
   if (carregando) {
     return (
@@ -209,11 +76,11 @@ export default function ListaProdutos() {
   return (
     <div className="space-y-6">
       {/* Cabeçalho com filtros */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Meus Produtos
+              Meus Produtos ({produtosOrdenados.length})
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Gerencie seu catálogo de produtos
@@ -259,23 +126,70 @@ export default function ListaProdutos() {
               ))}
             </select>
 
-            {/* Botão adicionar produto */}
-            <button
-              onClick={() => window.location.href = '/produtos/novo'}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Novo Produto
-            </button>
+            <div className="flex items-center space-x-4">
+              {/* Ordenação */}
+              <div className="flex items-center space-x-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Ordenar:
+                </label>
+                <select
+                  value={ordenacao}
+                  onChange={(e) => setOrdenacao(e.target.value)}
+                  className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                >
+                  <option value="data">Mais recentes</option>
+                  <option value="nome">Nome</option>
+                  <option value="preco-asc">Menor preço</option>
+                  <option value="preco-desc">Maior preço</option>
+                </select>
+              </div>
+
+              {/* Toggle de visualização */}
+              <div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                <button
+                  onClick={() => setVisualizacao('grid')}
+                  className={`p-2 rounded ${visualizacao === 'grid' 
+                    ? 'bg-white dark:bg-gray-600 shadow' 
+                    : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                  } transition-colors`}
+                  title="Visualização em grade"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setVisualizacao('lista')}
+                  className={`p-2 rounded ${visualizacao === 'lista' 
+                    ? 'bg-white dark:bg-gray-600 shadow' 
+                    : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                  } transition-colors`}
+                  title="Visualização em lista"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Botão adicionar produto */}
+              <button
+                onClick={() => window.location.href = '/produtos/novo'}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Novo Produto
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Lista de produtos */}
-      {produtosFiltrados.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
+      {produtosOrdenados.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 p-12 text-center">
           <svg
             className="mx-auto h-12 w-12 text-gray-400"
             fill="none"
@@ -299,9 +213,13 @@ export default function ListaProdutos() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {produtosFiltrados.map(produto => (
-            <CardProduto key={produto.id} produto={produto} />
+        <div className={
+          visualizacao === 'grid' 
+            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+            : 'space-y-4'
+        }>
+          {produtosOrdenados.map(produto => (
+            <CardProduto key={produto.id} produto={produto} visualizacao={visualizacao} />
           ))}
         </div>
       )}

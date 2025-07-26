@@ -2,13 +2,13 @@
 
 ## Visão Geral
 
-Este documento descreve o design técnico para a implementação do Microsserviço de Processamento (MCP) de Autenticação e a correção da aplicação do Tailwind CSS nas interfaces do PulseHub B2B. O objetivo é garantir um sistema de autenticação robusto e uma experiência visual consistente e profissional para os usuários.
+Este documento descreve o design técnico para a implementação do Microsserviço de Processamento (MCP) de Autenticação e a correção da aplicação do Tailwind CSS nas interfaces do PulseHub. O objetivo é garantir um sistema de autenticação robusto e uma experiência visual consistente e profissional para os usuários.
 
 ## Arquitetura
 
 ### MCP de Autenticação
 
-O MCP de Autenticação será implementado como um serviço independente que fornece funcionalidades de autenticação e autorização para o sistema PulseHub B2B. A comunicação entre o front-end e o MCP será feita através de uma API RESTful.
+O MCP de Autenticação será implementado como um serviço independente que fornece funcionalidades de autenticação e autorização para o sistema PulseHub. A comunicação entre o front-end e o MCP será feita através de uma API RESTful.
 
 ```mermaid
 graph TD

@@ -181,7 +181,7 @@ export default function LoginTailwind() {
                 Entrar na sua conta
               </h2>
               <p className="text-purple-100 text-sm text-center mt-1">
-                Acesse sua plataforma B2B
+                Acesse sua plataforma e Pulse
               </p>
             </div>
 

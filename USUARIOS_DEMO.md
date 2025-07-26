@@ -1,4 +1,4 @@
-# Usuários de Demonstração - PulseHub B2B
+# Usuários de Demonstração - PulseHub
 
 Este documento lista os usuários de demonstração disponíveis para teste da plataforma.
 

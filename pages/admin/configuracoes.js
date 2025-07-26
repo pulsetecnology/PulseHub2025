@@ -4,7 +4,7 @@ import LayoutPrincipal from '../../src/front-end/componentes/layout/LayoutPrinci
 export default function ConfiguracoesAdministrativas() {
   const [configuracoes, setConfiguracoes] = useState({
     sistema: {
-      nomeEmpresa: 'PulseHub B2B',
+      nomeEmpresa: 'PulseHub',
       emailContato: 'contato@pulsehub.com',
       telefoneContato: '+55 11 99999-9999',
       enderecoEmpresa: 'São Paulo, SP - Brasil',

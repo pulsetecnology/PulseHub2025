@@ -90,7 +90,7 @@ export default function CardPedido({ pedido }) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow duration-200">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-800">
       {/* Cabeçalho do pedido */}
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">

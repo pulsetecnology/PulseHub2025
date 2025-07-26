@@ -2,7 +2,7 @@
 inclusion: always
 ---
 
-# Padrões de Arquitetura - PulseHub B2B
+# Padrões de Arquitetura - PulseHub
 
 ## Arquitetura Geral
 

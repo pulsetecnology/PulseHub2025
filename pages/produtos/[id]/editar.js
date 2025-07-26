@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import LayoutPrincipal from '../../src/front-end/componentes/layout/LayoutPrincipal';
-import DetalheProduto from '../../src/front-end/componentes/catalogo/DetalheProduto';
-import ServicoProdutos from '../../src/front-end/servicos/ServicoProdutos';
+import LayoutPrincipal from '../../../src/front-end/componentes/layout/LayoutPrincipal';
+import FormularioProduto from '../../../src/front-end/componentes/produtos/FormularioProduto';
+import ServicoProdutos from '../../../src/front-end/servicos/ServicoProdutos';
 
-export default function PaginaDetalheProduto() {
+export default function EditarProduto() {
   const router = useRouter();
   const { id } = router.query;
   const [produto, setProduto] = useState(null);
@@ -14,6 +14,7 @@ export default function PaginaDetalheProduto() {
     if (id) {
       setCarregando(true);
       
+      // Simular delay de carregamento
       setTimeout(() => {
         const produtoCarregado = ServicoProdutos.obterPorId(id);
         setProduto(produtoCarregado);
@@ -49,8 +50,11 @@ export default function PaginaDetalheProduto() {
   }
 
   return (
-    <LayoutPrincipal titulo={produto.nome}>
-      <DetalheProduto produtoId={id} produto={produto} />
+    <LayoutPrincipal 
+      titulo={`Editar: ${produto.nome}`} 
+      subtitulo="Atualize as informações do produto"
+    >
+      <FormularioProduto produto={produto} />
     </LayoutPrincipal>
   );
 }

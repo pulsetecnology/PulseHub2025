@@ -1,110 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import ServicoProdutos from '../../servicos/ServicoProdutos';
+import ModalImagem from '../comum/ModalImagem';
 
-export default function DetalheProduto({ produtoId }) {
+export default function DetalheProduto({ produtoId, produto: produtoProp }) {
   const router = useRouter();
   const [produto, setProduto] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [imagemSelecionada, setImagemSelecionada] = useState(0);
   const [corSelecionada, setCorSelecionada] = useState('');
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState('');
+  const [modalImagemAberto, setModalImagemAberto] = useState(false);
   const [quantidade, setQuantidade] = useState(1);
 
   useEffect(() => {
-    const carregarProduto = async () => {
-      setCarregando(true);
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Produto simulado com mais detalhes
-      const produtoSimulado = {
-        id: produtoId,
-        nome: 'Vestido Floral Primavera',
-        categoria: 'Vestidos',
-        preco: 89.90,
-        precoOriginal: 120.00,
-        descricao: 'Vestido floral perfeito para a primavera, tecido leve e confortável. Ideal para ocasiões casuais e semi-formais.',
-        descricaoCompleta: `
-          Este elegante vestido floral é a peça perfeita para a temporada primavera-verão. 
-          Confeccionado em tecido de viscose de alta qualidade, oferece conforto e leveza para o dia a dia.
+    if (produtoProp) {
+      // Se o produto foi passado como prop, usar diretamente
+      const produtoCompleto = {
+        ...produtoProp,
+        descricaoCompleta: produtoProp.descricao + `
           
           Características:
-          • Tecido: 100% Viscose
-          • Modelagem: Solta, confortável
-          • Comprimento: Midi (altura do joelho)
-          • Fechamento: Zíper lateral invisível
-          • Forro: Sim, em tecido acetato
-          • Cuidados: Lavar à mão ou máquina (ciclo delicado)
+          • SKU: ${produtoProp.sku}
+          • Categoria: ${produtoProp.categoria}
+          • Fornecedor: ${produtoProp.fornecedor || 'Minha Empresa'}
+          • Status: ${produtoProp.ativo ? 'Ativo' : 'Inativo'}
           
-          O design floral delicado e as cores suaves fazem desta peça uma escolha versátil 
-          que combina tanto com sandálias para um look casual quanto com saltos para ocasiões mais elegantes.
+          Este produto faz parte do nosso catálogo premium com qualidade garantida.
         `,
-        imagens: [
-          '/api/placeholder/600/800',
-          '/api/placeholder/600/800',
-          '/api/placeholder/600/800',
-          '/api/placeholder/600/800'
-        ],
-        disponivel: true,
-        estoque: 15,
-        cores: [
-          { nome: 'Rosa', codigo: '#EC4899' },
-          { nome: 'Azul', codigo: '#3B82F6' },
-          { nome: 'Verde', codigo: '#10B981' }
-        ],
-        tamanhos: [
-          { nome: 'P', disponivel: true },
-          { nome: 'M', disponivel: true },
-          { nome: 'G', disponivel: true },
-          { nome: 'GG', disponivel: false }
-        ],
-        fornecedor: 'Moda Feminina Ltda',
-        avaliacoes: 4.5,
-        totalAvaliacoes: 23,
-        comentarios: [
-          {
-            id: 1,
-            usuario: 'Maria Silva',
-            avaliacao: 5,
-            comentario: 'Vestido lindo e muito confortável! A qualidade do tecido é excelente.',
-            data: '2024-01-15'
-          },
-          {
-            id: 2,
-            usuario: 'Ana Santos',
-            avaliacao: 4,
-            comentario: 'Gostei muito do modelo, mas achei que poderia ter mais opções de cores.',
-            data: '2024-01-10'
-          },
-          {
-            id: 3,
-            usuario: 'Carla Oliveira',
-            avaliacao: 5,
-            comentario: 'Perfeito! Exatamente como nas fotos. Recomendo!',
-            data: '2024-01-08'
-          }
-        ],
+        cores: produtoProp.cores?.map(cor => ({ nome: cor, codigo: '#6B7280' })) || [],
+        tamanhos: produtoProp.tamanhos?.map(tamanho => ({ nome: tamanho, disponivel: produtoProp.ativo })) || [],
+        comentarios: [],
         especificacoes: {
-          'Material': '100% Viscose',
-          'Modelagem': 'Solta',
-          'Comprimento': 'Midi',
-          'Fechamento': 'Zíper lateral',
-          'Forro': 'Sim',
-          'Origem': 'Nacional',
-          'Garantia': '30 dias'
+          'SKU': produtoProp.sku,
+          'Categoria': produtoProp.categoria,
+          'Prazo de Produção': `${produtoProp.prazoProducao || 15} dias`,
+          'Quantidade Mínima': `${produtoProp.quantidadeMinima || 1} unidades`,
+          'Status': produtoProp.ativo ? 'Ativo' : 'Inativo',
+          'Material': produtoProp.especificacoesTecnicas?.material || 'Não informado',
+          'Origem': produtoProp.especificacoesTecnicas?.origem || 'Nacional',
+          'Fornecedor': produtoProp.fornecedor || 'Minha Empresa',
+          'Última Atualização': new Date(produtoProp.dataAtualizacao).toLocaleDateString('pt-BR')
         }
       };
       
-      setProduto(produtoSimulado);
-      setCorSelecionada(produtoSimulado.cores[0].nome);
-      setTamanhoSelecionado(produtoSimulado.tamanhos.find(t => t.disponivel)?.nome || '');
+      setProduto(produtoCompleto);
+      setCorSelecionada(produtoCompleto.cores[0]?.nome || '');
+      setTamanhoSelecionado(produtoCompleto.tamanhos.find(t => t.disponivel)?.nome || '');
       setCarregando(false);
-    };
-
-    if (produtoId) {
-      carregarProduto();
+    } else if (produtoId) {
+      // Fallback para buscar produto por ID (caso não tenha sido passado como prop)
+      setCarregando(true);
+      // Implementar busca por ID se necessário
+      setCarregando(false);
     }
-  }, [produtoId]);
+  }, [produtoId, produtoProp]);
 
   const handleAdicionarCarrinho = () => {
     if (!corSelecionada || !tamanhoSelecionado) {
@@ -170,20 +120,28 @@ export default function DetalheProduto({ produtoId }) {
         {/* Galeria de imagens */}
         <div className="space-y-4">
           {/* Imagem principal */}
-          <div className="aspect-w-3 aspect-h-4 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden">
+          <div 
+            className="relative bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden cursor-pointer group"
+            onClick={() => setModalImagemAberto(true)}
+          >
             <img
               src={produto.imagens[imagemSelecionada]}
               alt={produto.nome}
-              className="w-full h-96 object-cover"
+              className="w-full h-[500px] object-cover transition-transform group-hover:scale-105"
               onError={(e) => {
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'flex';
               }}
             />
-            <div className="w-full h-96 hidden items-center justify-center bg-gray-200 dark:bg-gray-700">
+            <div className="w-full h-[500px] hidden items-center justify-center bg-gray-200 dark:bg-gray-700">
               <svg className="h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
+            </div>
+            
+            {/* Indicador de zoom */}
+            <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+              🔍 Clique para ampliar
             </div>
           </div>
 
@@ -344,10 +302,10 @@ export default function DetalheProduto({ produtoId }) {
           <div className="space-y-3">
             <button
               onClick={handleAdicionarCarrinho}
-              disabled={!produto.disponivel || !corSelecionada || !tamanhoSelecionado}
+              disabled={!produto.ativo || !corSelecionada || !tamanhoSelecionado}
               className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium"
             >
-              {produto.disponivel ? 'Adicionar ao Carrinho' : 'Produto Indisponível'}
+              {produto.ativo ? 'Solicitar Orçamento' : 'Produto Indisponível'}
             </button>
             <button
               onClick={() => router.back()}
@@ -357,10 +315,10 @@ export default function DetalheProduto({ produtoId }) {
             </button>
           </div>
 
-          {produto.estoque <= 5 && produto.disponivel && (
-            <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-3">
-              <p className="text-orange-800 dark:text-orange-400 text-sm">
-                ⚠️ Apenas {produto.estoque} unidades em estoque!
+          {produto.ativo && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+              <p className="text-blue-800 dark:text-blue-400 text-sm">
+                🏭 Produção sob demanda • Prazo: {produto.prazoProducao || 15} dias • Mínimo: {produto.quantidadeMinima || 1} unidades
               </p>
             </div>
           )}
@@ -391,6 +349,14 @@ export default function DetalheProduto({ produtoId }) {
           </div>
         </div>
       </div>
+
+      {/* Modal de imagem */}
+      <ModalImagem
+        isOpen={modalImagemAberto}
+        onClose={() => setModalImagemAberto(false)}
+        imagemSrc={produto.imagens[imagemSelecionada]}
+        imagemAlt={produto.nome}
+      />
     </div>
   );
 }

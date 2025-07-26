@@ -1,4 +1,5 @@
 import React from 'react';
+import { usarCorTema } from '../utils/coresTema';
 
 interface LogotipoProps {
   tamanho?: 'sm' | 'md' | 'lg' | 'xl';
@@ -7,6 +8,8 @@ interface LogotipoProps {
 }
 
 export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto = true }: LogotipoProps) {
+  const { classes } = usarCorTema();
+  
   // Definindo tamanhos com base no parâmetro tamanho
   const tamanhos = {
     sm: {
@@ -37,7 +40,7 @@ export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto 
   return (
     <div className={`flex items-center ${className}`}>
       {/* Círculo com efeito pulsante */}
-      <div className={`relative ${tamanhos[tamanhoAtual].container} aspect-square bg-purple-600 rounded-full flex items-center justify-center`}>
+      <div className={`relative ${tamanhos[tamanhoAtual].container} aspect-square ${classes.bg} rounded-full flex items-center justify-center`}>
         {/* Ondas de áudio/pulso */}
         <div className="flex items-center h-1/2 space-x-0.5">
           <div className="w-1 h-1/3 bg-white rounded-full"></div>
@@ -48,14 +51,14 @@ export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto 
         </div>
 
         {/* Círculos pulsantes animados */}
-        <div className="absolute inset-0 rounded-full bg-purple-600 opacity-30 animate-ping-slow"></div>
-        <div className="absolute inset-0 rounded-full bg-purple-600 opacity-20 animate-ping"></div>
+        <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-30 animate-ping-slow`}></div>
+        <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-20 animate-ping`}></div>
       </div>
 
       {/* Texto do logo */}
       {mostrarTexto && (
         <div className={`ml-2 font-bold ${tamanhos[tamanhoAtual].texto}`}>
-          <span className="text-purple-600">PulseHub</span>
+          <span className={classes.text}>PulseHub</span>
         </div>
       )}
     </div>

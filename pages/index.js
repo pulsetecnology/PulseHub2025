@@ -24,7 +24,7 @@ export default function Home() {
         <div className="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto mb-4 flex items-center justify-center relative animate-pulse">
           <div className="w-6 h-6 bg-white rounded-full absolute"></div>
         </div>
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">PulseHub B2B</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">PulseHub</h1>
         <p className="text-gray-600 mb-4">Carregando...</p>
       </div>
     </div>

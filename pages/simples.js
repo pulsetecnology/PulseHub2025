@@ -6,7 +6,7 @@ export default function PaginaSimples() {
       margin: '0 auto',
       padding: '20px'
     }}>
-      <h1 style={{ color: '#2563eb' }}>PulseHub B2B</h1>
+      <h1 style={{ color: '#2563eb' }}>PulseHub</h1>
       <p>Esta é uma página simples para testar o Next.js.</p>
       <div style={{ 
         marginTop: '20px',

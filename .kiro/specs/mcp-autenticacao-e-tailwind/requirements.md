@@ -2,7 +2,7 @@
 
 ## Introdução
 
-Este documento descreve os requisitos para a implementação do Microsserviço de Processamento (MCP) de Autenticação e a correção da aplicação do Tailwind CSS nas interfaces do PulseHub B2B. Estas melhorias são essenciais para garantir a funcionalidade completa do sistema de autenticação e uma experiência visual consistente e profissional para os usuários.
+Este documento descreve os requisitos para a implementação do Microsserviço de Processamento (MCP) de Autenticação e a correção da aplicação do Tailwind CSS nas interfaces do PulseHub. Estas melhorias são essenciais para garantir a funcionalidade completa do sistema de autenticação e uma experiência visual consistente e profissional para os usuários.
 
 ## Requisitos
 

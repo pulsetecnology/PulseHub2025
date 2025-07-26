@@ -248,7 +248,7 @@ export default function LoginBonito() {
           <div className="logo-section">
             <div className="logo"></div>
             <h1 className="logo-title">PulseHub</h1>
-            <p className="logo-subtitle">Plataforma B2B para fornecedores e representantes</p>
+            <p className="logo-subtitle">Plataforma para fornecedores e representantes</p>
           </div>
           
           <h2 className="form-title">Entrar na sua conta</h2>

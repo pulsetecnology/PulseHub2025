@@ -2,7 +2,7 @@
 inclusion: always
 ---
 
-# Diretrizes de Implementação Específica - PulseHub B2B
+# Diretrizes de Implementação Específica - PulseHub
 
 ## Segurança e Compliance
 

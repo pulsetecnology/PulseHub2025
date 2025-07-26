@@ -1,4 +1,4 @@
-# Sidebar Dinâmico - PulseHub B2B
+# Sidebar Dinâmico - PulseHub
 
 ## 🎯 Melhorias Implementadas
 

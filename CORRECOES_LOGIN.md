@@ -1,4 +1,4 @@
-# Correções da Tela de Login - PulseHub B2B
+# Correções da Tela de Login - PulseHub
 
 ## 🐛 Problemas Identificados
 

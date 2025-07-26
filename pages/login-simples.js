@@ -31,7 +31,7 @@ export default function LoginSimples() {
       margin: '0 auto',
       padding: '20px'
     }}>
-      <h1 style={{ color: '#2563eb', textAlign: 'center' }}>PulseHub B2B</h1>
+      <h1 style={{ color: '#2563eb', textAlign: 'center' }}>PulseHub</h1>
       <h2 style={{ textAlign: 'center' }}>Login</h2>
       
       {erro && (

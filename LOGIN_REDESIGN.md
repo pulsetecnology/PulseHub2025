@@ -1,4 +1,4 @@
-# Redesign da Tela de Login - PulseHub B2B
+# Redesign da Tela de Login - PulseHub
 
 ## 🎯 Problema Identificado
 A tela de login tinha um visual inconsistente com o restante do sistema, usando:
@@ -55,7 +55,7 @@ A tela de login tinha um visual inconsistente com o restante do sistema, usando:
     {/* Ícone de tema */}
   </button>
   <h2>Entrar na sua conta</h2>
-  <p>Acesse sua plataforma B2B</p>
+  <p>Acesse sua plataforma</p>
 </div>
 ```
 
@@ -63,7 +63,7 @@ A tela de login tinha um visual inconsistente com o restante do sistema, usando:
 ```jsx
 <div className="hidden lg:block">
   <Logotipo tamanho="xl" />
-  <h1>PulseHub B2B</h1>
+  <h1>PulseHub</h1>
   <p>Plataforma completa para fornecedores e representantes</p>
   <div className="space-y-4">
     {/* Lista de benefícios */}

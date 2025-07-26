@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import { ServicoAutenticacao } from '../../servicos/ServicoAutenticacao';
+import { usarCorTema } from '../../utils/coresTema';
 
 export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVoltar, botaoAcao }) {
   const [tema, setTema] = useState('claro');
+  const { classes } = usarCorTema();
   const [usuario, setUsuario] = useState(null);
   const [mostrarDropdownUsuario, setMostrarDropdownUsuario] = useState(false);
-  const [sidebarRecolhido, setSidebarRecolhido] = useState(false);
+  const [sidebarRecolhido, setSidebarRecolhido] = useState(() => {
+    // Recuperar estado do sidebar do localStorage
+    if (typeof window !== 'undefined') {
+      const estadoSalvo = localStorage.getItem('sidebarRecolhido');
+      return estadoSalvo === 'true';
+    }
+    return false;
+  });
   const servicoAutenticacao = new ServicoAutenticacao();
 
   useEffect(() => {
@@ -58,12 +67,16 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
         temaSidebar={tema} 
         alternarTema={alternarTema} 
         tipoUsuario={usuario?.papel || 'Fornecedor'}
-        onToggleRecolhido={setSidebarRecolhido}
+        estadoInicialRecolhido={sidebarRecolhido}
+        onToggleRecolhido={(novoEstado) => {
+          setSidebarRecolhido(novoEstado);
+          localStorage.setItem('sidebarRecolhido', novoEstado.toString());
+        }}
       />
       
       <div className={`flex-1 transition-all duration-300 ${sidebarRecolhido ? 'ml-16' : 'ml-56'}`}>
         {/* Header fixo no topo alinhado com a área do logo */}
-        <div className={`fixed top-0 right-0 z-10 flex justify-between items-center bg-white dark:bg-gray-800 p-4 h-16 transition-all duration-300 ${sidebarRecolhido ? 'left-16' : 'left-56'}`} style={{boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'}}>
+        <div className={`fixed top-0 right-0 z-10 flex justify-between items-center bg-white dark:bg-gray-800 p-4 h-16 transition-all duration-300 ${sidebarRecolhido ? 'left-16' : 'left-56'}`} style={{boxShadow: '0 8px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.1)'}}>
           <div>
             <h1 className="text-xl font-semibold text-gray-800 dark:text-white">{titulo}</h1>
             {subtitulo && <p className="text-sm text-gray-500 dark:text-gray-400">{subtitulo}</p>}
@@ -115,7 +128,7 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
                     {usuario?.papel || 'Fornecedor'}
                   </p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium">
+                <div className={`w-8 h-8 rounded-full ${classes.bg} flex items-center justify-center text-white font-medium`}>
                   {usuario?.nome?.charAt(0) || 'U'}
                 </div>
                 <svg className="h-4 w-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +138,7 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
 
               {/* Dropdown menu */}
               {mostrarDropdownUsuario && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 z-50" style={{boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 20px -5px rgba(0, 0, 0, 0.1)'}}>
                   <div className="py-1">
                     <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -149,8 +162,7 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
                     </button>
                     <button
                       onClick={() => {
-                        // Implementar configurações
-                        console.log('Abrir configurações');
+                        window.location.href = '/configuracoes';
                       }}
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
                     >

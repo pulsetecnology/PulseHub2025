@@ -72,7 +72,7 @@ export default function LayoutAutenticado({ children, titulo }: LayoutAutenticad
       <footer className="bg-white dark:bg-gray-800 shadow-inner">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-            &copy; {new Date().getFullYear()} PulseHub B2B. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} PulseHub. Todos os direitos reservados.
           </p>
         </div>
       </footer>

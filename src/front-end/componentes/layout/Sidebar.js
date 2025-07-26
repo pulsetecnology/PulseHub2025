@@ -3,11 +3,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Logotipo from '../Logotipo';
 import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
+import { usarCorTema } from '../../utils/coresTema';
 
-export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuario = 'Fornecedor', onToggleRecolhido }) {
+export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuario = 'Fornecedor', estadoInicialRecolhido = false, onToggleRecolhido }) {
   const router = useRouter();
   const [papelUsuario, setPapelUsuario] = useState(PAPEIS.REPRESENTANTE);
-  const [menuRecolhido, setMenuRecolhido] = useState(false);
+  const [menuRecolhido, setMenuRecolhido] = useState(estadoInicialRecolhido);
+  const { classes } = usarCorTema();
 
   useEffect(() => {
     // Obter o papel do usuário logado
@@ -15,11 +17,37 @@ export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuar
     setPapelUsuario(papel);
   }, []);
 
-  const isActive = (path) => {
-    if (path === '/painel' && (router.pathname === '/painel' || router.pathname === '/painel-representante' || router.pathname === '/admin')) {
-      return true;
+  useEffect(() => {
+    // Sincronizar estado com o prop
+    setMenuRecolhido(estadoInicialRecolhido);
+  }, [estadoInicialRecolhido]);
+
+  const getDashboardUrl = () => {
+    switch (papelUsuario) {
+      case PAPEIS.ADMINISTRADOR:
+        return '/admin';
+      case PAPEIS.FORNECEDOR:
+        return '/painel';
+      case PAPEIS.REPRESENTANTE:
+        return '/painel-representante';
+      default:
+        return '/painel';
     }
-    return router.pathname.startsWith(path);
+  };
+
+  const isActive = (path) => {
+    // Para o Dashboard, verificar se é exatamente a página do dashboard correspondente
+    const dashboardUrl = getDashboardUrl();
+    if (path === dashboardUrl) {
+      return router.pathname === dashboardUrl;
+    }
+    
+    // Para outras páginas, usar startsWith mas evitar conflitos
+    if (path === '/admin' && router.pathname.startsWith('/admin/')) {
+      return false; // Não marcar admin como ativo quando estiver em subpáginas
+    }
+    
+    return router.pathname === path || router.pathname.startsWith(path + '/');
   };
 
   // Configuração de menus por papel do usuário
@@ -83,20 +111,20 @@ export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuar
         return [
           ...baseItems,
           {
-            href: '/catalogo',
-            label: 'Catálogo',
-            icon: (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-              </svg>
-            )
-          },
-          {
             href: '/produtos',
             label: 'Meus Produtos',
             icon: (
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
+              </svg>
+            )
+          },
+          {
+            href: '/categorias',
+            label: 'Categorias',
+            icon: (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
               </svg>
             )
           },
@@ -159,29 +187,16 @@ export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuar
     }
   };
 
-  const getDashboardUrl = () => {
-    switch (papelUsuario) {
-      case PAPEIS.ADMINISTRADOR:
-        return '/admin';
-      case PAPEIS.FORNECEDOR:
-        return '/painel';
-      case PAPEIS.REPRESENTANTE:
-        return '/painel-representante';
-      default:
-        return '/painel';
-    }
-  };
-
   const menuItems = getMenuItems();
 
   return (
-    <div className={`${menuRecolhido ? 'w-16' : 'w-56'} min-h-screen flex flex-col fixed left-0 top-0 z-20 transition-all duration-300 ${temaSidebar === 'escuro' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}`} style={{boxShadow: '2px 0 8px -2px rgba(0, 0, 0, 0.1)'}}>
+    <div className={`${menuRecolhido ? 'w-16' : 'w-56'} min-h-screen flex flex-col fixed left-0 top-0 z-20 transition-all duration-300 ${temaSidebar === 'escuro' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}`} style={{boxShadow: '4px 0 15px -3px rgba(0, 0, 0, 0.2)'}}>
       
       {/* Header com Logo e Botão de Recolher */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center justify-between">
+      <div className="p-4">
+        <div className="relative flex items-center">
           {!menuRecolhido && (
-            <div className="flex items-center">
+            <div className="absolute left-0 right-10 flex justify-center">
               <Logotipo tamanho="sm" />
             </div>
           )}
@@ -193,7 +208,7 @@ export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuar
                 onToggleRecolhido(novoEstado);
               }
             }}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="ml-auto p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             title={menuRecolhido ? 'Expandir menu' : 'Recolher menu'}
           >
             <svg 
@@ -207,20 +222,11 @@ export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuar
           </button>
         </div>
         
-        {/* Indicador do Tipo de Usuário */}
-        {!menuRecolhido && (
-          <div className="mt-3 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-            <p className="text-xs font-medium text-purple-700 dark:text-purple-300">
-              {papelUsuario === PAPEIS.ADMINISTRADOR && '👨‍💼 Administrador'}
-              {papelUsuario === PAPEIS.FORNECEDOR && '🏭 Fornecedor'}
-              {papelUsuario === PAPEIS.REPRESENTANTE && '🤝 Representante'}
-            </p>
-          </div>
-        )}
+
       </div>
       
       {/* Menu de Navegação */}
-      <nav className="flex-1 py-4">
+      <nav className="flex-1 pt-1">
         <ul className="space-y-1">
           {menuItems.map((item, index) => (
             <li key={index}>
@@ -228,7 +234,7 @@ export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuar
                 <a 
                   className={`flex items-center px-4 py-3 transition-colors ${
                     isActive(item.href) 
-                      ? 'bg-purple-50 text-purple-600 border-l-4 border-purple-600 dark:bg-purple-900/20 dark:text-purple-400' 
+                      ? `${classes.bgLight} ${classes.text} border-l-4 ${classes.border} ${classes.bgLightDark} ${classes.textDark}` 
                       : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                   title={menuRecolhido ? item.label : ''}
@@ -248,10 +254,18 @@ export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuar
       
       {/* Footer com informações do usuário */}
       {!menuRecolhido && (
-        <div className="mt-auto p-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+        <div className="mt-auto p-4">
+          <div className="flex justify-center mb-2">
+            <div className={`px-3 py-2 ${classes.bgLight} ${classes.bgLightDark} rounded-lg`}>
+              <p className={`text-sm font-medium ${classes.textLight} ${classes.textLightDark} text-center`}>
+                {papelUsuario === PAPEIS.ADMINISTRADOR && '👨‍💼 Administrador'}
+                {papelUsuario === PAPEIS.FORNECEDOR && '🏭 Fornecedor'}
+                {papelUsuario === PAPEIS.REPRESENTANTE && '🤝 Representante'}
+              </p>
+            </div>
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
             <p>Menu otimizado por papel</p>
-            <p>Funcionalidades específicas no dashboard</p>
           </div>
         </div>
       )}

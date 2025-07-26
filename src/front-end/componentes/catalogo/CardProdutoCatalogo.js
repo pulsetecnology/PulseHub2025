@@ -1,8 +1,10 @@
 import React from 'react';
 import { useRouter } from 'next/router';
+import { usarCorTema } from '../../utils/coresTema';
 
 export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) {
   const router = useRouter();
+  const { classes } = usarCorTema();
 
   const handleVerDetalhes = (id) => {
     router.push(`/produtos/${id}`);
@@ -15,12 +17,12 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
 
   if (visualizacao === 'lista') {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
-        <div className="flex">
+      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:${classes.borderLight} dark:hover:${classes.borderLight} overflow-hidden`}>
+        <div className="flex h-56">
           {/* Imagem do produto */}
-          <div className="relative w-32 h-32 bg-gray-200 dark:bg-gray-700 flex-shrink-0">
+          <div className="relative w-42 h-full bg-gray-200 dark:bg-gray-700 flex-shrink-0">
             <img
-              src={produto.imagem}
+              src={produto.imagens && produto.imagens[0] ? produto.imagens[0] : produto.imagem}
               alt={produto.nome}
               className="w-full h-full object-cover"
               onError={(e) => {
@@ -39,7 +41,7 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
                 {Math.round(((produto.precoOriginal - produto.preco) / produto.precoOriginal) * 100)}% OFF
               </div>
             )}
-            {!produto.disponivel && (
+            {!produto.ativo && (
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                 <span className="text-white text-xs font-medium">Indisponível</span>
               </div>
@@ -47,9 +49,9 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
           </div>
 
           {/* Conteúdo do produto */}
-          <div className="flex-1 p-4">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
+          <div className="flex-1 p-6">
+            <div className="flex justify-between items-center h-full">
+              <div className="flex-1 flex flex-col justify-center">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
                   {produto.nome}
                 </h3>
@@ -59,6 +61,18 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
                   {produto.descricao}
                 </p>
+
+                {/* Badges de status */}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {produto.destaque && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                      ⭐ Destaque
+                    </span>
+                  )}
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${produto.ativo ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
+                    {produto.ativo ? 'Ativo' : 'Inativo'}
+                  </span>
+                </div>
 
                 {/* Avaliações */}
                 <div className="flex items-center mb-3">
@@ -123,7 +137,7 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
               </div>
 
               {/* Preço e ações */}
-              <div className="text-right ml-4">
+              <div className="text-right ml-4 flex flex-col justify-center">
                 <div className="mb-3">
                   {produto.precoOriginal && produto.precoOriginal > produto.preco && (
                     <p className="text-sm text-gray-500 dark:text-gray-400 line-through">
@@ -144,16 +158,16 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
                   </button>
                   <button
                     onClick={() => handleAdicionarCarrinho(produto)}
-                    disabled={!produto.disponivel}
+                    disabled={!produto.ativo}
                     className="w-full px-4 py-2 border border-purple-600 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
-                    {produto.disponivel ? 'Adicionar ao Carrinho' : 'Indisponível'}
+                    {produto.ativo ? 'Solicitar Orçamento' : 'Indisponível'}
                   </button>
                 </div>
 
-                {produto.estoque <= 5 && produto.disponivel && (
-                  <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">
-                    Apenas {produto.estoque} em estoque
+                {produto.prazoProducao && (
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                    Produção: {produto.prazoProducao} dias
                   </p>
                 )}
               </div>
@@ -166,11 +180,11 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
 
   // Visualização em grid (padrão)
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-800 overflow-hidden">
       {/* Imagem do produto */}
       <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
         <img
-          src={produto.imagem}
+          src={produto.imagens && produto.imagens[0] ? produto.imagens[0] : produto.imagem}
           alt={produto.nome}
           className="w-full h-full object-cover"
           onError={(e) => {
@@ -189,7 +203,7 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
             {Math.round(((produto.precoOriginal - produto.preco) / produto.precoOriginal) * 100)}% OFF
           </div>
         )}
-        {!produto.disponivel && (
+        {!produto.ativo && (
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <span className="text-white font-medium">Indisponível</span>
           </div>
@@ -210,6 +224,18 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
           {produto.descricao}
         </p>
+
+        {/* Badges de status */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {produto.destaque && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+              ⭐ Destaque
+            </span>
+          )}
+          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${produto.ativo ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}`}>
+            {produto.ativo ? 'Ativo' : 'Inativo'}
+          </span>
+        </div>
 
         {/* Avaliações */}
         <div className="flex items-center mb-3">
@@ -286,16 +312,16 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
           </button>
           <button
             onClick={() => handleAdicionarCarrinho(produto)}
-            disabled={!produto.disponivel}
+            disabled={!produto.ativo}
             className="w-full px-4 py-2 border border-purple-600 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
-            {produto.disponivel ? 'Adicionar ao Carrinho' : 'Indisponível'}
+            {produto.ativo ? 'Solicitar Orçamento' : 'Indisponível'}
           </button>
         </div>
 
-        {produto.estoque <= 5 && produto.disponivel && (
-          <p className="text-xs text-orange-600 dark:text-orange-400 mt-2 text-center">
-            Apenas {produto.estoque} em estoque
+        {produto.prazoProducao && (
+          <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 text-center">
+            Produção: {produto.prazoProducao} dias • Mín: {produto.quantidadeMinima || 1} un
           </p>
         )}
       </div>
