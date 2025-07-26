@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { usarCorTema } from '../../utils/coresTema';
 
 export default function CardPedido({ pedido }) {
+  const { classes } = usarCorTema();
   const [expandido, setExpandido] = useState(false);
 
   const formatarPreco = (preco) => {
@@ -23,7 +25,7 @@ export default function CardPedido({ pedido }) {
       case 'em_producao':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
       case 'enviado':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+        return `${classes.bgLight} ${classes.textLight} dark:${classes.bgLightDark} dark:${classes.textLightDark}`;
       case 'entregue':
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
       case 'cancelado':
@@ -90,7 +92,7 @@ export default function CardPedido({ pedido }) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-800">
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:${classes.borderLight} dark:hover:${classes.borderLight}`}>
       {/* Cabeçalho do pedido */}
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
@@ -104,7 +106,7 @@ export default function CardPedido({ pedido }) {
             </span>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+            <p className={`text-2xl font-bold ${classes.text} ${classes.textDark}`}>
               {formatarPreco(pedido.valor)}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -146,7 +148,7 @@ export default function CardPedido({ pedido }) {
         <div className="flex items-center justify-between">
           <button
             onClick={() => setExpandido(!expandido)}
-            className="flex items-center text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+            className={`flex items-center ${classes.text} ${classes.textDark} hover:${classes.textLight} dark:hover:${classes.textLightDark} transition-colors`}
           >
             <span className="text-sm font-medium">
               {expandido ? 'Ocultar itens' : `Ver itens (${pedido.itens.length})`}
@@ -165,7 +167,7 @@ export default function CardPedido({ pedido }) {
           <div className="flex gap-2">
             <button
               onClick={() => window.location.href = `/pedidos/${pedido.id}`}
-              className="px-3 py-2 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+              className={`px-3 py-2 text-sm ${classes.bg} text-white rounded-md ${classes.bgHover} transition-colors`}
             >
               Ver Detalhes
             </button>

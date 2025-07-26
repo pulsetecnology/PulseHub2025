@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import LayoutPrincipal from '../../src/front-end/componentes/layout/LayoutPrincipal';
 import ModalUsuario from '../../src/front-end/componentes/admin/ModalUsuario';
+import { usarCorTema } from '../../src/front-end/utils/coresTema';
 
 export default function GerenciamentoUsuarios() {
+  const { classes } = usarCorTema();
   const [usuarios, setUsuarios] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [filtro, setFiltro] = useState('');
@@ -105,7 +107,7 @@ export default function GerenciamentoUsuarios() {
   const getTipoColor = (tipo) => {
     switch (tipo) {
       case 'Administrador':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+        return `${classes.bgLight} ${classes.textLight} dark:${classes.bgLightDark} dark:${classes.textLightDark}`;
       case 'Fornecedor':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
       case 'Representante':
@@ -155,7 +157,7 @@ export default function GerenciamentoUsuarios() {
     return (
       <LayoutPrincipal titulo="Gerenciamento de Usuários" subtitulo="Carregando usuários...">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${classes.border}`}></div>
         </div>
       </LayoutPrincipal>
     );
@@ -177,7 +179,7 @@ export default function GerenciamentoUsuarios() {
                 placeholder="Buscar por nome ou email..."
                 value={filtro}
                 onChange={(e) => setFiltro(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               <svg
                 className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -198,7 +200,7 @@ export default function GerenciamentoUsuarios() {
             <select
               value={tipoFiltro}
               onChange={(e) => setTipoFiltro(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className={`px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
             >
               <option value="">Todos os tipos</option>
               {tiposUsuario.map(tipo => (
@@ -210,7 +212,7 @@ export default function GerenciamentoUsuarios() {
             <select
               value={statusFiltro}
               onChange={(e) => setStatusFiltro(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className={`px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
             >
               <option value="">Todos os status</option>
               {statusOptions.map(status => (
@@ -227,7 +229,7 @@ export default function GerenciamentoUsuarios() {
               setUsuarioSelecionado(null);
               setMostrarModal(true);
             }}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+            className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors flex items-center gap-2`}
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -266,7 +268,7 @@ export default function GerenciamentoUsuarios() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium">
+                        <div className={`h-10 w-10 rounded-full ${classes.bg} flex items-center justify-center text-white font-medium`}>
                           {usuario.nome.charAt(0)}
                         </div>
                       </div>
@@ -300,8 +302,7 @@ export default function GerenciamentoUsuarios() {
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => handleEditarUsuario(usuario)}
-                        className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
-                      >
+                        className={`${classes.text} hover:${classes.textLight} dark:${classes.textDark} dark:hover:${classes.textLightDark}`}>
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>

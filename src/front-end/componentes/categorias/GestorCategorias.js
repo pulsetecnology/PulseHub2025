@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ServicoCategorias from '../../servicos/ServicoCategorias';
+import { usarCorTema } from '../../utils/coresTema';
 
 export default function GestorCategorias() {
+  const { classes } = usarCorTema();
   const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
@@ -106,7 +108,7 @@ export default function GestorCategorias() {
   if (carregando) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${classes.border}`}></div>
       </div>
     );
   }
@@ -133,7 +135,7 @@ export default function GestorCategorias() {
                 placeholder="Buscar categorias..."
                 value={filtro}
                 onChange={(e) => setFiltro(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               <svg
                 className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -156,7 +158,7 @@ export default function GestorCategorias() {
                 type="checkbox"
                 checked={mostrarInativas}
                 onChange={(e) => setMostrarInativas(e.target.checked)}
-                className="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
+                className={`rounded border-gray-300 ${classes.accent} shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50`}
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                 Mostrar inativas
@@ -166,7 +168,7 @@ export default function GestorCategorias() {
             {/* Botão nova categoria */}
             <button
               onClick={() => abrirModal()}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+              className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors flex items-center gap-2`}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -252,7 +254,7 @@ export default function GestorCategorias() {
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => abrirModal(categoria)}
-                          className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+                          className={`${classes.text} hover:${classes.textLight} dark:${classes.textDark} dark:hover:${classes.textLightDark}`}
                           title="Editar categoria"
                         >
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,7 +321,7 @@ export default function GestorCategorias() {
                           type="text"
                           value={dadosCategoria.nome}
                           onChange={(e) => setDadosCategoria({...dadosCategoria, nome: e.target.value})}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:${classes.ring} focus:border-transparent dark:bg-gray-700 dark:text-white ${
                             erros.nome ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                           }`}
                           placeholder="Ex: Vestidos de Festa"
@@ -337,7 +339,7 @@ export default function GestorCategorias() {
                           value={dadosCategoria.descricao}
                           onChange={(e) => setDadosCategoria({...dadosCategoria, descricao: e.target.value})}
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                          className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:${classes.ring} focus:border-transparent dark:bg-gray-700 dark:text-white`}
                           placeholder="Descrição opcional da categoria..."
                         />
                       </div>
@@ -348,7 +350,7 @@ export default function GestorCategorias() {
                             type="checkbox"
                             checked={dadosCategoria.ativa}
                             onChange={(e) => setDadosCategoria({...dadosCategoria, ativa: e.target.checked})}
-                            className="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
+                            className={`rounded border-gray-300 ${classes.accent} shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50`}
                           />
                           <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                             Categoria ativa
@@ -362,13 +364,13 @@ export default function GestorCategorias() {
               <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={salvarCategoria}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm"
+                  className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${classes.bg} text-base font-medium text-white ${classes.bgHover} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:${classes.ring} sm:ml-3 sm:w-auto sm:text-sm`}
                 >
                   {categoriaEditando ? 'Atualizar' : 'Criar'}
                 </button>
                 <button
                   onClick={fecharModal}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-600 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-700"
+                  className={`mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:${classes.ring} sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-600 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-700`}
                 >
                   Cancelar
                 </button>

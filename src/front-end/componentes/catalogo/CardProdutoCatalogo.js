@@ -20,7 +20,7 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
       <div className={`bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:${classes.borderLight} dark:hover:${classes.borderLight} overflow-hidden`}>
         <div className="flex h-56">
           {/* Imagem do produto */}
-          <div className="relative w-42 h-full bg-gray-200 dark:bg-gray-700 flex-shrink-0">
+          <div className="relative w-40 h-full bg-gray-200 dark:bg-gray-700 flex-shrink-0">
             <img
               src={produto.imagens && produto.imagens[0] ? produto.imagens[0] : produto.imagem}
               alt={produto.nome}
@@ -144,7 +144,7 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
                       R$ {produto.precoOriginal.toFixed(2).replace('.', ',')}
                     </p>
                   )}
-                  <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                  <p className={`text-xl font-bold ${classes.text} ${classes.textDark}`}>
                     R$ {produto.preco.toFixed(2).replace('.', ',')}
                   </p>
                 </div>
@@ -152,14 +152,14 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
                 <div className="space-y-2">
                   <button
                     onClick={() => handleVerDetalhes(produto.id)}
-                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                    className={`w-full px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors text-sm`}
                   >
                     Ver Detalhes
                   </button>
                   <button
                     onClick={() => handleAdicionarCarrinho(produto)}
                     disabled={!produto.ativo}
-                    className="w-full px-4 py-2 border border-purple-600 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className={`w-full px-4 py-2 border ${classes.border} ${classes.text} ${classes.textDark} rounded-lg hover:${classes.bgLight} dark:hover:${classes.bgLightDark} transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm`}
                   >
                     {produto.ativo ? 'Solicitar Orçamento' : 'Indisponível'}
                   </button>
@@ -180,7 +180,7 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
 
   // Visualização em grid (padrão)
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-800 overflow-hidden">
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:${classes.borderLight} dark:hover:${classes.borderLight} overflow-hidden`}>
       {/* Imagem do produto */}
       <div className="relative h-48 bg-gray-200 dark:bg-gray-700">
         <img
@@ -297,7 +297,7 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
               R$ {produto.precoOriginal.toFixed(2).replace('.', ',')}
             </p>
           )}
-          <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+          <p className={`text-xl font-bold ${classes.text} ${classes.textDark}`}>
             R$ {produto.preco.toFixed(2).replace('.', ',')}
           </p>
         </div>
@@ -306,14 +306,14 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
         <div className="space-y-2">
           <button
             onClick={() => handleVerDetalhes(produto.id)}
-            className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+            className={`w-full px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors text-sm`}
           >
             Ver Detalhes
           </button>
           <button
             onClick={() => handleAdicionarCarrinho(produto)}
             disabled={!produto.ativo}
-            className="w-full px-4 py-2 border border-purple-600 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className={`w-full px-4 py-2 border ${classes.border} ${classes.text} ${classes.textDark} rounded-lg hover:${classes.bgLight} dark:hover:${classes.bgLightDark} transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm`}
           >
             {produto.ativo ? 'Solicitar Orçamento' : 'Indisponível'}
           </button>

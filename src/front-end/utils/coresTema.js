@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 // Paleta de cores disponíveis para o tema
 export const CORES_DISPONIVEIS = {
   purple: {
@@ -143,6 +145,78 @@ export const CORES_DISPONIVEIS = {
       ring: 'ring-pink-500',
       accent: 'accent-pink-600'
     }
+  },
+  yellow: {
+    nome: 'Amarelo',
+    primary: 'yellow',
+    classes: {
+      bg: 'bg-yellow-500',
+      bgHover: 'hover:bg-yellow-600',
+      bgLight: 'bg-yellow-50',
+      bgLightDark: 'dark:bg-yellow-900/20',
+      text: 'text-yellow-500',
+      textDark: 'dark:text-yellow-400',
+      textLight: 'text-yellow-600',
+      textLightDark: 'dark:text-yellow-300',
+      border: 'border-yellow-500',
+      borderLight: 'border-yellow-200',
+      ring: 'ring-yellow-500',
+      accent: 'accent-yellow-500'
+    }
+  },
+  rose: {
+    nome: 'Rosa Claro',
+    primary: 'rose',
+    classes: {
+      bg: 'bg-rose-400',
+      bgHover: 'hover:bg-rose-500',
+      bgLight: 'bg-rose-50',
+      bgLightDark: 'dark:bg-rose-900/20',
+      text: 'text-rose-400',
+      textDark: 'dark:text-rose-300',
+      textLight: 'text-rose-500',
+      textLightDark: 'dark:text-rose-200',
+      border: 'border-rose-400',
+      borderLight: 'border-rose-100',
+      ring: 'ring-rose-400',
+      accent: 'accent-rose-400'
+    }
+  },
+  black: {
+    nome: 'Preto',
+    primary: 'black',
+    classes: {
+      bg: 'bg-gray-900',
+      bgHover: 'hover:bg-gray-800',
+      bgLight: 'bg-gray-50',
+      bgLightDark: 'dark:bg-gray-900/20',
+      text: 'text-gray-900',
+      textDark: 'dark:text-gray-100',
+      textLight: 'text-gray-800',
+      textLightDark: 'dark:text-gray-200',
+      border: 'border-gray-900',
+      borderLight: 'border-gray-200',
+      ring: 'ring-gray-900',
+      accent: 'accent-gray-900'
+    }
+  },
+  cyan: {
+    nome: 'Ciano',
+    primary: 'cyan',
+    classes: {
+      bg: 'bg-cyan-500',
+      bgHover: 'hover:bg-cyan-600',
+      bgLight: 'bg-cyan-50',
+      bgLightDark: 'dark:bg-cyan-900/20',
+      text: 'text-cyan-500',
+      textDark: 'dark:text-cyan-400',
+      textLight: 'text-cyan-600',
+      textLightDark: 'dark:text-cyan-300',
+      border: 'border-cyan-500',
+      borderLight: 'border-cyan-200',
+      ring: 'ring-cyan-500',
+      accent: 'accent-cyan-500'
+    }
   }
 };
 
@@ -158,19 +232,29 @@ export const obterCorTema = () => {
 export const definirCorTema = (cor) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem('corTema', cor);
+    // Notificar os listeners sobre a mudança de tema
+    window.dispatchEvent(new Event('themeChange'));
   }
-};
-
-// Função para obter as classes CSS da cor atual
-export const obterClassesCor = (tipo = 'text') => {
-  const corAtual = obterCorTema();
-  const corConfig = CORES_DISPONIVEIS[corAtual] || CORES_DISPONIVEIS.purple;
-  return corConfig.classes[tipo] || '';
 };
 
 // Hook personalizado para usar cores do tema
 export const usarCorTema = () => {
-  const corAtual = obterCorTema();
+  const [corAtual, setCorAtual] = useState(obterCorTema());
+
+  useEffect(() => {
+    const handleThemeChange = () => {
+      setCorAtual(obterCorTema());
+    };
+
+    // Adicionar listener para o evento customizado
+    window.addEventListener('themeChange', handleThemeChange);
+
+    // Cleanup listener on unmount
+    return () => {
+      window.removeEventListener('themeChange', handleThemeChange);
+    };
+  }, []); // Empty dependency array means this runs once on mount and cleans up on unmount
+
   const corConfig = CORES_DISPONIVEIS[corAtual] || CORES_DISPONIVEIS.purple;
   
   return {

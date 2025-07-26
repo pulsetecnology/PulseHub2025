@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ServicoAutenticacao } from '../servicos/ServicoAutenticacao';
 import Logotipo from '../componentes/Logotipo';
+import { usarCorTema } from '../utils/coresTema';
 
 export default function LoginTailwind() {
+  const { classes } = usarCorTema();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState(null);
@@ -131,19 +133,19 @@ export default function LoginTailwind() {
             </p>
             <div className="space-y-3 text-gray-600 dark:text-gray-400 max-w-sm mx-auto">
               <div className="flex items-center">
-                <svg className="h-5 w-5 text-purple-600 flex-shrink-0 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`h-5 w-5 ${classes.text} flex-shrink-0 mr-3`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <span>Gestão completa de catálogos e produtos</span>
               </div>
               <div className="flex items-center">
-                <svg className="h-5 w-5 text-purple-600 flex-shrink-0 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`h-5 w-5 ${classes.text} flex-shrink-0 mr-3`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <span>Controle de pedidos e comissões</span>
               </div>
               <div className="flex items-center">
-                <svg className="h-5 w-5 text-purple-600 flex-shrink-0 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`h-5 w-5 ${classes.text} flex-shrink-0 mr-3`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 <span>Relatórios e análises em tempo real</span>
@@ -156,11 +158,11 @@ export default function LoginTailwind() {
         <div className="w-full max-w-md mx-auto lg:mx-0">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
             {/* Header do card */}
-            <div className="bg-purple-600 px-6 py-4 relative">
+            <div className={`${classes.bg} px-6 py-4 relative`}>
               {/* Botão de tema no canto superior direito */}
               <button
                 onClick={alternarTema}
-                className="absolute top-4 right-4 p-2 rounded-lg bg-purple-700 hover:bg-purple-800 text-white transition-colors"
+                className={`absolute top-4 right-4 p-2 rounded-lg ${classes.bgHover} text-white transition-colors`}
                 title={tema === 'claro' ? 'Ativar tema escuro' : 'Ativar tema claro'}
               >
                 {tema === 'claro' ? (
@@ -259,7 +261,7 @@ export default function LoginTailwind() {
                   <input
                     id="email"
                     type="email"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                    className={`w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:${classes.ring} focus:${classes.border} bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
                     placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -272,14 +274,14 @@ export default function LoginTailwind() {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300" htmlFor="senha">
                       Senha
                     </label>
-                    <a href="/recuperar-senha" className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 transition-colors">
+                    <a href="/recuperar-senha" className={`text-sm ${classes.text} ${classes.textDark} hover:${classes.textLight} dark:hover:${classes.textLightDark} transition-colors`}>
                       Esqueceu?
                     </a>
                   </div>
                   <input
                     id="senha"
                     type="password"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                    className={`w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:${classes.ring} focus:${classes.border} bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
                     placeholder="Digite sua senha"
                     value={senha}
                     onChange={(e) => setSenha(e.target.value)}
@@ -289,7 +291,7 @@ export default function LoginTailwind() {
                 
                 <button
                   type="submit"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg hover:shadow-lg transition duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed"
+                  className={`w-full ${classes.bg} ${classes.bgHover} text-white font-semibold py-3 px-4 rounded-lg hover:shadow-lg transition duration-300 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed`}
                   disabled={carregando}
                 >
                   {carregando ? (
@@ -308,7 +310,7 @@ export default function LoginTailwind() {
                 <button
                   type="button"
                   onClick={() => setMostrarUsuariosDemo(!mostrarUsuariosDemo)}
-                  className="w-full text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className={`w-full text-sm text-gray-600 dark:text-gray-400 hover:${classes.text} dark:hover:${classes.textDark} transition-colors flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700`}
                 >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
@@ -371,7 +373,7 @@ export default function LoginTailwind() {
               <div className="text-center mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Não tem uma conta?{' '}
-                  <a href="/registrar" className="text-purple-600 dark:text-purple-400 font-semibold hover:text-purple-800 dark:hover:text-purple-300 transition-colors">
+                  <a href="/registrar" className={`${classes.text} ${classes.textDark} font-semibold hover:${classes.textLight} dark:hover:${classes.textLightDark} transition-colors`}>
                     Criar conta gratuita
                   </a>
                 </p>

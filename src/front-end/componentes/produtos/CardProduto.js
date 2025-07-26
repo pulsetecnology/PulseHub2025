@@ -39,7 +39,7 @@ export default function CardProduto({ produto, visualizacao = 'grid' }) {
         <div className="flex h-56">
           {/* Imagem do produto */}
           <div className="relative flex-shrink-0">
-            <div className="w-42 h-full bg-gray-200 dark:bg-gray-700 rounded-l-lg overflow-hidden">
+            <div className="w-40 h-full bg-gray-200 dark:bg-gray-700 rounded-l-lg overflow-hidden">
               {produto.imagens && produto.imagens.length > 0 ? (
                 <>
                   <img

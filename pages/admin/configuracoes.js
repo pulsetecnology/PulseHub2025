@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import LayoutPrincipal from '../../src/front-end/componentes/layout/LayoutPrincipal';
+import { usarCorTema } from '../../src/front-end/utils/coresTema';
 
 export default function ConfiguracoesAdministrativas() {
+  const { classes } = usarCorTema();
   const [configuracoes, setConfiguracoes] = useState({
     sistema: {
       nomeEmpresa: 'PulseHub',
@@ -83,7 +85,7 @@ export default function ConfiguracoesAdministrativas() {
     return (
       <LayoutPrincipal titulo="Configurações do Sistema" subtitulo="Carregando configurações...">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${classes.border}`}></div>
         </div>
       </LayoutPrincipal>
     );
@@ -111,7 +113,7 @@ export default function ConfiguracoesAdministrativas() {
                 onClick={() => setAbaSelecionada(aba.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   abaSelecionada === aba.id
-                    ? 'border-purple-500 text-purple-600 dark:text-purple-400'
+                    ? `${classes.border} ${classes.text} ${classes.textDark}`
                     : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                 }`}
               >
@@ -140,7 +142,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="text"
                     value={configuracoes.sistema.nomeEmpresa}
                     onChange={(e) => handleAlterarConfiguracao('sistema', 'nomeEmpresa', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -152,7 +154,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="email"
                     value={configuracoes.sistema.emailContato}
                     onChange={(e) => handleAlterarConfiguracao('sistema', 'emailContato', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -164,7 +166,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="tel"
                     value={configuracoes.sistema.telefoneContato}
                     onChange={(e) => handleAlterarConfiguracao('sistema', 'telefoneContato', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -176,7 +178,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="text"
                     value={configuracoes.sistema.enderecoEmpresa}
                     onChange={(e) => handleAlterarConfiguracao('sistema', 'enderecoEmpresa', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -187,7 +189,7 @@ export default function ConfiguracoesAdministrativas() {
                   id="temaEscuro"
                   checked={configuracoes.sistema.temaEscuroPadrao}
                   onChange={(e) => handleAlterarConfiguracao('sistema', 'temaEscuroPadrao', e.target.checked)}
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                  className={`h-4 w-4 ${classes.text} focus:${classes.ring} border-gray-300 rounded`}
                 />
                 <label htmlFor="temaEscuro" className="ml-2 block text-sm text-gray-900 dark:text-white">
                   Tema escuro como padrão para novos usuários
@@ -215,7 +217,7 @@ export default function ConfiguracoesAdministrativas() {
                     step="0.1"
                     value={configuracoes.comissoes.taxaPadraoFornecedor}
                     onChange={(e) => handleAlterarConfiguracao('comissoes', 'taxaPadraoFornecedor', parseFloat(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -230,7 +232,7 @@ export default function ConfiguracoesAdministrativas() {
                     step="0.1"
                     value={configuracoes.comissoes.taxaPadraoRepresentante}
                     onChange={(e) => handleAlterarConfiguracao('comissoes', 'taxaPadraoRepresentante', parseFloat(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -245,7 +247,7 @@ export default function ConfiguracoesAdministrativas() {
                     step="0.1"
                     value={configuracoes.comissoes.limiteMaximoComissao}
                     onChange={(e) => handleAlterarConfiguracao('comissoes', 'limiteMaximoComissao', parseFloat(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -256,7 +258,7 @@ export default function ConfiguracoesAdministrativas() {
                   id="comissaoNegativa"
                   checked={configuracoes.comissoes.permitirComissaoNegativa}
                   onChange={(e) => handleAlterarConfiguracao('comissoes', 'permitirComissaoNegativa', e.target.checked)}
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                  className={`h-4 w-4 ${classes.text} focus:${classes.ring} border-gray-300 rounded`}
                 />
                 <label htmlFor="comissaoNegativa" className="ml-2 block text-sm text-gray-900 dark:text-white">
                   Permitir comissões negativas (descontos)
@@ -280,7 +282,7 @@ export default function ConfiguracoesAdministrativas() {
                   <select
                     value={configuracoes.pedidos.statusPadrao}
                     onChange={(e) => handleAlterarConfiguracao('pedidos', 'statusPadrao', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   >
                     <option value="pendente">Pendente</option>
                     <option value="aprovado">Aprovado</option>
@@ -298,7 +300,7 @@ export default function ConfiguracoesAdministrativas() {
                     max="168"
                     value={configuracoes.pedidos.tempoLimiteAprovacao}
                     onChange={(e) => handleAlterarConfiguracao('pedidos', 'tempoLimiteAprovacao', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -310,7 +312,7 @@ export default function ConfiguracoesAdministrativas() {
                     id="permitirCancelamento"
                     checked={configuracoes.pedidos.permitirCancelamento}
                     onChange={(e) => handleAlterarConfiguracao('pedidos', 'permitirCancelamento', e.target.checked)}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    className={`h-4 w-4 ${classes.text} focus:${classes.ring} border-gray-300 rounded`}
                   />
                   <label htmlFor="permitirCancelamento" className="ml-2 block text-sm text-gray-900 dark:text-white">
                     Permitir cancelamento de pedidos pelos representantes
@@ -323,7 +325,7 @@ export default function ConfiguracoesAdministrativas() {
                     id="notificarMudancaStatus"
                     checked={configuracoes.pedidos.notificarMudancaStatus}
                     onChange={(e) => handleAlterarConfiguracao('pedidos', 'notificarMudancaStatus', e.target.checked)}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    className={`h-4 w-4 ${classes.text} focus:${classes.ring} border-gray-300 rounded`}
                   />
                   <label htmlFor="notificarMudancaStatus" className="ml-2 block text-sm text-gray-900 dark:text-white">
                     Notificar automaticamente mudanças de status
@@ -347,7 +349,7 @@ export default function ConfiguracoesAdministrativas() {
                     id="emailAtivo"
                     checked={configuracoes.notificacoes.emailAtivo}
                     onChange={(e) => handleAlterarConfiguracao('notificacoes', 'emailAtivo', e.target.checked)}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    className={`h-4 w-4 ${classes.text} focus:${classes.ring} border-gray-300 rounded`}
                   />
                   <label htmlFor="emailAtivo" className="ml-2 block text-sm text-gray-900 dark:text-white">
                     Ativar notificações por email
@@ -360,7 +362,7 @@ export default function ConfiguracoesAdministrativas() {
                     id="notificacaoInApp"
                     checked={configuracoes.notificacoes.notificacaoInApp}
                     onChange={(e) => handleAlterarConfiguracao('notificacoes', 'notificacaoInApp', e.target.checked)}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    className={`h-4 w-4 ${classes.text} focus:${classes.ring} border-gray-300 rounded`}
                   />
                   <label htmlFor="notificacaoInApp" className="ml-2 block text-sm text-gray-900 dark:text-white">
                     Ativar notificações no aplicativo
@@ -376,7 +378,7 @@ export default function ConfiguracoesAdministrativas() {
                   <select
                     value={configuracoes.notificacoes.frequenciaResumo}
                     onChange={(e) => handleAlterarConfiguracao('notificacoes', 'frequenciaResumo', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   >
                     <option value="diario">Diário</option>
                     <option value="semanal">Semanal</option>
@@ -393,7 +395,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="time"
                     value={configuracoes.notificacoes.horarioEnvioResumo}
                     onChange={(e) => handleAlterarConfiguracao('notificacoes', 'horarioEnvioResumo', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -418,7 +420,7 @@ export default function ConfiguracoesAdministrativas() {
                     max="168"
                     value={configuracoes.seguranca.tempoExpiracaoSessao}
                     onChange={(e) => handleAlterarConfiguracao('seguranca', 'tempoExpiracaoSessao', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -432,7 +434,7 @@ export default function ConfiguracoesAdministrativas() {
                     max="10"
                     value={configuracoes.seguranca.tentativasLoginMax}
                     onChange={(e) => handleAlterarConfiguracao('seguranca', 'tentativasLoginMax', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -446,7 +448,7 @@ export default function ConfiguracoesAdministrativas() {
                     max="1440"
                     value={configuracoes.seguranca.bloqueioTemporario}
                     onChange={(e) => handleAlterarConfiguracao('seguranca', 'bloqueioTemporario', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -458,7 +460,7 @@ export default function ConfiguracoesAdministrativas() {
                     id="senhaForte"
                     checked={configuracoes.seguranca.exigirSenhaForte}
                     onChange={(e) => handleAlterarConfiguracao('seguranca', 'exigirSenhaForte', e.target.checked)}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    className={`h-4 w-4 ${classes.text} focus:${classes.ring} border-gray-300 rounded`}
                   />
                   <label htmlFor="senhaForte" className="ml-2 block text-sm text-gray-900 dark:text-white">
                     Exigir senhas fortes (maiúscula, minúscula, número, símbolo)
@@ -471,7 +473,7 @@ export default function ConfiguracoesAdministrativas() {
                     id="doisFatores"
                     checked={configuracoes.seguranca.autenticacaoDoisFatores}
                     onChange={(e) => handleAlterarConfiguracao('seguranca', 'autenticacaoDoisFatores', e.target.checked)}
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    className={`h-4 w-4 ${classes.text} focus:${classes.ring} border-gray-300 rounded`}
                   />
                   <label htmlFor="doisFatores" className="ml-2 block text-sm text-gray-900 dark:text-white">
                     Habilitar autenticação de dois fatores (2FA)
@@ -493,7 +495,7 @@ export default function ConfiguracoesAdministrativas() {
           <button
             onClick={handleSalvarConfiguracoes}
             disabled={salvando}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+            className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2`}
           >
             {salvando && (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

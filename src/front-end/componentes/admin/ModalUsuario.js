@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { usarCorTema } from '../../utils/coresTema';
 
 export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
+  const { classes } = usarCorTema();
   const [dadosUsuario, setDadosUsuario] = useState({
     nome: '',
     email: '',
@@ -165,7 +167,7 @@ export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
                 type="text"
                 value={dadosUsuario.nome}
                 onChange={(e) => handleInputChange('nome', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:text-white ${
                   erros.nome 
                     ? 'border-red-300 dark:border-red-600' 
                     : 'border-gray-300 dark:border-gray-600'
@@ -186,7 +188,7 @@ export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
                 type="email"
                 value={dadosUsuario.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:text-white ${
                   erros.email 
                     ? 'border-red-300 dark:border-red-600' 
                     : 'border-gray-300 dark:border-gray-600'
@@ -206,7 +208,7 @@ export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
               <select
                 value={dadosUsuario.tipo}
                 onChange={(e) => handleInputChange('tipo', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               >
                 {tiposUsuario.map(tipo => (
                   <option key={tipo.value} value={tipo.value}>
@@ -225,7 +227,7 @@ export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
                 type="text"
                 value={dadosUsuario.empresa}
                 onChange={(e) => handleInputChange('empresa', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:text-white ${
                   erros.empresa 
                     ? 'border-red-300 dark:border-red-600' 
                     : 'border-gray-300 dark:border-gray-600'
@@ -246,7 +248,7 @@ export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
                 type="tel"
                 value={dadosUsuario.telefone}
                 onChange={(e) => handleInputChange('telefone', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
                 placeholder="(11) 99999-9999"
               />
             </div>
@@ -259,7 +261,7 @@ export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
               <select
                 value={dadosUsuario.status}
                 onChange={(e) => handleInputChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               >
                 {statusOptions.map(status => (
                   <option key={status.value} value={status.value}>
@@ -280,7 +282,7 @@ export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
                     type="password"
                     value={dadosUsuario.senha}
                     onChange={(e) => handleInputChange('senha', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:text-white ${
                       erros.senha 
                         ? 'border-red-300 dark:border-red-600' 
                         : 'border-gray-300 dark:border-gray-600'
@@ -300,7 +302,7 @@ export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
                     type="password"
                     value={dadosUsuario.confirmarSenha}
                     onChange={(e) => handleInputChange('confirmarSenha', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:text-white ${
                       erros.confirmarSenha 
                         ? 'border-red-300 dark:border-red-600' 
                         : 'border-gray-300 dark:border-gray-600'
@@ -327,7 +329,7 @@ export default function ModalUsuario({ mostrar, usuario, onFechar, onSalvar }) {
             <button
               type="submit"
               disabled={salvando}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2`}
             >
               {salvando && (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

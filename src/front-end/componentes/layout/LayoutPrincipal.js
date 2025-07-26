@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './Sidebar';
 import { ServicoAutenticacao } from '../../servicos/ServicoAutenticacao';
-import { usarCorTema } from '../../utils/coresTema';
+import { usarCorTema, definirCorTema } from '../../utils/coresTema';
+import MiniModalSeletorCores from '../comum/MiniModalSeletorCores';
 
 export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVoltar, botaoAcao }) {
   const [tema, setTema] = useState('claro');
   const { classes } = usarCorTema();
   const [usuario, setUsuario] = useState(null);
   const [mostrarDropdownUsuario, setMostrarDropdownUsuario] = useState(false);
+  const [mostrarColorModal, setMostrarColorModal] = useState(false); // New state for color modal
   const [sidebarRecolhido, setSidebarRecolhido] = useState(() => {
     // Recuperar estado do sidebar do localStorage
     if (typeof window !== 'undefined') {
@@ -17,6 +19,8 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
     return false;
   });
   const servicoAutenticacao = new ServicoAutenticacao();
+
+  const colorModalRef = useRef(null);
 
   useEffect(() => {
     // Verificar tema salvo
@@ -36,10 +40,13 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
       setUsuario(dadosUsuario);
     }
 
-    // Fechar dropdown quando clicar fora
+    // Fechar dropdowns e modais quando clicar fora
     const handleClickOutside = (event) => {
       if (!event.target.closest('.dropdown-usuario')) {
         setMostrarDropdownUsuario(false);
+      }
+      if (colorModalRef.current && !colorModalRef.current.contains(event.target) && !event.target.closest('.color-palette-button')) {
+        setMostrarColorModal(false);
       }
     };
 
@@ -59,6 +66,12 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
     } else {
       document.documentElement.classList.remove('dark');
     }
+  };
+
+  const handleColorSelect = (newColor) => {
+    definirCorTema(newColor); // Update the theme color
+    setMostrarColorModal(false); // Close the modal
+    // No need to reload, themeChange event will handle it
   };
 
   return (
@@ -84,16 +97,29 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
           
           <div className="flex items-center space-x-4">
             {/* Botões de ação movidos do sidebar */}
-            <button 
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Ajuda"
-              title="Ajuda"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-              </svg>
-            </button>
             
+            
+            {/* Color Palette Button and Modal */}
+            <div className="relative">
+              <button
+                onClick={() => setMostrarColorModal(!mostrarColorModal)}
+                className="color-palette-button text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Selecionar cor do tema"
+                title="Selecionar cor do tema"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22c3.31 0 6-2.69 6-6 0-4.5-6-14-6-14s-6 9.5-6 14c0 3.31 2.69 6 6 6z"/>
+                </svg>
+              </button>
+              <div ref={colorModalRef} className="absolute top-full mt-2 left-0 z-50">
+                <MiniModalSeletorCores 
+                  isOpen={mostrarColorModal}
+                  onClose={() => setMostrarColorModal(false)}
+                  onColorSelect={handleColorSelect}
+                />
+              </div>
+            </div>
+
             <button 
               onClick={alternarTema}
               className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -197,6 +223,8 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
           {children}
         </main>
       </div>
+
+      
     </div>
   );
 }

@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import ServicoProdutos from '../../servicos/ServicoProdutos';
 import ModalImagem from '../comum/ModalImagem';
+import { usarCorTema } from '../../utils/coresTema';
 
 export default function DetalheProduto({ produtoId, produto: produtoProp }) {
   const router = useRouter();
+  const { classes } = usarCorTema();
   const [produto, setProduto] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [imagemSelecionada, setImagemSelecionada] = useState(0);
@@ -76,7 +78,7 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
   if (carregando) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${classes.border}`}></div>
       </div>
     );
   }
@@ -87,7 +89,7 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Produto não encontrado</h2>
         <button
           onClick={() => router.back()}
-          className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          className={`mt-4 px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors`}
         >
           Voltar
         </button>
@@ -101,13 +103,13 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
       <nav className="mb-6">
         <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
           <li>
-            <button onClick={() => router.push('/catalogo')} className="hover:text-purple-600">
+            <button onClick={() => router.push('/catalogo')} className={`hover:${classes.text}`}>
               Catálogo
             </button>
           </li>
           <li>/</li>
           <li>
-            <button onClick={() => router.push(`/catalogo?categoria=${produto.categoria}`)} className="hover:text-purple-600">
+            <button onClick={() => router.push(`/catalogo?categoria=${produto.categoria}`)} className={`hover:${classes.text}`}>
               {produto.categoria}
             </button>
           </li>
@@ -153,7 +155,7 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
                 onClick={() => setImagemSelecionada(index)}
                 className={`aspect-w-1 aspect-h-1 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden border-2 ${
                   imagemSelecionada === index 
-                    ? 'border-purple-600' 
+                    ? classes.border 
                     : 'border-transparent hover:border-gray-300'
                 }`}
               >
@@ -208,7 +210,7 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
                 R$ {produto.precoOriginal.toFixed(2).replace('.', ',')}
               </p>
             )}
-            <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+            <p className={`text-3xl font-bold ${classes.text} ${classes.textDark}`}>
               R$ {produto.preco.toFixed(2).replace('.', ',')}
             </p>
             {produto.precoOriginal && produto.precoOriginal > produto.preco && (
@@ -238,7 +240,7 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
                   onClick={() => setCorSelecionada(cor.nome)}
                   className={`w-10 h-10 rounded-full border-2 ${
                     corSelecionada === cor.nome 
-                      ? 'border-purple-600 ring-2 ring-purple-200' 
+                      ? `${classes.border} ring-2 ${classes.ring}` 
                       : 'border-gray-300 dark:border-gray-600'
                   }`}
                   style={{ backgroundColor: cor.codigo }}
@@ -261,9 +263,9 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
                   disabled={!tamanho.disponivel}
                   className={`px-4 py-2 border rounded-lg ${
                     tamanhoSelecionado === tamanho.nome
-                      ? 'border-purple-600 bg-purple-50 dark:bg-purple-900/20 text-purple-600'
+                      ? `${classes.border} ${classes.bgLight} dark:${classes.bgLightDark} ${classes.text}`
                       : tamanho.disponivel
-                      ? 'border-gray-300 dark:border-gray-600 hover:border-purple-600'
+                      ? `border-gray-300 dark:border-gray-600 hover:${classes.border}`
                       : 'border-gray-200 dark:border-gray-700 text-gray-400 cursor-not-allowed'
                   }`}
                 >
@@ -303,7 +305,7 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
             <button
               onClick={handleAdicionarCarrinho}
               disabled={!produto.ativo || !corSelecionada || !tamanhoSelecionado}
-              className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium"
+              className={`w-full px-6 py-3 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium`}
             >
               {produto.ativo ? 'Solicitar Orçamento' : 'Produto Indisponível'}
             </button>
@@ -329,7 +331,7 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
         <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-8 px-6">
-            <button className="py-4 px-1 border-b-2 border-purple-600 text-purple-600 font-medium text-sm">
+            <button className={`py-4 px-1 border-b-2 ${classes.border} ${classes.text} font-medium text-sm`}>
               Descrição
             </button>
             <button className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm">

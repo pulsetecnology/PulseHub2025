@@ -1,6 +1,9 @@
 import React from 'react';
+import { usarCorTema } from '../../utils/coresTema';
 
 export default function CardCliente({ cliente }) {
+  const { classes } = usarCorTema();
+
   const formatarPreco = (preco) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -65,7 +68,7 @@ export default function CardCliente({ cliente }) {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-800">
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 hover:${classes.borderLight} dark:hover:${classes.borderLight}`}>
       {/* Cabeçalho do card */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex justify-between items-start mb-2">
@@ -110,7 +113,7 @@ export default function CardCliente({ cliente }) {
         {/* Estatísticas */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="text-center">
-            <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+            <p className={`text-2xl font-bold ${classes.text} ${classes.textDark}`}>
               {cliente.totalPedidos}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">Pedidos</p>
@@ -146,7 +149,7 @@ export default function CardCliente({ cliente }) {
         <div className="flex gap-2">
           <button
             onClick={() => window.location.href = `/clientes/${cliente.id}`}
-            className="flex-1 px-3 py-2 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            className={`flex-1 px-3 py-2 text-sm ${classes.bg} text-white rounded-md ${classes.bgHover} transition-colors`}
           >
             Ver Detalhes
           </button>

@@ -249,6 +249,13 @@ class ServicoProdutos {
     return ServicoCategorias.obterNomes();
   }
 
+  // Obter fornecedores únicos
+  obterFornecedores() {
+    const produtos = this.obterTodos();
+    const fornecedores = produtos.map(p => p.fornecedor).filter(Boolean);
+    return [...new Set(fornecedores)];
+  }
+
   // Validar SKU único
   validarSKU(sku, idExcluir = null) {
     const produtos = this.obterTodos();

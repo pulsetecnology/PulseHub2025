@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CardProdutoCatalogo from './CardProdutoCatalogo';
 import ServicoProdutos from '../../servicos/ServicoProdutos';
 import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
+import InputPreco from '../comum/InputPreco';
 
 export default function CatalogoProdutos() {
   const [produtos, setProdutos] = useState([]);
@@ -10,10 +11,13 @@ export default function CatalogoProdutos() {
     categoria: '',
     precoMin: '',
     precoMax: '',
-    busca: ''
+    busca: '',
+    fornecedor: ''
   });
   const [ordenacao, setOrdenacao] = useState('nome');
   const [visualizacao, setVisualizacao] = useState('grid'); // grid ou lista
+  const [agruparPorFornecedor, setAgruparPorFornecedor] = useState(false);
+  const [filtrosVisiveis, setFiltrosVisiveis] = useState(false);
   const [papelUsuario, setPapelUsuario] = useState(PAPEIS.REPRESENTANTE);
 
   // Carregar produtos reais do ServicoProdutos
@@ -64,8 +68,9 @@ export default function CatalogoProdutos() {
     const matchCategoria = !filtros.categoria || produto.categoria === filtros.categoria;
     const matchPrecoMin = !filtros.precoMin || produto.preco >= parseFloat(filtros.precoMin);
     const matchPrecoMax = !filtros.precoMax || produto.preco <= parseFloat(filtros.precoMax);
+    const matchFornecedor = !filtros.fornecedor || produto.fornecedor === filtros.fornecedor;
     
-    return matchBusca && matchCategoria && matchPrecoMin && matchPrecoMax;
+    return matchBusca && matchCategoria && matchPrecoMin && matchPrecoMax && matchFornecedor;
   });
 
   // Ordenar produtos (produtos em destaque sempre primeiro)
@@ -89,7 +94,17 @@ export default function CatalogoProdutos() {
     }
   });
 
+  const produtosAgrupados = produtosOrdenados.reduce((acc, produto) => {
+    const fornecedor = produto.fornecedor || 'Outros';
+    if (!acc[fornecedor]) {
+      acc[fornecedor] = [];
+    }
+    acc[fornecedor].push(produto);
+    return acc;
+  }, {});
+
   const categorias = ServicoProdutos.obterCategorias();
+  const fornecedores = ServicoProdutos.obterFornecedores();
 
   const handleFiltroChange = (campo, valor) => {
     setFiltros(prev => ({
@@ -103,7 +118,8 @@ export default function CatalogoProdutos() {
       categoria: '',
       precoMin: '',
       precoMax: '',
-      busca: ''
+      busca: '',
+      fornecedor: ''
     });
   };
 
@@ -119,75 +135,98 @@ export default function CatalogoProdutos() {
     <div className="space-y-6">
       {/* Barra de busca e filtros */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-          {/* Busca */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Buscar produtos
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={filtros.busca}
-                onChange={(e) => handleFiltroChange('busca', e.target.value)}
-                placeholder="Nome ou descrição..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              />
-              <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Filtros</h2>
+          <button 
+            onClick={() => setFiltrosVisiveis(!filtrosVisiveis)}
+            className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300"
+          >
+            {filtrosVisiveis ? 'Ocultar Filtros' : 'Mostrar Filtros'}
+          </button>
+        </div>
+
+        {filtrosVisiveis && (
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+            {/* Busca */}
+            <div className="md:col-span-1 lg:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Buscar produtos
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={filtros.busca}
+                  onChange={(e) => handleFiltroChange('busca', e.target.value)}
+                  placeholder="Nome ou descrição..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+                <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Categoria */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Categoria
+              </label>
+              <select
+                value={filtros.categoria}
+                onChange={(e) => handleFiltroChange('categoria', e.target.value)}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">Todas</option>
+                {categorias.map(categoria => (
+                  <option key={categoria} value={categoria}>{categoria}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Fornecedor */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Fornecedor
+              </label>
+              <select
+                value={filtros.fornecedor}
+                onChange={(e) => handleFiltroChange('fornecedor', e.target.value)}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">Todos</option>
+                {fornecedores.map(fornecedor => (
+                  <option key={fornecedor} value={fornecedor}>{fornecedor}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Preço */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Preço Mín.
+                </label>
+                <InputPreco
+                  value={filtros.precoMin}
+                  onChange={(valor) => handleFiltroChange('precoMin', valor)}
+                  placeholder="0,00"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Preço Máx.
+                </label>
+                <InputPreco
+                  value={filtros.precoMax}
+                  onChange={(valor) => handleFiltroChange('precoMax', valor)}
+                  placeholder="1.000,00"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+              </div>
             </div>
           </div>
-
-          {/* Categoria */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Categoria
-            </label>
-            <select
-              value={filtros.categoria}
-              onChange={(e) => handleFiltroChange('categoria', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-            >
-              <option value="">Todas as categorias</option>
-              {categorias.map(categoria => (
-                <option key={categoria} value={categoria}>{categoria}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Preço mínimo */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Preço mínimo
-            </label>
-            <input
-              type="number"
-              value={filtros.precoMin}
-              onChange={(e) => handleFiltroChange('precoMin', e.target.value)}
-              placeholder="R$ 0,00"
-              min="0"
-              step="0.01"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-
-          {/* Preço máximo */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Preço máximo
-            </label>
-            <input
-              type="number"
-              value={filtros.precoMax}
-              onChange={(e) => handleFiltroChange('precoMax', e.target.value)}
-              placeholder="R$ 999,99"
-              min="0"
-              step="0.01"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-            />
-          </div>
-        </div>
+        )}
 
         {/* Botões de ação */}
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -199,6 +238,17 @@ export default function CatalogoProdutos() {
           </button>
 
           <div className="flex items-center space-x-4">
+            {/* Agrupar por Fornecedor */}
+            <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                checked={agruparPorFornecedor}
+                onChange={(e) => setAgruparPorFornecedor(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              />
+              <span className="ml-2">Agrupar por fornecedor</span>
+            </label>
+
             {/* Ordenação */}
             <div className="flex items-center space-x-2">
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -207,7 +257,7 @@ export default function CatalogoProdutos() {
               <select
                 value={ordenacao}
                 onChange={(e) => setOrdenacao(e.target.value)}
-                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                className="px-3 py-1 pr-10 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
               >
                 <option value="nome">Nome</option>
                 <option value="preco-asc">Menor preço</option>
@@ -280,19 +330,40 @@ export default function CatalogoProdutos() {
             </p>
           </div>
         ) : (
-          <div className={
-            visualizacao === 'grid' 
-              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-              : 'space-y-4'
-          }>
-            {produtosOrdenados.map(produto => (
-              <CardProdutoCatalogo 
-                key={produto.id} 
-                produto={produto} 
-                visualizacao={visualizacao}
-              />
-            ))}
-          </div>
+          agruparPorFornecedor ? (
+            Object.keys(produtosAgrupados).map(fornecedor => (
+              <div key={fornecedor} className="mb-8">
+                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 border-b pb-2">{fornecedor}</h2>
+                <div className={
+                  visualizacao === 'grid' 
+                    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                    : 'space-y-4'
+                }>
+                  {produtosAgrupados[fornecedor].map(produto => (
+                    <CardProdutoCatalogo 
+                      key={produto.id} 
+                      produto={produto} 
+                      visualizacao={visualizacao}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className={
+              visualizacao === 'grid' 
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+                : 'space-y-4'
+            }>
+              {produtosOrdenados.map(produto => (
+                <CardProdutoCatalogo 
+                  key={produto.id} 
+                  produto={produto} 
+                  visualizacao={visualizacao}
+                />
+              ))}
+            </div>
+          )
         )}
       </div>
     </div>
