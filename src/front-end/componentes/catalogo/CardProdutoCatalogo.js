@@ -144,7 +144,7 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
                       R$ {produto.precoOriginal.toFixed(2).replace('.', ',')}
                     </p>
                   )}
-                  <p className={`text-xl font-bold ${classes.text} ${classes.textDark}`}>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">
                     R$ {produto.preco.toFixed(2).replace('.', ',')}
                   </p>
                 </div>
@@ -297,7 +297,7 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
               R$ {produto.precoOriginal.toFixed(2).replace('.', ',')}
             </p>
           )}
-          <p className={`text-xl font-bold ${classes.text} ${classes.textDark}`}>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">
             R$ {produto.preco.toFixed(2).replace('.', ',')}
           </p>
         </div>

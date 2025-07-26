@@ -220,6 +220,20 @@ export const CORES_DISPONIVEIS = {
   }
 };
 
+// Classes Tailwind CSS que precisam ser geradas dinamicamente para o hover
+// hover:bg-purple-50 dark:hover:bg-purple-900/20
+// hover:bg-blue-50 dark:hover:bg-blue-900/20
+// hover:bg-green-50 dark:hover:bg-green-900/20
+// hover:bg-red-50 dark:hover:bg-red-900/20
+// hover:bg-orange-50 dark:hover:bg-orange-900/20
+// hover:bg-indigo-50 dark:hover:bg-indigo-900/20
+// hover:bg-teal-50 dark:hover:bg-teal-900/20
+// hover:bg-pink-50 dark:hover:bg-pink-900/20
+// hover:bg-yellow-50 dark:hover:bg-yellow-900/20
+// hover:bg-rose-50 dark:hover:bg-rose-900/20
+// hover:bg-gray-50 dark:hover:bg-gray-900/20
+// hover:bg-cyan-50 dark:hover:bg-cyan-900/20
+
 // Função para obter a cor atual do tema
 export const obterCorTema = () => {
   if (typeof window !== 'undefined') {

@@ -33,7 +33,7 @@ export default function CardEstatistica({ titulo, valor, variacao, icone, usarCo
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg p-6">
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-gray-600 dark:text-gray-400 truncate">

@@ -106,7 +106,7 @@ export default function CardPedido({ pedido }) {
             </span>
           </div>
           <div className="text-right">
-            <p className={`text-2xl font-bold ${classes.text} ${classes.textDark}`}>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatarPreco(pedido.valor)}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -196,7 +196,7 @@ export default function CardPedido({ pedido }) {
                   <p className="font-medium text-gray-900 dark:text-white">
                     {item.produto}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-900 dark:text-white">
                     Quantidade: {item.quantidade} • Preço unitário: {formatarPreco(item.preco)}
                   </p>
                 </div>

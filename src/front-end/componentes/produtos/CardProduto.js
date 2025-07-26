@@ -109,7 +109,7 @@ export default function CardProduto({ produto, visualizacao = 'grid' }) {
               <div className="flex flex-col items-end justify-center ml-4">
                 {/* Preço */}
                 <div className="text-right mb-4">
-                  <span className={`text-xl font-bold ${classes.text} ${classes.textDark}`}>
+                  <span className="text-xl font-bold text-gray-900 dark:text-white">
                     {formatarPreco(produto.preco)}
                   </span>
                   {produto.precoOriginal && produto.precoOriginal > produto.preco && (
@@ -222,7 +222,7 @@ export default function CardProduto({ produto, visualizacao = 'grid' }) {
         {/* Preço e produção */}
         <div className="flex justify-between items-center mb-4">
           <div>
-            <span className={`text-xl font-bold ${classes.text} ${classes.textDark}`}>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
               {formatarPreco(produto.preco)}
             </span>
           </div>

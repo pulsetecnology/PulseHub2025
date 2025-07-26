@@ -13,7 +13,7 @@ export default function CardAcaoRapida({ titulo, descricao, icone, url }) {
   return (
     <div
       onClick={handleClick}
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow border-2 p-6 cursor-pointer transition-all duration-200 hover:${classes.bgLight} hover:${classes.bgLightDark} ${classes.borderLight} dark:${classes.borderLight}`}
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg border-2 p-6 cursor-pointer transition-all duration-200 ${classes.borderLight} dark:${classes.borderLight} hover:${classes.bgLight} hover:${classes.bgLightDark}`}
     >
       <div className="flex items-start space-x-4">
         <div className="flex-shrink-0">
