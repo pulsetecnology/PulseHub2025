@@ -5,6 +5,8 @@ import '../src/front-end/estilos/globals.css';
 import '../src/front-end/estilos/styles.css';
 // Importar script para remover Turbopack
 import { removerIconeTurbopack } from '../src/front-end/utils/removerTurbopack';
+// Importar container de toast
+import ContainerToast from '../src/front-end/componentes/notificacoes/ContainerToast';
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
@@ -20,7 +22,12 @@ function MyApp({ Component, pageProps }) {
     removerIconeTurbopack();
   }, []);
 
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <Component {...pageProps} />
+      <ContainerToast />
+    </>
+  );
 }
 
 export default MyApp;

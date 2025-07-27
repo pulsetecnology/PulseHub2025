@@ -206,13 +206,13 @@
   - Escrever testes para componentes de catálogo
   - _Requisitos: 2.1, 2.3, 2.5, 3.6_
 
-- [ ] 6.6 Implementar interface de criação de pedidos
+- [x] 6.6 Implementar interface de criação de pedidos
   - Codificar fluxo de criação de pedido
   - Implementar validações em tempo real
   - Escrever testes para componentes de pedido
   - _Requisitos: 4.1, 4.2, 4.3, 5.4_
 
-- [ ] 6.7 Implementar dashboards de relatórios
+- [x] 6.7 Implementar dashboards de relatórios
   - Codificar visualizações de dados e gráficos
   - Implementar filtros e exportação
   - Escrever testes para componentes de relatórios

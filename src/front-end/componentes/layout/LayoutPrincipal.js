@@ -3,6 +3,8 @@ import Sidebar from './Sidebar';
 import { ServicoAutenticacao } from '../../servicos/ServicoAutenticacao';
 import { usarCorTema, definirCorTema } from '../../utils/coresTema';
 import MiniModalSeletorCores from '../comum/MiniModalSeletorCores';
+import CentroNotificacoes from '../notificacoes/CentroNotificacoes';
+import { adicionarNotificacoesExemplo } from '../../utils/notificacoesExemplo';
 
 export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVoltar, botaoAcao }) {
   const [tema, setTema] = useState('claro');
@@ -39,6 +41,9 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
     if (dadosUsuario) {
       setUsuario(dadosUsuario);
     }
+
+    // Adicionar notificações de exemplo (apenas uma vez)
+    adicionarNotificacoesExemplo();
 
     // Fechar dropdowns e modais quando clicar fora
     const handleClickOutside = (event) => {
@@ -96,8 +101,8 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Botões de ação movidos do sidebar */}
-            
+            {/* Centro de Notificações */}
+            <CentroNotificacoes />
             
             {/* Color Palette Button and Modal */}
             <div className="relative">
