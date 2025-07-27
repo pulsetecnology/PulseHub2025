@@ -4,9 +4,18 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* Smooth scrolling */
+/* Evitar flash durante navegação */
 html {
+  background-color: #f9fafb;
   scroll-behavior: smooth;
+}
+
+html.dark {
+  background-color: #111827;
+}
+
+body {
+  background-color: inherit;
 }
 
 /* Custom scrollbar */
@@ -35,6 +44,8 @@ html {
 .dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(75, 85, 99, 0.7);
 }
+
+/* Smooth scrolling */
 
 /* Custom focus styles */
 .focus-ring {

@@ -135,7 +135,7 @@ export default function GestorCategorias() {
                 placeholder="Buscar categorias..."
                 value={filtro}
                 onChange={(e) => setFiltro(e.target.value)}
-                className={`pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               <svg
                 className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -321,7 +321,7 @@ export default function GestorCategorias() {
                           type="text"
                           value={dadosCategoria.nome}
                           onChange={(e) => setDadosCategoria({...dadosCategoria, nome: e.target.value})}
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:${classes.ring} focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:${classes.ring} focus:border-transparent bg-white dark:bg-gray-700 dark:text-white ${
                             erros.nome ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                           }`}
                           placeholder="Ex: Vestidos de Festa"
@@ -339,7 +339,7 @@ export default function GestorCategorias() {
                           value={dadosCategoria.descricao}
                           onChange={(e) => setDadosCategoria({...dadosCategoria, descricao: e.target.value})}
                           rows={3}
-                          className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:${classes.ring} focus:border-transparent dark:bg-gray-700 dark:text-white`}
+                          className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:${classes.ring} focus:border-transparent bg-white dark:bg-gray-700 dark:text-white`}
                           placeholder="Descrição opcional da categoria..."
                         />
                       </div>

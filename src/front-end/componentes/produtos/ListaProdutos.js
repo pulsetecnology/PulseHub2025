@@ -97,7 +97,7 @@ export default function ListaProdutos() {
                 placeholder="Buscar produtos..."
                 value={filtro}
                 onChange={(e) => setFiltro(e.target.value)}
-                className={`pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                className={`pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
               />
               <svg
                 className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
@@ -118,7 +118,7 @@ export default function ListaProdutos() {
             <select
               value={categoriaFiltro}
               onChange={(e) => setCategoriaFiltro(e.target.value)}
-              className={`px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+              className={`px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
             >
               <option value="">Todas as categorias</option>
               {categorias.map(categoria => (
@@ -137,7 +137,7 @@ export default function ListaProdutos() {
                 <select
                   value={ordenacao}
                   onChange={(e) => setOrdenacao(e.target.value)}
-                  className={`px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:${classes.ring} focus:border-transparent dark:bg-gray-700 dark:text-white text-sm`}
+                  className={`px-3 py-1 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:${classes.ring} focus:border-transparent bg-white dark:bg-gray-700 dark:text-white text-sm`}
                 >
                   <option value="data">Mais recentes</option>
                   <option value="nome">Nome</option>

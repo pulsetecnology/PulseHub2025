@@ -8,6 +8,14 @@ import { removerIconeTurbopack } from '../src/front-end/utils/removerTurbopack';
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
+    // Aplicar tema imediatamente para evitar flash
+    const temaSalvo = localStorage.getItem('tema') || 'claro';
+    if (temaSalvo === 'escuro') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
     // Remover ícone do Turbopack
     removerIconeTurbopack();
   }, []);

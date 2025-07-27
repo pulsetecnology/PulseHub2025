@@ -210,7 +210,7 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
                 R$ {produto.precoOriginal.toFixed(2).replace('.', ',')}
               </p>
             )}
-            <p className={`text-3xl font-bold ${classes.text} ${classes.textDark}`}>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">
               R$ {produto.preco.toFixed(2).replace('.', ',')}
             </p>
             {produto.precoOriginal && produto.precoOriginal > produto.preco && (
