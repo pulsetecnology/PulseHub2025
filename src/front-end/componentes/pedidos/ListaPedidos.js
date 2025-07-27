@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import CardPedido from './CardPedido';
 import { usarCorTema } from '../../utils/coresTema';
 import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
 import ServicoPedidos from '../../servicos/ServicoPedidos';
 
 export default function ListaPedidos() {
+  const router = useRouter();
   const { classes } = usarCorTema();
   const [pedidos, setPedidos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [filtro, setFiltro] = useState('');
   const [statusFiltro, setStatusFiltro] = useState('');
   const [papelUsuario, setPapelUsuario] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
   const servicoPedidos = new ServicoPedidos();
 
   useEffect(() => {
+    setMounted(true);
     setPapelUsuario(obterPapelUsuario());
     carregarPedidos();
   }, []);
@@ -156,7 +160,7 @@ export default function ListaPedidos() {
             {/* Botão novo pedido - apenas para representantes */}
             {papelUsuario === PAPEIS.REPRESENTANTE && (
               <button
-                onClick={() => window.location.href = '/pedidos/novo'}
+                onClick={() => router.push('/pedidos/novo')}
                 className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors flex items-center gap-2`}
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

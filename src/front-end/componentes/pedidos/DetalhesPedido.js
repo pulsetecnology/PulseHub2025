@@ -14,10 +14,17 @@ export default function DetalhesPedido({ pedidoId }) {
   const [carregandoStatus, setCarregandoStatus] = useState(false);
   const [papelUsuario, setPapelUsuario] = useState(null);
   const [erro, setErro] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
   const servicoPedidos = new ServicoPedidos();
 
+  const formatarValor = (valor) => {
+    if (!mounted || !valor) return 'R$ 0,00';
+    return `R$ ${valor.toFixed(2)}`;
+  };
+
   useEffect(() => {
+    setMounted(true);
     setPapelUsuario(obterPapelUsuario());
     carregarPedido();
   }, [pedidoId]);
@@ -141,7 +148,7 @@ export default function DetalhesPedido({ pedidoId }) {
               Pedido {pedido.numero}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Criado em {new Date(pedido.dataCreacao).toLocaleDateString('pt-BR')}
+              Criado em {mounted ? new Date(pedido.dataCreacao).toLocaleDateString('pt-BR') : ''}
             </p>
           </div>
           <div className="flex items-center space-x-4">
@@ -171,23 +178,23 @@ export default function DetalhesPedido({ pedidoId }) {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>R$ {pedido.subtotal?.toFixed(2)}</span>
+                <span>{formatarValor(pedido.subtotal)}</span>
               </div>
               {pedido.desconto > 0 && (
                 <div className="flex justify-between text-red-600">
                   <span>Desconto:</span>
-                  <span>- R$ {pedido.desconto?.toFixed(2)}</span>
+                  <span>- {formatarValor(pedido.desconto)}</span>
                 </div>
               )}
               {pedido.frete > 0 && (
                 <div className="flex justify-between">
                   <span>Frete:</span>
-                  <span>R$ {pedido.frete?.toFixed(2)}</span>
+                  <span>{formatarValor(pedido.frete)}</span>
                 </div>
               )}
               <div className="border-t pt-2 flex justify-between font-medium text-lg">
                 <span>Total:</span>
-                <span className={classes.text}>R$ {pedido.total?.toFixed(2)}</span>
+                <span className={classes.text}>{formatarValor(pedido.total)}</span>
               </div>
             </div>
           </div>
@@ -245,10 +252,10 @@ export default function DetalhesPedido({ pedidoId }) {
                     {item.quantidade}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                    R$ {item.precoUnitario?.toFixed(2)}
+                    {formatarValor(item.precoUnitario)}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                    R$ {item.subtotal?.toFixed(2)}
+                    {formatarValor(item.subtotal)}
                   </td>
                 </tr>
               ))}

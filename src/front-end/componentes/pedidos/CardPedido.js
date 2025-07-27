@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { usarCorTema } from '../../utils/coresTema';
 
 export default function CardPedido({ pedido }) {
+  const router = useRouter();
   const { classes } = usarCorTema();
   const [expandido, setExpandido] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const formatarPreco = (preco) => {
+    if (!mounted) return 'R$ 0,00'; // Valor padrão durante SSR
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
@@ -13,6 +21,7 @@ export default function CardPedido({ pedido }) {
   };
 
   const formatarData = (data) => {
+    if (!mounted) return ''; // Valor padrão durante SSR
     return new Date(data).toLocaleDateString('pt-BR');
   };
 
@@ -184,7 +193,7 @@ export default function CardPedido({ pedido }) {
           {/* Ações */}
           <div className="flex gap-2">
             <button
-              onClick={() => window.location.href = `/pedidos/${pedido.id}`}
+              onClick={() => router.push(`/pedidos/${pedido.id}`)}
               className={`px-3 py-2 text-sm ${classes.bg} text-white rounded-md ${classes.bgHover} transition-colors`}
             >
               Ver Detalhes
