@@ -213,15 +213,15 @@ export default function CardPedido({ pedido }) {
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex-1">
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {item.produto}
+                    {item.produto?.nome || item.produto}
                   </p>
                   <p className="text-sm text-gray-900 dark:text-white">
-                    Quantidade: {item.quantidade} • Preço unitário: {formatarPreco(item.preco)}
+                    Quantidade: {item.quantidade} • Preço unitário: {formatarPreco(item.precoUnitario || item.preco)}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {formatarPreco(item.quantidade * item.preco)}
+                    {formatarPreco(item.subtotal || (item.quantidade * (item.precoUnitario || item.preco)))}
                   </p>
                 </div>
               </div>

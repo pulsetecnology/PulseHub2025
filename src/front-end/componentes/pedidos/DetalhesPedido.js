@@ -284,7 +284,7 @@ export default function DetalhesPedido({ pedidoId }) {
           )}
 
           {/* Botões para Fornecedor */}
-          {papelUsuario === PAPEIS.FORNECEDOR && pedido.status === 'pendente' && (
+          {papelUsuario === PAPEIS.FORNECEDOR && (pedido.status === 'pendente' || pedido.status === 'em_analise') && (
             <>
               <BotaoCarregando
                 onClick={() => alterarStatusPedido('aprovado')}
@@ -297,16 +297,19 @@ export default function DetalhesPedido({ pedidoId }) {
                 Aprovar Pedido
               </BotaoCarregando>
 
-              <BotaoCarregando
-                onClick={() => alterarStatusPedido('em_analise')}
-                carregando={carregandoStatus}
-                className="px-3 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors flex items-center gap-2"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Colocar em Análise
-              </BotaoCarregando>
+              {/* Botão "Colocar em Análise" só aparece se status for "pendente" */}
+              {pedido.status === 'pendente' && (
+                <BotaoCarregando
+                  onClick={() => alterarStatusPedido('em_analise')}
+                  carregando={carregandoStatus}
+                  className="px-3 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors flex items-center gap-2"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Colocar em Análise
+                </BotaoCarregando>
+              )}
 
               <BotaoCarregando
                 onClick={() => alterarStatusPedido('recusado')}
