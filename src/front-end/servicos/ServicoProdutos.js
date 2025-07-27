@@ -246,7 +246,8 @@ class ServicoProdutos {
 
   // Obter categorias únicas (agora usa o ServicoCategorias)
   obterCategorias() {
-    return ServicoCategorias.obterNomes();
+    const servicoCategorias = new ServicoCategorias();
+    return servicoCategorias.obterNomes();
   }
 
   // Obter fornecedores únicos
@@ -308,5 +309,5 @@ class ServicoProdutos {
   }
 }
 
-// Exportar instância única (singleton)
-export default new ServicoProdutos();
+// Exportar a classe
+export default ServicoProdutos;

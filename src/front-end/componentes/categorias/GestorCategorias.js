@@ -4,6 +4,7 @@ import { usarCorTema } from '../../utils/coresTema';
 
 export default function GestorCategorias() {
   const { classes } = usarCorTema();
+  const servicoCategorias = new ServicoCategorias();
   const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
@@ -27,7 +28,7 @@ export default function GestorCategorias() {
     setCarregando(true);
     
     setTimeout(() => {
-      const categoriasCarregadas = ServicoCategorias.filtrar({
+      const categoriasCarregadas = servicoCategorias.filtrar({
         busca: filtro,
         ativa: mostrarInativas ? undefined : true,
         ordenacao: 'nome'
@@ -76,9 +77,9 @@ export default function GestorCategorias() {
     
     try {
       if (categoriaEditando) {
-        await ServicoCategorias.atualizar(categoriaEditando.id, dadosCategoria);
+        await servicoCategorias.atualizar(categoriaEditando.id, dadosCategoria);
       } else {
-        await ServicoCategorias.criar(dadosCategoria);
+        await servicoCategorias.criar(dadosCategoria);
       }
       
       carregarCategorias();
@@ -91,9 +92,9 @@ export default function GestorCategorias() {
   const alternarStatusCategoria = async (categoria) => {
     try {
       if (categoria.ativa) {
-        await ServicoCategorias.excluir(categoria.id);
+        await servicoCategorias.excluir(categoria.id);
       } else {
-        await ServicoCategorias.reativar(categoria.id);
+        await servicoCategorias.reativar(categoria.id);
       }
       carregarCategorias();
     } catch (error) {

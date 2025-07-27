@@ -256,5 +256,5 @@ class ServicoCategorias {
   }
 }
 
-// Exportar instância única (singleton)
-export default new ServicoCategorias();
+// Exportar a classe
+export default ServicoCategorias;

@@ -40,7 +40,8 @@ export default function FormularioProduto({ produto = null }) {
 
   // Carregar categorias
   useEffect(() => {
-    const categoriasCarregadas = ServicoCategorias.obterAtivas();
+    const servicoCategorias = new ServicoCategorias();
+    const categoriasCarregadas = servicoCategorias.obterAtivas();
     setCategorias(categoriasCarregadas);
   }, []);
 
