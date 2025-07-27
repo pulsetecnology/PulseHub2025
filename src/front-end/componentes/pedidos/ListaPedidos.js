@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CardPedido from './CardPedido';
 import { usarCorTema } from '../../utils/coresTema';
 import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
+import ServicoPedidos from '../../servicos/ServicoPedidos';
 
 export default function ListaPedidos() {
   const { classes } = usarCorTema();
@@ -11,120 +12,55 @@ export default function ListaPedidos() {
   const [statusFiltro, setStatusFiltro] = useState('');
   const [papelUsuario, setPapelUsuario] = useState(null);
 
+  const servicoPedidos = new ServicoPedidos();
+
   useEffect(() => {
     setPapelUsuario(obterPapelUsuario());
+    carregarPedidos();
   }, []);
 
-  const handleStatusChange = (pedidoId, novoStatus) => {
-    // Atualizar o status do pedido na lista local
-    setPedidos(prevPedidos => 
-      prevPedidos.map(pedido => 
-        pedido.id === pedidoId 
-          ? { ...pedido, status: novoStatus }
-          : pedido
-      )
-    );
+
+
+  const carregarPedidos = async () => {
+    try {
+      setCarregando(true);
+      const pedidosData = await servicoPedidos.listar();
+      // Adaptar os dados para o formato esperado pelo CardPedido
+      const pedidosAdaptados = pedidosData.map(pedido => ({
+        ...pedido,
+        valor: pedido.total,
+        data: pedido.dataCreacao
+      }));
+      setPedidos(pedidosAdaptados);
+    } catch (error) {
+      console.error('Erro ao carregar pedidos:', error);
+    } finally {
+      setCarregando(false);
+    }
   };
 
-  // Dados simulados para demonstração
+  // Recarregar pedidos quando a tela ficar visível ou quando navegar de volta
   useEffect(() => {
-    const pedidosSimulados = [
-      {
-        id: 1,
-        numero: 'PED-2024-001',
-        cliente: {
-          id: 1,
-          nome: 'Tech Solutions Ltda',
-          email: 'contato@techsolutions.com'
-        },
-        representante: 'João Silva',
-        valor: 15420.50,
-        status: 'pendente',
-        data: '2024-01-15',
-        itens: [
-          { produto: 'Smartphone Galaxy Pro', quantidade: 5, preco: 2499.99 },
-          { produto: 'Fone Bluetooth Premium', quantidade: 10, preco: 599.99 }
-        ],
-        observacoes: 'Cliente solicitou entrega expressa'
-      },
-      {
-        id: 2,
-        numero: 'PED-2024-002',
-        cliente: {
-          id: 2,
-          nome: 'Inovação Digital',
-          email: 'vendas@inovacaodigital.com'
-        },
-        representante: 'Maria Santos',
-        valor: 8750.00,
-        status: 'aprovado',
-        data: '2024-01-14',
-        itens: [
-          { produto: 'Notebook Ultrabook', quantidade: 2, preco: 3299.99 },
-          { produto: 'Tablet Design Pro', quantidade: 1, preco: 1899.99 }
-        ],
-        observacoes: ''
-      },
-      {
-        id: 3,
-        numero: 'PED-2024-003',
-        cliente: {
-          id: 1,
-          nome: 'Tech Solutions Ltda',
-          email: 'contato@techsolutions.com'
-        },
-        representante: 'Carlos Oliveira',
-        valor: 12300.75,
-        status: 'em_producao',
-        data: '2024-01-13',
-        itens: [
-          { produto: 'Smartphone Galaxy Pro', quantidade: 3, preco: 2499.99 },
-          { produto: 'Fone Bluetooth Premium', quantidade: 8, preco: 599.99 }
-        ],
-        observacoes: 'Pedido prioritário'
-      },
-      {
-        id: 4,
-        numero: 'PED-2024-004',
-        cliente: {
-          id: 3,
-          nome: 'StartUp Tech',
-          email: 'hello@startuptech.com'
-        },
-        representante: 'Ana Costa',
-        valor: 5200.00,
-        status: 'enviado',
-        data: '2024-01-12',
-        itens: [
-          { produto: 'Tablet Design Pro', quantidade: 2, preco: 1899.99 },
-          { produto: 'Fone Bluetooth Premium', quantidade: 2, preco: 599.99 }
-        ],
-        observacoes: ''
-      },
-      {
-        id: 5,
-        numero: 'PED-2024-005',
-        cliente: {
-          id: 4,
-          nome: 'Consultoria Empresarial',
-          email: 'contato@consultoria.com'
-        },
-        representante: 'Pedro Lima',
-        valor: 3299.99,
-        status: 'entregue',
-        data: '2024-01-10',
-        itens: [
-          { produto: 'Notebook Ultrabook', quantidade: 1, preco: 3299.99 }
-        ],
-        observacoes: 'Cliente satisfeito com a entrega'
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        carregarPedidos();
       }
-    ];
+    };
 
-    // Simular carregamento
-    setTimeout(() => {
-      setPedidos(pedidosSimulados);
-      setCarregando(false);
-    }, 1000);
+    const handlePopState = () => {
+      // Pequeno delay para garantir que a página foi carregada
+      setTimeout(() => {
+        carregarPedidos();
+      }, 100);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   const pedidosFiltrados = pedidos.filter(pedido => {
@@ -204,6 +140,19 @@ export default function ListaPedidos() {
               ))}
             </select>
 
+            {/* Botão atualizar */}
+            <button
+              onClick={carregarPedidos}
+              disabled={carregando}
+              className="px-3 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+              title="Atualizar lista"
+            >
+              <svg className={`h-5 w-5 ${carregando ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {carregando ? 'Atualizando...' : 'Atualizar'}
+            </button>
+
             {/* Botão novo pedido - apenas para representantes */}
             {papelUsuario === PAPEIS.REPRESENTANTE && (
               <button
@@ -251,7 +200,6 @@ export default function ListaPedidos() {
             <CardPedido 
               key={pedido.id} 
               pedido={pedido} 
-              onStatusChange={handleStatusChange}
             />
           ))}
         </div>
