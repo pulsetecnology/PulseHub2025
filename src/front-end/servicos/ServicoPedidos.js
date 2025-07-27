@@ -94,7 +94,7 @@ export default class ServicoPedidos {
         desconto: 29.00,
         frete: 12.00,
         total: 272.70,
-        status: 'aprovado',
+        status: 'em_analise',
         observacoes: '',
         dataCreacao: '2024-01-14T14:20:00Z',
         dataAtualizacao: '2024-01-14T16:45:00Z'
@@ -281,7 +281,9 @@ export default class ServicoPedidos {
     return [
       { valor: 'rascunho', label: 'Rascunho', cor: 'gray' },
       { valor: 'pendente', label: 'Pendente', cor: 'yellow' },
+      { valor: 'em_analise', label: 'Em Análise', cor: 'orange' },
       { valor: 'aprovado', label: 'Aprovado', cor: 'green' },
+      { valor: 'recusado', label: 'Recusado', cor: 'red' },
       { valor: 'em_producao', label: 'Em Produção', cor: 'blue' },
       { valor: 'enviado', label: 'Enviado', cor: 'purple' },
       { valor: 'entregue', label: 'Entregue', cor: 'green' },

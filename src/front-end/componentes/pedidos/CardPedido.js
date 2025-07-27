@@ -1,9 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usarCorTema } from '../../utils/coresTema';
+import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
+import servicoNotificacoes from '../../servicos/ServicoNotificacoes';
 
-export default function CardPedido({ pedido }) {
+export default function CardPedido({ pedido, onStatusChange }) {
   const { classes } = usarCorTema();
   const [expandido, setExpandido] = useState(false);
+  const [papelUsuario, setPapelUsuario] = useState(null);
+  const [carregandoStatus, setCarregandoStatus] = useState(false);
+
+  useEffect(() => {
+    setPapelUsuario(obterPapelUsuario());
+  }, []);
+
+  const alterarStatusPedido = async (novoStatus) => {
+    setCarregandoStatus(true);
+    try {
+      // Simular chamada para API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Notificar sobre a mudança de status
+      const statusLabels = {
+        'aprovado': 'aprovado',
+        'recusado': 'recusado',
+        'em_analise': 'colocado em análise'
+      };
+      
+      servicoNotificacoes.notificarPedido(
+        'Status do Pedido Alterado',
+        `Pedido ${pedido.numero} foi ${statusLabels[novoStatus]}`,
+        pedido.id
+      );
+      
+      // Callback para atualizar a lista
+      if (onStatusChange) {
+        onStatusChange(pedido.id, novoStatus);
+      }
+      
+    } catch (error) {
+      console.error('Erro ao alterar status:', error);
+      servicoNotificacoes.notificarErro(
+        'Erro',
+        'Não foi possível alterar o status do pedido'
+      );
+    } finally {
+      setCarregandoStatus(false);
+    }
+  };
 
   const formatarPreco = (preco) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -20,8 +63,12 @@ export default function CardPedido({ pedido }) {
     switch (status) {
       case 'pendente':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      case 'em_analise':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
       case 'aprovado':
         return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'recusado':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
       case 'em_producao':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
       case 'enviado':
@@ -38,7 +85,9 @@ export default function CardPedido({ pedido }) {
   const getStatusLabel = (status) => {
     const labels = {
       'pendente': 'Pendente',
+      'em_analise': 'Em Análise',
       'aprovado': 'Aprovado',
+      'recusado': 'Recusado',
       'em_producao': 'Em Produção',
       'enviado': 'Enviado',
       'entregue': 'Entregue',
@@ -55,10 +104,22 @@ export default function CardPedido({ pedido }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         );
+      case 'em_analise':
+        return (
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+        );
       case 'aprovado':
         return (
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        );
+      case 'recusado':
+        return (
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         );
       case 'em_producao':
@@ -171,14 +232,72 @@ export default function CardPedido({ pedido }) {
             >
               Ver Detalhes
             </button>
-            <button
-              onClick={() => window.location.href = `/pedidos/${pedido.id}/editar`}
-              className="px-3 py-2 text-sm border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </button>
+            
+            {/* Botões específicos por papel de usuário */}
+            {papelUsuario === PAPEIS.REPRESENTANTE && (
+              <button
+                onClick={() => window.location.href = `/pedidos/${pedido.id}/editar`}
+                className="px-3 py-2 text-sm border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                title="Editar Pedido"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+            )}
+            
+            {/* Botões de aprovação para fornecedores */}
+            {papelUsuario === PAPEIS.FORNECEDOR && pedido.status === 'pendente' && (
+              <>
+                <button
+                  onClick={() => alterarStatusPedido('aprovado')}
+                  disabled={carregandoStatus}
+                  className="px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-1"
+                  title="Aprovar Pedido"
+                >
+                  {carregandoStatus ? (
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                  ) : (
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                  Aprovar
+                </button>
+                
+                <button
+                  onClick={() => alterarStatusPedido('em_analise')}
+                  disabled={carregandoStatus}
+                  className="px-3 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50 flex items-center gap-1"
+                  title="Colocar em Análise"
+                >
+                  {carregandoStatus ? (
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                  ) : (
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  )}
+                  Análise
+                </button>
+                
+                <button
+                  onClick={() => alterarStatusPedido('recusado')}
+                  disabled={carregandoStatus}
+                  className="px-3 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-1"
+                  title="Recusar Pedido"
+                >
+                  {carregandoStatus ? (
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                  ) : (
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                  Recusar
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

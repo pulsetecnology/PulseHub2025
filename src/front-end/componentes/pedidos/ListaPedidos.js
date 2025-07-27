@@ -15,6 +15,17 @@ export default function ListaPedidos() {
     setPapelUsuario(obterPapelUsuario());
   }, []);
 
+  const handleStatusChange = (pedidoId, novoStatus) => {
+    // Atualizar o status do pedido na lista local
+    setPedidos(prevPedidos => 
+      prevPedidos.map(pedido => 
+        pedido.id === pedidoId 
+          ? { ...pedido, status: novoStatus }
+          : pedido
+      )
+    );
+  };
+
   // Dados simulados para demonstração
   useEffect(() => {
     const pedidosSimulados = [
@@ -237,7 +248,11 @@ export default function ListaPedidos() {
       ) : (
         <div className="space-y-4">
           {pedidosFiltrados.map(pedido => (
-            <CardPedido key={pedido.id} pedido={pedido} />
+            <CardPedido 
+              key={pedido.id} 
+              pedido={pedido} 
+              onStatusChange={handleStatusChange}
+            />
           ))}
         </div>
       )}
