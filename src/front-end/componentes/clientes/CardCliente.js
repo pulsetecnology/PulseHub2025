@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { usarCorTema } from '../../utils/coresTema';
+import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
 
 export default function CardCliente({ cliente }) {
   const { classes } = usarCorTema();
+  const [papelUsuario, setPapelUsuario] = useState(null);
+
+  useEffect(() => {
+    setPapelUsuario(obterPapelUsuario());
+  }, []);
 
   const formatarPreco = (preco) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -153,14 +159,18 @@ export default function CardCliente({ cliente }) {
           >
             Ver Detalhes
           </button>
-          <button
-            onClick={() => window.location.href = `/pedidos/novo?cliente=${cliente.id}`}
-            className="px-3 py-2 text-sm border border-green-300 text-green-700 dark:text-green-400 dark:border-green-600 rounded-md hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
+          {/* Botão criar pedido - apenas para representantes */}
+          {papelUsuario === PAPEIS.REPRESENTANTE && (
+            <button
+              onClick={() => window.location.href = `/pedidos/novo?cliente=${cliente.id}`}
+              className="px-3 py-2 text-sm border border-green-300 text-green-700 dark:text-green-400 dark:border-green-600 rounded-md hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
+              title="Criar Pedido"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
+          )}
           <button
             onClick={() => window.location.href = `/clientes/${cliente.id}/editar`}
             className="px-3 py-2 text-sm border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"

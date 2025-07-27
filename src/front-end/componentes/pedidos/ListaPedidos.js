@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CardPedido from './CardPedido';
 import { usarCorTema } from '../../utils/coresTema';
+import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
 
 export default function ListaPedidos() {
   const { classes } = usarCorTema();
@@ -8,6 +9,11 @@ export default function ListaPedidos() {
   const [carregando, setCarregando] = useState(true);
   const [filtro, setFiltro] = useState('');
   const [statusFiltro, setStatusFiltro] = useState('');
+  const [papelUsuario, setPapelUsuario] = useState(null);
+
+  useEffect(() => {
+    setPapelUsuario(obterPapelUsuario());
+  }, []);
 
   // Dados simulados para demonstração
   useEffect(() => {
@@ -187,16 +193,18 @@ export default function ListaPedidos() {
               ))}
             </select>
 
-            {/* Botão novo pedido */}
-            <button
-              onClick={() => window.location.href = '/pedidos/novo'}
-              className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors flex items-center gap-2`}
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Novo Pedido
-            </button>
+            {/* Botão novo pedido - apenas para representantes */}
+            {papelUsuario === PAPEIS.REPRESENTANTE && (
+              <button
+                onClick={() => window.location.href = '/pedidos/novo'}
+                className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors flex items-center gap-2`}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Novo Pedido
+              </button>
+            )}
           </div>
         </div>
       </div>
