@@ -20,6 +20,7 @@
 - [x] 3. Desenvolver ResumoFinanceiro component
 
 
+
   - Criar cards para exibição de valores financeiros
   - Implementar inputs para desconto e frete
   - Adicionar cálculo automático de totais em tempo real
