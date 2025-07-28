@@ -5,6 +5,10 @@ import ServicoProdutos from '../../../src/front-end/servicos/ServicoProdutos';
 import ServicoClientes from '../../../src/front-end/servicos/ServicoClientes';
 import LayoutPrincipal from '../../../src/front-end/componentes/layout/LayoutPrincipal';
 import BotaoCarregando from '../../../src/front-end/componentes/comum/BotaoCarregando';
+import HeaderPedido from '../../../src/front-end/componentes/pedidos/HeaderPedido';
+import InformacoesCliente from '../../../src/front-end/componentes/pedidos/InformacoesCliente';
+import GerenciadorItens from '../../../src/front-end/componentes/pedidos/GerenciadorItens';
+import ResumoFinanceiro from '../../../src/front-end/componentes/pedidos/ResumoFinanceiro';
 import { usarCorTema } from '../../../src/front-end/utils/coresTema';
 
 export default function EditarPedidoPage() {
@@ -196,202 +200,78 @@ export default function EditarPedidoPage() {
   const clienteDoPedido = clientes.find(c => c.id === pedido.clienteId);
 
   return (
-    <LayoutPrincipal
-      titulo={`Editar Pedido #${pedido.numero}`}
-      subtitulo="Edite os detalhes do pedido"
-      botaoVoltar={{
-        texto: 'Voltar para Pedidos',
-        href: '/pedidos'
-      }}
-    >
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6">
-        {erros.geral && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-            <p className="text-sm text-red-600 dark:text-red-400">{erros.geral}</p>
-          </div>
-        )}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header do Pedido */}
+        <HeaderPedido 
+          pedido={pedido} 
+          onVoltar={() => router.push('/pedidos')}
+        />
 
-        {/* Informações do Pedido */}
-        <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Informações do Pedido</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cliente</label>
-              <select
-                value={pedido.clienteId}
-                onChange={(e) => handleInputChange('clienteId', e.target.value)}
-                disabled={isEditDisabled}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              >
-                <option value="">Selecione um cliente</option>
-                {clientes.map(cliente => (
-                  <option key={cliente.id} value={cliente.id}>
-                    {cliente.nomeFantasia || cliente.razaoSocial}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
-              <input
-                type="text"
-                value={pedido.status}
-                disabled
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Observações</label>
-              <textarea
-                value={pedido.observacoes}
-                onChange={(e) => handleInputChange('observacoes', e.target.value)}
-                disabled={isEditDisabled}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Produtos do Pedido */}
-        <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Produtos do Pedido</h3>
-          {!isEditDisabled && (
-            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Produto</label>
-                  <select
-                    value={produtoSelecionado}
-                    onChange={(e) => setProdutoSelecionado(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="">Selecione um produto</option>
-                    {produtos.map((produto) => (
-                      <option key={produto.id} value={produto.id}>
-                        {produto.nome} - R$ {produto.preco.toFixed(2)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quantidade</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={quantidadeProduto}
-                    onChange={(e) => setQuantidadeProduto(parseInt(e.target.value) || 1)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div className="flex items-end">
-                  <button
-                    onClick={adicionarProduto}
-                    disabled={!produtoSelecionado}
-                    className={`w-full px-4 py-2 ${classes.bg} text-white rounded-md hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    Adicionar
-                  </button>
-                </div>
-              </div>
+        <div className="space-y-6">
+          {erros.geral && (
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+              <p className="text-sm text-red-600 dark:text-red-400">{erros.geral}</p>
             </div>
           )}
 
-          {pedido.itens && pedido.itens.length > 0 ? (
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-50 dark:bg-gray-800">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Produto</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Preço Unit.</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Quantidade</th>
-                    <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Subtotal</th>
-                    {!isEditDisabled && <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">Ações</th>}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {pedido.itens.map((item) => (
-                    <tr key={item.produtoId}>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.produto?.nome || item.produtoId}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">R$ {item.precoUnitario.toFixed(2)}</td>
-                      <td className="px-4 py-3">
-                        <input
-                          type="number"
-                          min="1"
-                          value={item.quantidade}
-                          onChange={(e) => atualizarQuantidade(item.produtoId, parseInt(e.target.value) || 0)}
-                          disabled={isEditDisabled}
-                          className="w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-                        />
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">R$ {item.subtotal.toFixed(2)}</td>
-                      {!isEditDisabled && (
-                        <td className="px-4 py-3">
-                          <button
-                            onClick={() => removerProduto(item.produtoId)}
-                            className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
-                          >
-                            Remover
-                          </button>
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p>Nenhum produto adicionado ao pedido.</p>
-            </div>
-          )}
-        </div>
+          {/* Informações do Cliente */}
+          <InformacoesCliente 
+            cliente={clienteDoPedido}
+            clientes={clientes}
+            onClienteChange={(clienteId) => handleInputChange('clienteId', clienteId)}
+            readonly={isEditDisabled}
+          />
 
-        {/* Resumo Financeiro */}
-        <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Resumo Financeiro</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Desconto (R$)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={pedido.desconto}
-                onChange={(e) => handleInputChange('desconto', parseFloat(e.target.value) || 0)}
-                disabled={isEditDisabled}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frete (R$)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={pedido.frete}
-                onChange={(e) => handleInputChange('frete', parseFloat(e.target.value) || 0)}
-                disabled={isEditDisabled}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-              />
-            </div>
-          </div>
-          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex justify-between items-center">
-            <span className="text-lg font-medium text-gray-900 dark:text-white">Total do Pedido:</span>
-            <span className={`text-lg font-bold ${classes.text} ${classes.textDark}`}>R$ {calcularTotais().total.toFixed(2)}</span>
-          </div>
-        </div>
+          {/* Gerenciador de Itens */}
+          <GerenciadorItens
+            itens={pedido.itens || []}
+            produtos={produtos}
+            onItensChange={(novosItens) => setPedido(prev => ({ ...prev, itens: novosItens }))}
+            readonly={isEditDisabled}
+          />
 
-        {/* Botões de Ação */}
-        <div className="flex justify-between items-center mt-6">
-          {/* Botão de Exclusão - só para pedidos em rascunho */}
-          <div>
-            {!isEditDisabled && pedido.status === 'rascunho' && (
-              <BotaoCarregando
-                onClick={handleExcluir}
-                carregando={salvando}
-                className="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          {/* Resumo Financeiro */}
+          <ResumoFinanceiro
+            subtotal={calcularTotais().subtotal}
+            desconto={pedido.desconto || 0}
+            frete={pedido.frete || 0}
+            onDescontoChange={(valor) => handleInputChange('desconto', valor)}
+            onFreteChange={(valor) => handleInputChange('frete', valor)}
+            readonly={isEditDisabled}
+          />
+
+          {/* Observações do Pedido */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+              <svg className="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              </svg>
+              Observações do Pedido
+            </h3>
+            <textarea
+              value={pedido.observacoes || ''}
+              onChange={(e) => handleInputChange('observacoes', e.target.value)}
+              disabled={isEditDisabled}
+              rows={4}
+              placeholder="Adicione observações sobre o pedido..."
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Botões de Ação */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="flex justify-between items-center">
+              {/* Botão de Exclusão - só para pedidos em rascunho */}
+              <div>
+                {!isEditDisabled && pedido.status === 'rascunho' && (
+                  <BotaoCarregando
+                    onClick={handleExcluir}
+                    carregando={salvando}
+                    className="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
                 Excluir Pedido
               </BotaoCarregando>
@@ -432,8 +312,10 @@ export default function EditarPedidoPage() {
               </button>
             )}
           </div>
+            </div>
+          </div>
         </div>
       </div>
-    </LayoutPrincipal>
+    </div>
   );
 }
