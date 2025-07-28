@@ -1,13 +1,22 @@
+import ServicoClientes from './ServicoClientes';
+
 export default class ServicoPedidos {
   constructor() {
     this.baseUrl = '/api/pedidos';
+    this.servicoClientes = new ServicoClientes();
     this.pedidos = this.carregarPedidos();
   }
 
   carregarPedidos() {
     try {
       const pedidosSalvos = localStorage.getItem('pedidos');
-      return pedidosSalvos ? JSON.parse(pedidosSalvos) : this.obterPedidosExemplo();
+      const pedidos = pedidosSalvos ? JSON.parse(pedidosSalvos) : this.obterPedidosExemplo();
+      
+      // Reassociar o objeto cliente completo a cada pedido
+      return pedidos.map(pedido => {
+        const cliente = this.servicoClientes.obterPorId(pedido.clienteId);
+        return { ...pedido, cliente: cliente || {} }; // Garante que cliente não seja undefined
+      });
     } catch (error) {
       console.error('Erro ao carregar pedidos:', error);
       return this.obterPedidosExemplo();
@@ -30,9 +39,9 @@ export default class ServicoPedidos {
         clienteId: '1',
         cliente: {
           id: '1',
-          nome: 'João Silva',
-          email: 'joao@email.com',
-          telefone: '(11) 99999-9999'
+          razaoSocial: 'João Silva Ltda.',
+          emailComercial: 'joao.silva@email.com',
+          telefoneComercial: '(11) 99999-9999'
         },
         itens: [
           {
@@ -62,9 +71,9 @@ export default class ServicoPedidos {
         clienteId: '2',
         cliente: {
           id: '2',
-          nome: 'Maria Santos',
-          email: 'maria@email.com',
-          telefone: '(11) 88888-8888'
+          razaoSocial: 'Maria Santos ME',
+          emailComercial: 'maria.santos@email.com',
+          telefoneComercial: '(11) 88888-8888'
         },
         itens: [
           {
@@ -137,8 +146,11 @@ export default class ServicoPedidos {
       const termoBusca = filtros.busca.toLowerCase();
       pedidosFiltrados = pedidosFiltrados.filter(pedido => 
         pedido.numero.toLowerCase().includes(termoBusca) ||
-        pedido.cliente.nome.toLowerCase().includes(termoBusca) ||
-        pedido.cliente.email.toLowerCase().includes(termoBusca)
+        (pedido.cliente.nomeFantasia && pedido.cliente.nomeFantasia.toLowerCase().includes(termoBusca)) ||
+        (pedido.cliente.razaoSocial && pedido.cliente.razaoSocial.toLowerCase().includes(termoBusca)) ||
+        (pedido.cliente.nome && pedido.cliente.nome.toLowerCase().includes(termoBusca)) ||
+        (pedido.cliente.emailComercial && pedido.cliente.emailComercial.toLowerCase().includes(termoBusca)) ||
+        (pedido.cliente.email && pedido.cliente.email.toLowerCase().includes(termoBusca))
       );
     }
 
@@ -169,13 +181,19 @@ export default class ServicoPedidos {
     }
 
     // Gerar ID e número do pedido
-    const novoId = (Math.max(...this.pedidos.map(p => parseInt(p.id))) + 1).toString();
+    const novoId = (Math.max(...this.pedidos.map(p => parseInt(p.id || 0)), 0) + 1).toString();
     const numeroSequencial = this.pedidos.length + 1;
     const numero = `PED-${numeroSequencial.toString().padStart(3, '0')}`;
+
+    const clienteAssociado = this.servicoClientes.obterPorId(dadosPedido.clienteId);
+    if (!clienteAssociado) {
+      throw new Error('Cliente associado ao pedido não encontrado.');
+    }
 
     const novoPedido = {
       id: novoId,
       numero,
+      cliente: clienteAssociado, // Adiciona o objeto cliente completo
       ...dadosPedido,
       dataCreacao: new Date().toISOString(),
       dataAtualizacao: new Date().toISOString()
@@ -294,5 +312,10 @@ export default class ServicoPedidos {
   obterCorStatus(status) {
     const statusInfo = this.obterStatusDisponiveis().find(s => s.valor === status);
     return statusInfo ? statusInfo.cor : 'gray';
+  }
+
+  limparDados() {
+    localStorage.removeItem('pedidos');
+    this.pedidos = this.obterPedidosExemplo(); // Recarrega com exemplos limpos
   }
 }

@@ -76,6 +76,8 @@ export default function DetalhesPedido({ pedidoId }) {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'rascunho':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
       case 'pendente':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
       case 'em_analise':
@@ -99,6 +101,7 @@ export default function DetalhesPedido({ pedidoId }) {
 
   const getStatusLabel = (status) => {
     const labels = {
+      'rascunho': 'Rascunho',
       'pendente': 'Pendente',
       'em_analise': 'Em Análise',
       'aprovado': 'Aprovado',
@@ -165,9 +168,9 @@ export default function DetalhesPedido({ pedidoId }) {
               Informações do Cliente
             </h3>
             <div className="space-y-2 text-sm">
-              <p><span className="font-medium">Nome:</span> {pedido.cliente?.nome}</p>
-              <p><span className="font-medium">Email:</span> {pedido.cliente?.email}</p>
-              <p><span className="font-medium">Telefone:</span> {pedido.cliente?.telefone}</p>
+              <p><span className="font-medium">Nome:</span> {pedido.cliente?.nomeFantasia || pedido.cliente?.razaoSocial || pedido.cliente?.nome}</p>
+              <p><span className="font-medium">Email:</span> {pedido.cliente?.emailComercial || pedido.cliente?.email}</p>
+              <p><span className="font-medium">Telefone:</span> {pedido.cliente?.telefoneComercial || pedido.cliente?.telefone}</p>
             </div>
           </div>
           
@@ -272,15 +275,34 @@ export default function DetalhesPedido({ pedidoId }) {
         <div className="flex flex-wrap gap-3">
           {/* Botões para Representante */}
           {papelUsuario === PAPEIS.REPRESENTANTE && (
-            <button
-              onClick={() => router.push(`/pedidos/${pedido.id}/editar`)}
-              className="px-3 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Editar Pedido
-            </button>
+            <>
+              {/* Botão Editar - só para pedidos em rascunho */}
+              {pedido.status === 'rascunho' && (
+                <button
+                  onClick={() => router.push(`/pedidos/${pedido.id}/editar`)}
+                  className="px-3 py-2 text-sm border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Editar Pedido
+                </button>
+              )}
+              
+              {/* Botão Cancelar - só para pedidos pendentes */}
+              {pedido.status === 'pendente' && (
+                <BotaoCarregando
+                  onClick={() => alterarStatusPedido('cancelado')}
+                  carregando={carregandoStatus}
+                  className="px-3 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Cancelar Pedido
+                </BotaoCarregando>
+              )}
+            </>
           )}
 
           {/* Botões para Fornecedor */}
@@ -289,7 +311,7 @@ export default function DetalhesPedido({ pedidoId }) {
               <BotaoCarregando
                 onClick={() => alterarStatusPedido('aprovado')}
                 carregando={carregandoStatus}
-                className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
+                className="px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -302,7 +324,7 @@ export default function DetalhesPedido({ pedidoId }) {
                 <BotaoCarregando
                   onClick={() => alterarStatusPedido('em_analise')}
                   carregando={carregandoStatus}
-                  className="px-3 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors flex items-center gap-2"
+                  className="px-3 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors flex items-center gap-2"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -314,7 +336,7 @@ export default function DetalhesPedido({ pedidoId }) {
               <BotaoCarregando
                 onClick={() => alterarStatusPedido('recusado')}
                 carregando={carregandoStatus}
-                className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
+                className="px-3 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -327,7 +349,7 @@ export default function DetalhesPedido({ pedidoId }) {
           {/* Botão Voltar */}
           <button
             onClick={() => router.push('/pedidos')}
-            className="px-3 py-2 border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            className="px-3 py-2 text-sm border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             Voltar para Lista
           </button>

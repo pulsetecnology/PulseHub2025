@@ -9,7 +9,7 @@ class ServicoProdutos {
 
   inicializarDados() {
     // Verificar se já existem dados no localStorage
-    const dadosExistentes = this.obterTodos();
+    const dadosExistentes = this.listar();
     
     // Verificar se as imagens estão quebradas e recriar se necessário
     
@@ -94,7 +94,7 @@ class ServicoProdutos {
   }
 
   // Obter todos os produtos
-  obterTodos() {
+  listar() {
     if (typeof window === 'undefined') return [];
     
     try {

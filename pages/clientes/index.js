@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import LayoutPrincipal from '../../src/front-end/componentes/layout/LayoutPrincipal';
 import ListaClientes from '../../src/front-end/componentes/clientes/ListaClientes';
 
-export default function PaginaClientes() {
+export default function ClientesPage() {
   return (
     <LayoutPrincipal 
-      titulo="Meus Clientes" 
-      subtitulo="Gerencie seu portfólio de clientes e relacionamentos"
+      titulo="Clientes" 
+      subtitulo="Gerencie todos os seus clientes"
     >
       <ListaClientes />
     </LayoutPrincipal>

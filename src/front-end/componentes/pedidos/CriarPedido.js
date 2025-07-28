@@ -94,10 +94,19 @@ export default function CriarPedido() {
   };
 
   const adicionarProduto = () => {
-    if (!produtoSelecionado || quantidadeProduto <= 0) return;
+    console.log('produtoSelecionado:', produtoSelecionado);
+    console.log('quantidadeProduto:', quantidadeProduto);
+    if (!produtoSelecionado || quantidadeProduto <= 0) {
+      console.log('Condição de retorno inicial ativada.');
+      return;
+    }
 
-    const produto = produtos.find(p => p.id === produtoSelecionado);
-    if (!produto) return;
+    const produto = produtos.find(p => p.id === parseInt(produtoSelecionado));
+    console.log('Produto encontrado:', produto);
+    if (!produto) {
+      console.log('Produto não encontrado no array.');
+      return;
+    }
 
     const itemExistente = pedido.itens.find(item => item.produtoId === produto.id);
     
@@ -205,9 +214,9 @@ export default function CriarPedido() {
                   : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
-              <h4 className="font-medium">{cliente.nome}</h4>
-              <p className="text-sm opacity-75">{cliente.email}</p>
-              <p className="text-sm opacity-75">{cliente.telefone}</p>
+              <h4 className="font-medium">{cliente.nomeFantasia || cliente.razaoSocial}</h4>
+              <p className="text-sm opacity-75">{cliente.emailComercial}</p>
+              <p className="text-sm opacity-75">{cliente.telefoneComercial}</p>
             </div>
           ))}
         </div>

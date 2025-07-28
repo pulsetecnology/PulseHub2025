@@ -27,6 +27,8 @@ export default function CardPedido({ pedido }) {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'rascunho':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
       case 'pendente':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
       case 'em_analise':
@@ -50,6 +52,7 @@ export default function CardPedido({ pedido }) {
 
   const getStatusLabel = (status) => {
     const labels = {
+      'rascunho': 'Rascunho',
       'pendente': 'Pendente',
       'em_analise': 'Em Análise',
       'aprovado': 'Aprovado',
@@ -64,6 +67,12 @@ export default function CardPedido({ pedido }) {
 
   const getStatusIcon = (status) => {
     switch (status) {
+      case 'rascunho':
+        return (
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        );
       case 'pendente':
         return (
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,10 +156,13 @@ export default function CardPedido({ pedido }) {
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Cliente</p>
             <p className="font-medium text-gray-900 dark:text-white">
-              {pedido.cliente.nome}
+              {pedido.cliente.nomeFantasia || pedido.cliente.razaoSocial}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              {pedido.cliente.email}
+              {pedido.cliente.emailComercial}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {pedido.cliente.telefoneComercial}
             </p>
           </div>
           <div>
@@ -193,10 +205,10 @@ export default function CardPedido({ pedido }) {
           {/* Ações */}
           <div className="flex gap-2">
             <button
-              onClick={() => router.push(`/pedidos/${pedido.id}`)}
+              onClick={() => router.push(pedido.status === 'rascunho' ? `/pedidos/${pedido.id}/editar` : `/pedidos/${pedido.id}`)}
               className={`px-3 py-2 text-sm ${classes.bg} text-white rounded-md ${classes.bgHover} transition-colors`}
             >
-              Ver Detalhes
+              {pedido.status === 'rascunho' ? 'Editar' : 'Ver Detalhes'}
             </button>
           </div>
         </div>

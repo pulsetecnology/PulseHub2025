@@ -29,8 +29,18 @@ export default function ListaPedidos() {
     try {
       setCarregando(true);
       const pedidosData = await servicoPedidos.listar();
+      
+      // Filtrar pedidos baseado no papel do usuário
+      const papel = obterPapelUsuario();
+      let pedidosFiltrados = pedidosData;
+      
+      if (papel === PAPEIS.FORNECEDOR) {
+        // Fornecedores não veem pedidos em rascunho
+        pedidosFiltrados = pedidosData.filter(pedido => pedido.status !== 'rascunho');
+      }
+      
       // Adaptar os dados para o formato esperado pelo CardPedido
-      const pedidosAdaptados = pedidosData.map(pedido => ({
+      const pedidosAdaptados = pedidosFiltrados.map(pedido => ({
         ...pedido,
         valor: pedido.total,
         data: pedido.dataCreacao
@@ -69,7 +79,11 @@ export default function ListaPedidos() {
 
   const pedidosFiltrados = pedidos.filter(pedido => {
     const matchNumero = pedido.numero.toLowerCase().includes(filtro.toLowerCase());
-    const matchCliente = pedido.cliente.nome.toLowerCase().includes(filtro.toLowerCase());
+    const matchCliente = pedido.cliente && (
+      (pedido.cliente.nomeFantasia?.toLowerCase().includes(filtro.toLowerCase())) || 
+      (pedido.cliente.razaoSocial?.toLowerCase().includes(filtro.toLowerCase())) ||
+      (pedido.cliente.emailComercial?.toLowerCase().includes(filtro.toLowerCase()))
+    );
     const matchStatus = statusFiltro === '' || pedido.status === statusFiltro;
     return (matchNumero || matchCliente) && matchStatus;
   });
