@@ -8,6 +8,12 @@ import { removerIconeTurbopack } from '../src/front-end/utils/removerTurbopack';
 // Importar container de toast
 import ContainerToast from '../src/front-end/componentes/notificacoes/ContainerToast';
 
+// Carregar ferramentas de debug apenas em desenvolvimento
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  import('../src/front-end/utils/debugConsole');
+  import('../src/front-end/utils/testePedido');
+}
+
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
     // Aplicar tema imediatamente para evitar flash

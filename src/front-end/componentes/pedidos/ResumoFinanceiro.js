@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { usarCorTema } from '../../utils/coresTema';
+import { useValidacao } from '../../hooks/useValidacao';
+import MensagemErro from '../comum/MensagemErro';
+import InputPreco from '../comum/InputPreco';
 
 export default function ResumoFinanceiro({ 
   subtotal = 0, 
@@ -10,6 +13,24 @@ export default function ResumoFinanceiro({
   readonly = false 
 }) {
   const { classes } = usarCorTema();
+  
+  const validacoesFinanceiras = {
+    desconto: {
+      minimo: 0,
+      maximo: 100,
+      customizada: (valor) => {
+        if (valor > subtotal) {
+          return 'Desconto não pode ser maior que o subtotal';
+        }
+        return null;
+      }
+    },
+    frete: {
+      minimo: 0
+    }
+  };
+  
+  const { erros, validarCampo, marcarComoTocado } = useValidacao(validacoesFinanceiras);
   const [descontoLocal, setDescontoLocal] = useState(desconto);
   const [freteLocal, setFreteLocal] = useState(frete);
   const [alteracaoRecente, setAlteracaoRecente] = useState(null);
@@ -22,12 +43,12 @@ export default function ResumoFinanceiro({
     setFreteLocal(frete);
   }, [frete]);
 
-  const formatarPreco = (preco) => {
+  const formatarPreco = useCallback((preco) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
     }).format(preco);
-  };
+  }, []);
 
   const calcularTotal = () => {
     return Math.max(0, subtotal - descontoLocal + freteLocal);
@@ -134,24 +155,25 @@ export default function ResumoFinanceiro({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Desconto (R$)
+                Desconto
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-500 dark:text-gray-400 sm:text-sm">R$</span>
-                </div>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max={subtotal}
-                  value={descontoLocal}
-                  onChange={(e) => handleDescontoChange(parseFloat(e.target.value) || 0)}
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0,00"
-                />
-              </div>
-              {descontoLocal > 0 && (
+              <InputPreco
+                value={descontoLocal > 0 ? descontoLocal.toString() : ''}
+                onChange={(valor) => {
+                  const novoValor = parseFloat(valor) || 0;
+                  validarCampo('desconto', novoValor);
+                  handleDescontoChange(novoValor);
+                }}
+                onBlur={() => marcarComoTocado('desconto')}
+                className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  erros.desconto 
+                    ? 'border-red-500 dark:border-red-400' 
+                    : 'border-gray-300 dark:border-gray-600'
+                }`}
+                placeholder="0,00"
+              />
+              <MensagemErro erro={erros.desconto} />
+              {descontoLocal > 0 && !erros.desconto && (
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {calcularPercentualDesconto().toFixed(1)}% do subtotal
                 </p>
@@ -160,22 +182,24 @@ export default function ResumoFinanceiro({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Frete (R$)
+                Frete
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-500 dark:text-gray-400 sm:text-sm">R$</span>
-                </div>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={freteLocal}
-                  onChange={(e) => handleFreteChange(parseFloat(e.target.value) || 0)}
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="0,00"
-                />
-              </div>
+              <InputPreco
+                value={freteLocal > 0 ? freteLocal.toString() : ''}
+                onChange={(valor) => {
+                  const novoValor = parseFloat(valor) || 0;
+                  validarCampo('frete', novoValor);
+                  handleFreteChange(novoValor);
+                }}
+                onBlur={() => marcarComoTocado('frete')}
+                className={`w-full px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  erros.frete 
+                    ? 'border-red-500 dark:border-red-400' 
+                    : 'border-gray-300 dark:border-gray-600'
+                }`}
+                placeholder="0,00"
+              />
+              <MensagemErro erro={erros.frete} />
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Valor do frete para entrega
               </p>

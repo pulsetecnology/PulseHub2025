@@ -88,15 +88,24 @@ export default function ListaPedidos() {
     return (matchNumero || matchCliente) && matchStatus;
   });
 
-  const statusOptions = [
-    { value: '', label: 'Todos os status' },
-    { value: 'pendente', label: 'Pendente' },
-    { value: 'aprovado', label: 'Aprovado' },
-    { value: 'em_producao', label: 'Em Produção' },
-    { value: 'enviado', label: 'Enviado' },
-    { value: 'entregue', label: 'Entregue' },
-    { value: 'cancelado', label: 'Cancelado' }
-  ];
+  const getStatusOptions = () => {
+    const baseOptions = [
+      { value: '', label: 'Todos os status' },
+      { value: 'pendente', label: 'Pendente' },
+      { value: 'aprovado', label: 'Aprovado' },
+      { value: 'em_producao', label: 'Em Produção' },
+      { value: 'enviado', label: 'Enviado' },
+      { value: 'entregue', label: 'Entregue' },
+      { value: 'cancelado', label: 'Cancelado' }
+    ];
+
+    // Adicionar "Rascunho" apenas para representantes
+    if (papelUsuario === PAPEIS.REPRESENTANTE) {
+      baseOptions.splice(1, 0, { value: 'rascunho', label: 'Rascunho' });
+    }
+
+    return baseOptions;
+  };
 
   if (carregando) {
     return (
@@ -151,7 +160,7 @@ export default function ListaPedidos() {
               onChange={(e) => setStatusFiltro(e.target.value)}
               className={`px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
             >
-              {statusOptions.map(option => (
+              {getStatusOptions().map(option => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>

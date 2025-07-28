@@ -4,7 +4,7 @@ import ServicoProdutos from '../../servicos/ServicoProdutos';
 import ServicoClientes from '../../servicos/ServicoClientes';
 import ServicoPedidos from '../../servicos/ServicoPedidos';
 import { usarCorTema } from '../../utils/coresTema';
-import Modal from '../comum/Modal';
+import InputPreco from '../comum/InputPreco';
 import BotaoCarregando from '../comum/BotaoCarregando';
 
 export default function CriarPedido() {
@@ -29,7 +29,7 @@ export default function CriarPedido() {
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
   const [produtoSelecionado, setProdutoSelecionado] = useState('');
   const [quantidadeProduto, setQuantidadeProduto] = useState(1);
-  const [mostrarResumo, setMostrarResumo] = useState(false);
+
 
   const servicoProdutos = new ServicoProdutos();
   const servicoClientes = new ServicoClientes();
@@ -167,7 +167,7 @@ export default function CriarPedido() {
     return { subtotal, desconto, frete, total };
   };
 
-  const finalizarPedido = async () => {
+  const salvarComoRascunho = async () => {
     if (!validarEtapa(3)) return;
 
     setCarregando(true);
@@ -177,6 +177,29 @@ export default function CriarPedido() {
         ...pedido,
         ...totais,
         status: 'rascunho',
+        dataCreacao: new Date().toISOString()
+      };
+
+      await servicoPedidos.criar(novoPedido);
+      router.push('/pedidos?sucesso=rascunho');
+    } catch (error) {
+      console.error('Erro ao salvar rascunho:', error);
+      setErros({ geral: 'Erro ao salvar rascunho. Tente novamente.' });
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  const finalizarPedido = async () => {
+    if (!validarEtapa(3)) return;
+
+    setCarregando(true);
+    try {
+      const totais = calcularTotais();
+      const novoPedido = {
+        ...pedido,
+        ...totais,
+        status: 'pendente',
         dataCreacao: new Date().toISOString()
       };
 
@@ -374,7 +397,10 @@ export default function CriarPedido() {
             <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-6">
               <h4 className="font-medium text-gray-900 dark:text-white mb-2">Cliente</h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {clienteSelecionado.nome} - {clienteSelecionado.email}
+                {clienteSelecionado.nomeFantasia || clienteSelecionado.razaoSocial}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">
+                {clienteSelecionado.emailComercial}
               </p>
             </div>
           )}
@@ -383,29 +409,25 @@ export default function CriarPedido() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Desconto (R$)
+                Desconto
               </label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={pedido.desconto}
-                onChange={(e) => setPedido({ ...pedido, desconto: parseFloat(e.target.value) || 0 })}
+              <InputPreco
+                value={pedido.desconto > 0 ? pedido.desconto.toString() : ''}
+                onChange={(valor) => setPedido({ ...pedido, desconto: parseFloat(valor) || 0 })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="0,00"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Frete (R$)
+                Frete
               </label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={pedido.frete}
-                onChange={(e) => setPedido({ ...pedido, frete: parseFloat(e.target.value) || 0 })}
+              <InputPreco
+                value={pedido.frete > 0 ? pedido.frete.toString() : ''}
+                onChange={(valor) => setPedido({ ...pedido, frete: parseFloat(valor) || 0 })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="0,00"
               />
             </div>
           </div>
@@ -538,13 +560,22 @@ export default function CriarPedido() {
               Próximo
             </button>
           ) : (
-            <BotaoCarregando
-              onClick={finalizarPedido}
-              carregando={carregando}
-              className={`px-6 py-2 ${classes.bg} text-white rounded-md hover:opacity-90`}
-            >
-              Finalizar Pedido
-            </BotaoCarregando>
+            <>
+              <BotaoCarregando
+                onClick={salvarComoRascunho}
+                carregando={carregando}
+                className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Salvar como Rascunho
+              </BotaoCarregando>
+              <BotaoCarregando
+                onClick={finalizarPedido}
+                carregando={carregando}
+                className={`px-6 py-2 ${classes.bg} text-white rounded-md hover:opacity-90`}
+              >
+                Finalizar Pedido
+              </BotaoCarregando>
+            </>
           )}
         </div>
       </div>

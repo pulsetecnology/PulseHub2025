@@ -5,6 +5,12 @@ import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
 import servicoNotificacoes from '../../servicos/ServicoNotificacoes';
 import ServicoPedidos from '../../servicos/ServicoPedidos';
 import BotaoCarregando from '../comum/BotaoCarregando';
+import ModalConfirmacao from '../comum/ModalConfirmacao';
+import TimelinePedido from './TimelinePedido';
+import HeaderPedido from './HeaderPedido';
+import InformacoesCliente from './InformacoesCliente';
+import GerenciadorItens from './GerenciadorItens';
+import ResumoFinanceiro from './ResumoFinanceiro';
 
 export default function DetalhesPedido({ pedidoId }) {
   const router = useRouter();
@@ -15,6 +21,7 @@ export default function DetalhesPedido({ pedidoId }) {
   const [papelUsuario, setPapelUsuario] = useState(null);
   const [erro, setErro] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const [modalCancelamento, setModalCancelamento] = useState(false);
 
   const servicoPedidos = new ServicoPedidos();
 
@@ -68,6 +75,38 @@ export default function DetalhesPedido({ pedidoId }) {
       servicoNotificacoes.notificarErro(
         'Erro',
         'Não foi possível alterar o status do pedido'
+      );
+    } finally {
+      setCarregandoStatus(false);
+    }
+  };
+
+  const cancelarPedido = async () => {
+    console.log('Função cancelarPedido chamada');
+    setCarregandoStatus(true);
+    try {
+      await servicoPedidos.atualizarStatus(pedidoId, 'cancelado');
+      
+      // Atualizar o pedido local
+      setPedido(prev => ({ ...prev, status: 'cancelado' }));
+      
+      // Notificar sobre o cancelamento
+      servicoNotificacoes.notificarPedido(
+        'Pedido Cancelado',
+        `Pedido ${pedido.numero} foi cancelado com sucesso`,
+        pedido.id
+      );
+      
+      // Simular notificação ao fornecedor
+      console.log('Notificação enviada ao fornecedor sobre cancelamento do pedido:', pedido.id);
+      
+      setModalCancelamento(false);
+      
+    } catch (error) {
+      console.error('Erro ao cancelar pedido:', error);
+      servicoNotificacoes.notificarErro(
+        'Erro',
+        'Não foi possível cancelar o pedido'
       );
     } finally {
       setCarregandoStatus(false);
@@ -142,219 +181,187 @@ export default function DetalhesPedido({ pedidoId }) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header do Pedido */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Pedido {pedido.numero}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Criado em {mounted ? new Date(pedido.dataCreacao).toLocaleDateString('pt-BR') : ''}
-            </p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(pedido.status)}`}>
-              {getStatusLabel(pedido.status)}
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header do Pedido */}
+        <HeaderPedido 
+          pedido={pedido} 
+          onVoltar={() => router.push('/pedidos')}
+        />
 
-        {/* Informações do Cliente */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-              Informações do Cliente
-            </h3>
-            <div className="space-y-2 text-sm">
-              <p><span className="font-medium">Nome:</span> {pedido.cliente?.nomeFantasia || pedido.cliente?.razaoSocial || pedido.cliente?.nome}</p>
-              <p><span className="font-medium">Email:</span> {pedido.cliente?.emailComercial || pedido.cliente?.email}</p>
-              <p><span className="font-medium">Telefone:</span> {pedido.cliente?.telefoneComercial || pedido.cliente?.telefone}</p>
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-              Resumo Financeiro
-            </h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>Subtotal:</span>
-                <span>{formatarValor(pedido.subtotal)}</span>
-              </div>
-              {pedido.desconto > 0 && (
-                <div className="flex justify-between text-red-600">
-                  <span>Desconto:</span>
-                  <span>- {formatarValor(pedido.desconto)}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Coluna Principal */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Informações do Cliente */}
+            <InformacoesCliente 
+              cliente={pedido.cliente}
+              readonly={true}
+            />
+
+            {/* Itens do Pedido */}
+            <GerenciadorItens
+              itens={pedido.itens || []}
+              produtos={[]}
+              onItensChange={() => {}}
+              readonly={true}
+            />
+
+            {/* Resumo Financeiro */}
+            <ResumoFinanceiro
+              subtotal={pedido.subtotal || 0}
+              desconto={pedido.desconto || 0}
+              frete={pedido.frete || 0}
+              readonly={true}
+            />
+
+            {/* Observações */}
+            {pedido.observacoes && (
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                  <svg className="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                  </svg>
+                  Observações
+                </h3>
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                    {pedido.observacoes}
+                  </p>
                 </div>
-              )}
-              {pedido.frete > 0 && (
-                <div className="flex justify-between">
-                  <span>Frete:</span>
-                  <span>{formatarValor(pedido.frete)}</span>
-                </div>
-              )}
-              <div className="border-t pt-2 flex justify-between font-medium text-lg">
-                <span>Total:</span>
-                <span className={classes.text}>{formatarValor(pedido.total)}</span>
               </div>
-            </div>
+            )}
           </div>
-        </div>
 
-        {/* Observações */}
-        {pedido.observacoes && (
-          <div className="mt-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Observações
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
-              {pedido.observacoes}
-            </p>
-          </div>
-        )}
-      </div>
+          {/* Coluna Lateral */}
+          <div className="space-y-6">
+            {/* Timeline do Pedido */}
+            <TimelinePedido
+              status={pedido.status}
+              dataCreacao={pedido.dataCreacao}
+              dataFinalizacao={pedido.dataFinalizacao}
+              dataAtualizacao={pedido.dataAtualizacao}
+            />
 
-      {/* Itens do Pedido */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-          Itens do Pedido
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Produto
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
-                  SKU
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Quantidade
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Preço Unit.
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Subtotal
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {pedido.itens?.map((item, index) => (
-                <tr key={index}>
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                    {item.produto?.nome}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
-                    {item.produto?.sku}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                    {item.quantidade}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                    {formatarValor(item.precoUnitario)}
-                  </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
-                    {formatarValor(item.subtotal)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            {/* Ações do Pedido */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                <svg className="h-5 w-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                </svg>
+                Ações
+              </h3>
 
-      {/* Ações do Pedido */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-          Ações
-        </h3>
-        <div className="flex flex-wrap gap-3">
-          {/* Botões para Representante */}
-          {papelUsuario === PAPEIS.REPRESENTANTE && (
-            <>
-              {/* Botão Editar - só para pedidos em rascunho */}
-              {pedido.status === 'rascunho' && (
+              <div className="space-y-3">
+                {/* Botões para Representante */}
+                {papelUsuario === PAPEIS.REPRESENTANTE && (
+                  <>
+                    {pedido.status === 'rascunho' && (
+                      <button
+                        onClick={() => router.push(`/pedidos/${pedido.id}/editar`)}
+                        className="w-full px-4 py-2 text-sm border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Editar Pedido
+                      </button>
+                    )}
+                    
+                    {/* Botão Cancelar - só para pedidos pendentes */}
+                    {pedido.status === 'pendente' && (
+                      <button
+                        onClick={() => {
+                          console.log('Botão cancelar clicado');
+                          setModalCancelamento(true);
+                        }}
+                        className="w-full px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Cancelar Pedido
+                      </button>
+                    )}
+                  </>
+                )}
+
+                {/* Botões para Fornecedor */}
+                {papelUsuario === PAPEIS.FORNECEDOR && (pedido.status === 'pendente' || pedido.status === 'em_analise') && (
+                  <>
+                    <BotaoCarregando
+                      onClick={() => alterarStatusPedido('aprovado')}
+                      carregando={carregandoStatus}
+                      className="w-full px-4 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Aprovar Pedido
+                    </BotaoCarregando>
+
+                    {/* Botão "Colocar em Análise" só aparece se status for "pendente" */}
+                    {pedido.status === 'pendente' && (
+                      <BotaoCarregando
+                        onClick={() => alterarStatusPedido('em_analise')}
+                        carregando={carregandoStatus}
+                        className="w-full px-4 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Colocar em Análise
+                      </BotaoCarregando>
+                    )}
+
+                    <BotaoCarregando
+                      onClick={() => alterarStatusPedido('recusado')}
+                      carregando={carregandoStatus}
+                      className="w-full px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Recusar Pedido
+                    </BotaoCarregando>
+                  </>
+                )}
+
+                {/* Botão Voltar */}
                 <button
-                  onClick={() => router.push(`/pedidos/${pedido.id}/editar`)}
-                  className="px-3 py-2 text-sm border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                  onClick={() => router.push('/pedidos')}
+                  className="w-full px-4 py-2 text-sm border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
-                  Editar Pedido
+                  Voltar para Lista
                 </button>
-              )}
-              
-              {/* Botão Cancelar - só para pedidos pendentes */}
-              {pedido.status === 'pendente' && (
-                <BotaoCarregando
-                  onClick={() => alterarStatusPedido('cancelado')}
-                  carregando={carregandoStatus}
-                  className="px-3 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Cancelar Pedido
-                </BotaoCarregando>
-              )}
-            </>
-          )}
-
-          {/* Botões para Fornecedor */}
-          {papelUsuario === PAPEIS.FORNECEDOR && (pedido.status === 'pendente' || pedido.status === 'em_analise') && (
-            <>
-              <BotaoCarregando
-                onClick={() => alterarStatusPedido('aprovado')}
-                carregando={carregandoStatus}
-                className="px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center gap-2"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Aprovar Pedido
-              </BotaoCarregando>
-
-              {/* Botão "Colocar em Análise" só aparece se status for "pendente" */}
-              {pedido.status === 'pendente' && (
-                <BotaoCarregando
-                  onClick={() => alterarStatusPedido('em_analise')}
-                  carregando={carregandoStatus}
-                  className="px-3 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors flex items-center gap-2"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Colocar em Análise
-                </BotaoCarregando>
-              )}
-
-              <BotaoCarregando
-                onClick={() => alterarStatusPedido('recusado')}
-                carregando={carregandoStatus}
-                className="px-3 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Recusar Pedido
-              </BotaoCarregando>
-            </>
-          )}
-
-          {/* Botão Voltar */}
-          <button
-            onClick={() => router.push('/pedidos')}
-            className="px-3 py-2 text-sm border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            Voltar para Lista
-          </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+
+
+      {/* Modal de Confirmação de Cancelamento */}
+      <ModalConfirmacao
+        aberto={modalCancelamento}
+        onFechar={() => {
+          console.log('Modal fechado');
+          setModalCancelamento(false);
+        }}
+        onConfirmar={() => {
+          console.log('Modal confirmado');
+          cancelarPedido();
+        }}
+        titulo="Cancelar Pedido"
+        mensagem={`Tem certeza que deseja cancelar o pedido ${pedido?.numero}? Esta ação não pode ser desfeita e o fornecedor será notificado sobre o cancelamento.`}
+        textoBotaoConfirmar="Sim, Cancelar"
+        textoBotaoCancelar="Não, Manter"
+        tipoConfirmacao="perigo"
+        carregando={carregandoStatus}
+      />
     </div>
   );
 }

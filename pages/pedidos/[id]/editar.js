@@ -5,11 +5,17 @@ import ServicoProdutos from '../../../src/front-end/servicos/ServicoProdutos';
 import ServicoClientes from '../../../src/front-end/servicos/ServicoClientes';
 import LayoutPrincipal from '../../../src/front-end/componentes/layout/LayoutPrincipal';
 import BotaoCarregando from '../../../src/front-end/componentes/comum/BotaoCarregando';
+import IndicadorCarregamento from '../../../src/front-end/componentes/comum/IndicadorCarregamento';
+import FeedbackVisual from '../../../src/front-end/componentes/comum/FeedbackVisual';
+import StatusAutoSave from '../../../src/front-end/componentes/comum/StatusAutoSave';
+import ModalConfirmacao from '../../../src/front-end/componentes/comum/ModalConfirmacao';
+import { useAutoSave } from '../../../src/front-end/hooks/useAutoSave';
 import HeaderPedido from '../../../src/front-end/componentes/pedidos/HeaderPedido';
 import InformacoesCliente from '../../../src/front-end/componentes/pedidos/InformacoesCliente';
 import GerenciadorItens from '../../../src/front-end/componentes/pedidos/GerenciadorItens';
 import ResumoFinanceiro from '../../../src/front-end/componentes/pedidos/ResumoFinanceiro';
 import { usarCorTema } from '../../../src/front-end/utils/coresTema';
+import servicoNotificacoes from '../../../src/front-end/servicos/ServicoNotificacoes';
 
 export default function EditarPedidoPage() {
   const router = useRouter();
@@ -22,13 +28,50 @@ export default function EditarPedidoPage() {
   const [clientes, setClientes] = useState([]);
   const [erros, setErros] = useState({});
   const [salvando, setSalvando] = useState(false);
+  const [feedback, setFeedback] = useState({ visivel: false, tipo: 'sucesso', mensagem: '' });
 
   const [produtoSelecionado, setProdutoSelecionado] = useState('');
   const [quantidadeProduto, setQuantidadeProduto] = useState(1);
+  const [mostrarModalConfirmacao, setMostrarModalConfirmacao] = useState(false);
+  const [mostrarModalExclusao, setMostrarModalExclusao] = useState(false);
 
   const servicoPedidos = new ServicoPedidos();
   const servicoProdutos = new ServicoProdutos();
   const servicoClientes = new ServicoClientes();
+
+  // Função para auto-save
+  const salvarAutomaticamente = async (dadosPedido) => {
+    console.log('🔄 Auto-save chamado para pedido:', dadosPedido.id, 'Status:', dadosPedido.status);
+    if (dadosPedido.status !== 'rascunho') {
+      console.log('⏭️ Auto-save ignorado - pedido não é rascunho');
+      return; // Só salva rascunhos automaticamente
+    }
+    
+    const totais = calcularTotais();
+    const pedidoParaSalvar = {
+      ...dadosPedido,
+      ...totais,
+    };
+    
+    console.log('💾 Auto-save executando...');
+    await servicoPedidos.atualizar(dadosPedido.id, pedidoParaSalvar);
+  };
+
+  // Hook de auto-save
+  const autoSaveHabilitado = pedido?.status === 'rascunho' && !salvando;
+  console.log('🔧 Auto-save habilitado:', autoSaveHabilitado, 'Status:', pedido?.status, 'Salvando:', salvando);
+  
+  const {
+    salvandoAuto,
+    ultimoSalvamento,
+    erro: erroAutoSave,
+    formatarUltimoSalvamento
+  } = useAutoSave(
+    pedido,
+    salvarAutomaticamente,
+    3000, // 3 segundos de delay
+    autoSaveHabilitado // Só habilita para rascunhos e quando não está salvando manualmente
+  );
 
   useEffect(() => {
     const carregarDados = async () => {
@@ -134,9 +177,28 @@ export default function EditarPedidoPage() {
         status: pedido.status, // Mantém o status atual
       };
       await servicoPedidos.atualizar(pedido.id, pedidoParaSalvar);
-      router.push('/pedidos');
+      // Notificação de sucesso
+      servicoNotificacoes.notificarPedido(
+        'Pedido Salvo',
+        `Pedido ${pedido.numero} foi salvo como rascunho`,
+        pedido.id
+      );
+      
+      setFeedback({ 
+        visivel: true, 
+        tipo: 'sucesso', 
+        mensagem: 'Pedido salvo com sucesso!' 
+      });
+      setTimeout(() => router.push('/pedidos'), 1500);
     } catch (error) {
       console.error('Erro ao salvar pedido:', error);
+      
+      // Notificação de erro
+      servicoNotificacoes.notificarErro(
+        'Erro ao Salvar',
+        'Não foi possível salvar o pedido. Tente novamente.'
+      );
+      
       setErros({ geral: 'Erro ao salvar pedido. Tente novamente.' });
     } finally {
       setSalvando(false);
@@ -144,18 +206,91 @@ export default function EditarPedidoPage() {
   };
 
   const handleFinalizar = async () => {
+    // Validações antes de finalizar
+    const errosValidacao = {};
+    
+    if (!pedido.clienteId) {
+      errosValidacao.geral = 'Selecione um cliente para o pedido';
+    }
+    
+    if (!pedido.itens || pedido.itens.length === 0) {
+      errosValidacao.geral = 'Adicione pelo menos um item ao pedido';
+    }
+    
+    // Validar itens
+    if (pedido.itens) {
+      for (let i = 0; i < pedido.itens.length; i++) {
+        const item = pedido.itens[i];
+        if (!item.quantidade || item.quantidade <= 0) {
+          errosValidacao.geral = `Item ${i + 1}: Quantidade deve ser maior que zero`;
+          break;
+        }
+        if (!item.precoUnitario || item.precoUnitario <= 0) {
+          errosValidacao.geral = `Item ${i + 1}: Preço deve ser maior que zero`;
+          break;
+        }
+      }
+    }
+    
+    if (Object.keys(errosValidacao).length > 0) {
+      setErros(errosValidacao);
+      return;
+    }
+
+    // Confirmar finalização
+    setMostrarModalConfirmacao(true);
+  };
+
+  const confirmarFinalizacao = async () => {
+    setMostrarModalConfirmacao(false);
     setSalvando(true);
     try {
       const totais = calcularTotais();
       const pedidoParaFinalizar = {
         ...pedido,
         ...totais,
-        status: 'pendente', // Altera o status para pendente
+        status: 'pendente',
+        dataFinalizacao: new Date().toISOString(),
       };
-      await servicoPedidos.atualizar(pedido.id, pedidoParaFinalizar);
-      router.push('/pedidos');
+      
+      console.log('🔄 Finalizando pedido:', pedidoParaFinalizar.id, 'Status:', pedidoParaFinalizar.status);
+      const pedidoAtualizado = await servicoPedidos.atualizar(pedido.id, pedidoParaFinalizar);
+      console.log('✅ Pedido atualizado:', pedidoAtualizado.id, 'Novo status:', pedidoAtualizado.status);
+      
+      // Atualizar o estado local
+      setPedido(pedidoAtualizado);
+      
+      // Notificar fornecedor sobre novo pedido
+      servicoNotificacoes.notificarPedido(
+        'Novo Pedido Recebido',
+        `Pedido ${pedido.numero} foi finalizado e está aguardando aprovação`,
+        pedido.id,
+        'fornecedor'
+      );
+      
+      // Notificar representante sobre finalização
+      servicoNotificacoes.notificarPedido(
+        'Pedido Finalizado',
+        `Pedido ${pedido.numero} foi finalizado com sucesso`,
+        pedido.id
+      );
+      
+      // Mostrar mensagem de sucesso e redirecionar
+      setFeedback({ 
+        visivel: true, 
+        tipo: 'sucesso', 
+        mensagem: 'Pedido finalizado com sucesso! O fornecedor foi notificado.' 
+      });
+      setTimeout(() => router.push('/pedidos'), 2000);
     } catch (error) {
       console.error('Erro ao finalizar pedido:', error);
+      
+      // Notificação de erro
+      servicoNotificacoes.notificarErro(
+        'Erro ao Finalizar',
+        'Não foi possível finalizar o pedido. Tente novamente.'
+      );
+      
       setErros({ geral: 'Erro ao finalizar pedido. Tente novamente.' });
     } finally {
       setSalvando(false);
@@ -163,10 +298,11 @@ export default function EditarPedidoPage() {
   };
 
   const handleExcluir = async () => {
-    if (!confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) {
-      return;
-    }
+    setMostrarModalExclusao(true);
+  };
 
+  const confirmarExclusao = async () => {
+    setMostrarModalExclusao(false);
     setSalvando(true);
     try {
       await servicoPedidos.excluir(pedido.id);
@@ -183,7 +319,7 @@ export default function EditarPedidoPage() {
     return (
       <LayoutPrincipal titulo="Carregando...">
         <div className="flex items-center justify-center h-64">
-          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${classes.border}`}></div>
+          <IndicadorCarregamento tamanho="grande" texto="Carregando pedido..." />
         </div>
       </LayoutPrincipal>
     );
@@ -206,6 +342,14 @@ export default function EditarPedidoPage() {
         <HeaderPedido 
           pedido={pedido} 
           onVoltar={() => router.push('/pedidos')}
+          statusAutoSave={
+            <StatusAutoSave
+              salvandoAuto={salvandoAuto}
+              ultimoSalvamento={ultimoSalvamento}
+              erro={erroAutoSave}
+              formatarUltimoSalvamento={formatarUltimoSalvamento}
+            />
+          }
         />
 
         <div className="space-y-6">
@@ -316,6 +460,39 @@ export default function EditarPedidoPage() {
           </div>
         </div>
       </div>
+      
+      {/* Modal de Confirmação - Finalizar */}
+      <ModalConfirmacao
+        aberto={mostrarModalConfirmacao}
+        titulo="Finalizar Pedido"
+        mensagem="Tem certeza que deseja finalizar este pedido? Após finalizado, ele será enviado para aprovação do fornecedor."
+        textoBotaoConfirmar="Finalizar Pedido"
+        textoBotaoCancelar="Cancelar"
+        onConfirmar={confirmarFinalizacao}
+        onCancelar={() => setMostrarModalConfirmacao(false)}
+        carregando={salvando}
+      />
+
+      {/* Modal de Confirmação - Excluir */}
+      <ModalConfirmacao
+        aberto={mostrarModalExclusao}
+        titulo="Excluir Pedido"
+        mensagem="Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita."
+        textoBotaoConfirmar="Excluir Pedido"
+        textoBotaoCancelar="Cancelar"
+        onConfirmar={confirmarExclusao}
+        onCancelar={() => setMostrarModalExclusao(false)}
+        carregando={salvando}
+        tipo="perigo"
+      />
+
+      {/* Feedback Visual */}
+      <FeedbackVisual
+        tipo={feedback.tipo}
+        mensagem={feedback.mensagem}
+        visivel={feedback.visivel}
+        onFechar={() => setFeedback({ ...feedback, visivel: false })}
+      />
     </div>
   );
 }

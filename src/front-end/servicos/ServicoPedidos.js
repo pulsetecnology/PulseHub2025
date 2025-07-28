@@ -1,4 +1,5 @@
 import ServicoClientes from './ServicoClientes';
+import { LocalStorageManager } from '../utils/localStorage';
 
 export default class ServicoPedidos {
   constructor() {
@@ -9,8 +10,7 @@ export default class ServicoPedidos {
 
   carregarPedidos() {
     try {
-      const pedidosSalvos = localStorage.getItem('pedidos');
-      const pedidos = pedidosSalvos ? JSON.parse(pedidosSalvos) : this.obterPedidosExemplo();
+      const pedidos = LocalStorageManager.getItem('pedidos', this.obterPedidosExemplo());
       
       // Reassociar o objeto cliente completo a cada pedido
       return pedidos.map(pedido => {
@@ -24,10 +24,10 @@ export default class ServicoPedidos {
   }
 
   salvarPedidos() {
-    try {
-      localStorage.setItem('pedidos', JSON.stringify(this.pedidos));
-    } catch (error) {
-      console.error('Erro ao salvar pedidos:', error);
+    const resultado = LocalStorageManager.setItem('pedidos', this.pedidos, 50);
+    if (resultado !== this.pedidos) {
+      // Se os dados foram reduzidos, atualizar a instância local
+      this.pedidos = resultado || [];
     }
   }
 
@@ -213,15 +213,21 @@ export default class ServicoPedidos {
       throw new Error('Pedido não encontrado');
     }
 
+    console.log('📝 ServicoPedidos.atualizar - Dados recebidos:', dadosAtualizacao);
+    console.log('📝 Status antes:', this.pedidos[index].status);
+
     const pedidoAtualizado = {
       ...this.pedidos[index],
       ...dadosAtualizacao,
       dataAtualizacao: new Date().toISOString()
     };
 
+    console.log('📝 Status depois:', pedidoAtualizado.status);
+
     this.pedidos[index] = pedidoAtualizado;
     this.salvarPedidos();
 
+    console.log('💾 Pedido salvo no localStorage com status:', pedidoAtualizado.status);
     return pedidoAtualizado;
   }
 

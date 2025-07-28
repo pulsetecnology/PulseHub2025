@@ -1,6 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function InputPreco({ value, onChange, placeholder = "0,00", className = "", ...props }) {
+  const [valorInterno, setValorInterno] = useState('');
+  const [inicializado, setInicializado] = useState(false);
+
+  // Inicializar apenas uma vez com o valor inicial
+  useEffect(() => {
+    if (!inicializado) {
+      if (value && parseFloat(value) > 0) {
+        const valorFormatado = parseFloat(value).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+        setValorInterno(valorFormatado);
+      } else {
+        setValorInterno('');
+      }
+      setInicializado(true);
+    }
+  }, [value, inicializado]);
+
   const formatarPreco = (valor) => {
     // Remove tudo que não é dígito
     const apenasNumeros = valor.replace(/\D/g, '');
@@ -19,15 +38,17 @@ export default function InputPreco({ value, onChange, placeholder = "0,00", clas
   };
 
   const handleChange = (e) => {
-    const valorFormatado = formatarPreco(e.target.value);
+    const valorDigitado = e.target.value;
+    const valorFormatado = formatarPreco(valorDigitado);
+    
+    // Atualizar valor interno
+    setValorInterno(valorFormatado);
     
     // Converte de volta para número para salvar no estado
     const valorNumerico = valorFormatado.replace(',', '.');
     
     onChange(valorNumerico);
   };
-
-  const valorExibido = value ? formatarPreco(value.toString().replace('.', '')) : '';
 
   return (
     <div className="relative">
@@ -36,7 +57,7 @@ export default function InputPreco({ value, onChange, placeholder = "0,00", clas
       </span>
       <input
         type="text"
-        value={valorExibido}
+        value={valorInterno}
         onChange={handleChange}
         placeholder={placeholder}
         className={`pl-10 ${className}`}

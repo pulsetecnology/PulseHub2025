@@ -1,7 +1,7 @@
 import React from 'react';
 import { usarCorTema } from '../../utils/coresTema';
 
-export default function HeaderPedido({ pedido, onVoltar }) {
+export default function HeaderPedido({ pedido, onVoltar, statusAutoSave }) {
   const { classes } = usarCorTema();
 
   const getStatusColor = (status) => {
@@ -123,12 +123,17 @@ export default function HeaderPedido({ pedido, onVoltar }) {
           </div>
         </div>
 
-        {/* Status Badge */}
-        <div className="mt-4 sm:mt-0">
+        {/* Status Badge e Auto-save */}
+        <div className="mt-4 sm:mt-0 flex flex-col items-end space-y-2">
           <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(pedido.status)}`}>
             {getStatusIcon(pedido.status)}
             <span className="ml-2">{getStatusLabel(pedido.status)}</span>
           </span>
+          {statusAutoSave && (
+            <div>
+              {statusAutoSave}
+            </div>
+          )}
         </div>
       </div>
 

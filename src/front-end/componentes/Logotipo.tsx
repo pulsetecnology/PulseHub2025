@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { usarCorTema } from '../utils/coresTema';
 
 interface LogotipoProps {
@@ -9,6 +9,11 @@ interface LogotipoProps {
 
 export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto = true }: LogotipoProps) {
   const { classes } = usarCorTema();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   // Definindo tamanhos com base no parâmetro tamanho
   const tamanhos = {
@@ -50,9 +55,13 @@ export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto 
           <div className="w-1 h-1/3 bg-white rounded-full"></div>
         </div>
 
-        {/* Círculos pulsantes animados */}
-        <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-30 animate-ping-slow`}></div>
-        <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-20 animate-ping`}></div>
+        {/* Círculos pulsantes animados - só renderiza após mounted para evitar hidratação */}
+        {mounted && (
+          <>
+            <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-30 animate-ping-slow`}></div>
+            <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-20 animate-ping`}></div>
+          </>
+        )}
       </div>
 
       {/* Texto do logo */}
