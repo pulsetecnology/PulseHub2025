@@ -116,7 +116,7 @@ export default function RelatoriosAdministrativos() {
             <select
               value={filtros.tipoRelatorio}
               onChange={(e) => setFiltros(prev => ({ ...prev, tipoRelatorio: e.target.value }))}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white"
             >
               {tiposRelatorio.map(tipo => (
                 <option key={tipo.id} value={tipo.id}>{tipo.nome}</option>
@@ -126,7 +126,7 @@ export default function RelatoriosAdministrativos() {
             <select
               value={filtros.periodo}
               onChange={(e) => setFiltros(prev => ({ ...prev, periodo: e.target.value }))}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white"
             >
               {periodosDisponiveis.map(periodo => (
                 <option key={periodo.id} value={periodo.id}>{periodo.nome}</option>
@@ -221,7 +221,7 @@ export default function RelatoriosAdministrativos() {
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               Evolução de Vendas - Últimos 12 Meses
             </h3>
-            <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+            <div className="h-64 bg-gray-100 dark:bg-gray-700 bg-white rounded-lg flex items-center justify-center">
               <p className="text-gray-500 dark:text-gray-400">Gráfico de vendas seria exibido aqui</p>
             </div>
           </div>
@@ -362,7 +362,7 @@ export default function RelatoriosAdministrativos() {
                     </span>
                   </div>
                   <div className="flex items-center">
-                    <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-3">
+                    <div className="w-32 bg-gray-200 dark:bg-gray-700 bg-white rounded-full h-2 mr-3">
                       <div 
                         className="bg-purple-600 h-2 rounded-full" 
                         style={{ width: `${(categoria.vendas / dadosRelatorios.produtos.categoriasPopulares[0].vendas) * 100}%` }}

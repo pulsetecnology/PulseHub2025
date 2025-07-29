@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import servicoNotificacoes from '../../servicos/ServicoNotificacoes';
-import { usarCorTema } from '../../utils/coresTema';
+import { usarCorTemaSeguro } from '../../hooks/usarCorTemaSeguro';
 
 export default function CentroNotificacoes() {
   const [notificacoes, setNotificacoes] = useState([]);
   const [aberto, setAberto] = useState(false);
-  const { classes } = usarCorTema();
+  const { classes, mounted } = usarCorTemaSeguro();
 
   useEffect(() => {
     // Carregar notificações iniciais
@@ -23,7 +23,7 @@ export default function CentroNotificacoes() {
     };
   }, []);
 
-  const naoLidas = servicoNotificacoes.contarNaoLidas();
+  const naoLidas = mounted ? servicoNotificacoes.contarNaoLidas() : 0;
 
   const formatarTempo = (timestamp) => {
     const agora = new Date();
@@ -131,7 +131,11 @@ export default function CentroNotificacoes() {
 
             {/* Lista de notificações */}
             <div className="max-h-96 overflow-y-auto">
-              {notificacoes.length === 0 ? (
+              {!mounted ? (
+                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                  <div className="animate-pulse">Carregando...</div>
+                </div>
+              ) : notificacoes.length === 0 ? (
                 <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                   <svg className="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-3.5-3.5a1.5 1.5 0 010-2.12L20 8h-5M9 17H4l3.5-3.5a1.5 1.5 0 000-2.12L4 8h5m6 9a3 3 0 11-6 0 3 3 0 016 0z" />

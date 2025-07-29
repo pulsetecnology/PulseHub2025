@@ -6,6 +6,11 @@ class ServicoNotificacoes {
 
   // Carregar notificações do localStorage
   carregarNotificacoes() {
+    // Verificar se estamos no cliente
+    if (typeof window === 'undefined') {
+      return [];
+    }
+    
     try {
       const notificacoesSalvas = localStorage.getItem('notificacoes');
       return notificacoesSalvas ? JSON.parse(notificacoesSalvas) : [];
@@ -17,6 +22,11 @@ class ServicoNotificacoes {
 
   // Salvar notificações no localStorage
   salvarNotificacoes() {
+    // Verificar se estamos no cliente
+    if (typeof window === 'undefined') {
+      return;
+    }
+    
     try {
       localStorage.setItem('notificacoes', JSON.stringify(this.notificacoes));
     } catch (error) {

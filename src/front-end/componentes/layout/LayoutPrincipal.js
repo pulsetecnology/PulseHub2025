@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from './Sidebar';
 import { ServicoAutenticacao } from '../../servicos/ServicoAutenticacao';
 import { usarCorTema, definirCorTema } from '../../utils/coresTema';
+import { usarCorTemaSeguro } from '../../hooks/usarCorTemaSeguro';
 import MiniModalSeletorCores from '../comum/MiniModalSeletorCores';
 import CentroNotificacoes from '../notificacoes/CentroNotificacoes';
 import { adicionarNotificacoesExemplo } from '../../utils/notificacoesExemplo';
 
 export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVoltar, botaoAcao }) {
   const [tema, setTema] = useState('claro');
-  const { classes } = usarCorTema();
+  const { classes, mounted } = usarCorTemaSeguro();
   const [usuario, setUsuario] = useState(null);
   const [mostrarDropdownUsuario, setMostrarDropdownUsuario] = useState(false);
   const [mostrarColorModal, setMostrarColorModal] = useState(false); // New state for color modal

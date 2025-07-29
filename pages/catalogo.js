@@ -6,7 +6,7 @@ export default function PaginaCatalogo() {
   return (
     <LayoutPrincipal 
       titulo="Catálogo de Produtos" 
-      subtitulo="Explore nossa coleção completa de produtos"
+      subtitulo="Explore nosso catálogo completo de produtos"
     >
       <CatalogoProdutos />
     </LayoutPrincipal>

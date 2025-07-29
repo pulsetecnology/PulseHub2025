@@ -23,7 +23,7 @@ class ServicoProdutos {
           preco: 89.90,
           precoOriginal: 120.00,
           descricao: 'Vestido floral perfeito para a primavera, tecido leve e confortável.',
-          ativo: true,
+          disponivel: true,
           destaque: false,
           sku: 'VES-001',
           cores: ['Rosa', 'Azul', 'Verde'],
@@ -46,7 +46,7 @@ class ServicoProdutos {
           categoria: 'Calças',
           preco: 129.90,
           descricao: 'Calça jeans skinny de alta qualidade, modelagem perfeita.',
-          ativo: true,
+          disponivel: true,
           destaque: true,
           sku: 'CAL-002',
           cores: ['Azul Escuro', 'Azul Claro', 'Preto'],
@@ -69,8 +69,8 @@ class ServicoProdutos {
           categoria: 'Blusas',
           preco: 69.90,
           precoOriginal: 89.90,
-          descricao: 'Blusa social elegante, ideal para ambiente corporativo.',
-          ativo: true,
+          descricao: 'Blusa social elegante, ideal para ambiente corpordisponivel.',
+          disponivel: true,
           destaque: false,
           sku: 'BLU-003',
           cores: ['Branco', 'Azul Claro', 'Rosa Claro'],
@@ -108,7 +108,7 @@ class ServicoProdutos {
 
   // Obter produto por ID
   obterPorId(id) {
-    const produtos = this.obterTodos();
+    const produtos = this.listar();
     return produtos.find(produto => produto.id === parseInt(id));
   }
 
@@ -125,7 +125,7 @@ class ServicoProdutos {
 
   // Criar novo produto
   criar(dadosProduto) {
-    const produtos = this.obterTodos();
+    const produtos = this.listar();
     const novoId = Math.max(...produtos.map(p => p.id), 0) + 1;
     
     const novoProduto = {
@@ -135,7 +135,7 @@ class ServicoProdutos {
       precoOriginal: dadosProduto.precoOriginal ? parseFloat(dadosProduto.precoOriginal) : null,
       prazoProducao: parseInt(dadosProduto.prazoProducao) || 15,
       quantidadeMinima: parseInt(dadosProduto.quantidadeMinima) || 1,
-      ativo: dadosProduto.ativo !== undefined ? dadosProduto.ativo : true,
+      disponivel: dadosProduto.disponivel !== undefined ? dadosProduto.disponivel : true,
       destaque: dadosProduto.destaque !== undefined ? dadosProduto.destaque : false,
       especificacoesTecnicas: dadosProduto.especificacoesTecnicas || {},
       fornecedor: 'Minha Empresa', // Seria obtido do usuário logado
@@ -151,7 +151,7 @@ class ServicoProdutos {
 
   // Atualizar produto existente
   atualizar(id, dadosProduto) {
-    const produtos = this.obterTodos();
+    const produtos = this.listar();
     const index = produtos.findIndex(produto => produto.id === parseInt(id));
     
     if (index === -1) {
@@ -166,7 +166,7 @@ class ServicoProdutos {
       precoOriginal: dadosProduto.precoOriginal ? parseFloat(dadosProduto.precoOriginal) : null,
       prazoProducao: parseInt(dadosProduto.prazoProducao) || produtos[index].prazoProducao,
       quantidadeMinima: parseInt(dadosProduto.quantidadeMinima) || produtos[index].quantidadeMinima,
-      ativo: dadosProduto.ativo !== undefined ? dadosProduto.ativo : produtos[index].ativo,
+      disponivel: dadosProduto.disponivel !== undefined ? dadosProduto.disponivel : produtos[index].disponivel,
       destaque: dadosProduto.destaque !== undefined ? dadosProduto.destaque : produtos[index].destaque,
       especificacoesTecnicas: dadosProduto.especificacoesTecnicas || produtos[index].especificacoesTecnicas,
       dataAtualizacao: new Date().toISOString()
@@ -180,7 +180,7 @@ class ServicoProdutos {
 
   // Excluir produto
   excluir(id) {
-    const produtos = this.obterTodos();
+    const produtos = this.listar();
     const produtosFiltrados = produtos.filter(produto => produto.id !== parseInt(id));
     
     if (produtos.length === produtosFiltrados.length) {
@@ -193,7 +193,7 @@ class ServicoProdutos {
 
   // Filtrar produtos
   filtrar(filtros = {}) {
-    let produtos = this.obterTodos();
+    let produtos = this.listar();
     
     if (filtros.busca) {
       const busca = filtros.busca.toLowerCase();
@@ -252,14 +252,14 @@ class ServicoProdutos {
 
   // Obter fornecedores únicos
   obterFornecedores() {
-    const produtos = this.obterTodos();
+    const produtos = this.listar();
     const fornecedores = produtos.map(p => p.fornecedor).filter(Boolean);
     return [...new Set(fornecedores)];
   }
 
   // Validar SKU único
   validarSKU(sku, idExcluir = null) {
-    const produtos = this.obterTodos();
+    const produtos = this.listar();
     return !produtos.some(produto => 
       produto.sku === sku && produto.id !== idExcluir
     );

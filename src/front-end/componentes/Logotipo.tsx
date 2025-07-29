@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { usarCorTema } from '../utils/coresTema';
+import React from 'react';
+import { usarCorTemaSeguro } from '../hooks/usarCorTemaSeguro';
 
 interface LogotipoProps {
   tamanho?: 'sm' | 'md' | 'lg' | 'xl';
@@ -8,12 +8,7 @@ interface LogotipoProps {
 }
 
 export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto = true }: LogotipoProps) {
-  const { classes } = usarCorTema();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { classes, mounted } = usarCorTemaSeguro();
   
   // Definindo tamanhos com base no parâmetro tamanho
   const tamanhos = {
@@ -42,6 +37,28 @@ export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto 
   // Garantir que o tamanho existe, senão usar 'md' como fallback
   const tamanhoAtual = tamanhos[tamanho] ? tamanho : 'md';
 
+  // Evitar problemas de hidratação renderizando apenas após mounted
+  if (!mounted) {
+    return (
+      <div className={`flex items-center ${className}`}>
+        <div className={`relative ${tamanhos[tamanhoAtual].container} aspect-square bg-gray-900 rounded-full flex items-center justify-center`}>
+          <div className="flex items-center h-1/2 space-x-0.5">
+            <div className="w-1 h-1/3 bg-white rounded-full"></div>
+            <div className="w-1 h-2/3 bg-white rounded-full"></div>
+            <div className="w-1 h-full bg-white rounded-full"></div>
+            <div className="w-1 h-2/3 bg-white rounded-full"></div>
+            <div className="w-1 h-1/3 bg-white rounded-full"></div>
+          </div>
+        </div>
+        {mostrarTexto && (
+          <div className={`ml-2 font-bold ${tamanhos[tamanhoAtual].texto}`}>
+            <span className="text-gray-900">PulseHub</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={`flex items-center ${className}`}>
       {/* Círculo com efeito pulsante */}
@@ -55,13 +72,9 @@ export default function Logotipo({ tamanho = 'md', className = '', mostrarTexto 
           <div className="w-1 h-1/3 bg-white rounded-full"></div>
         </div>
 
-        {/* Círculos pulsantes animados - só renderiza após mounted para evitar hidratação */}
-        {mounted && (
-          <>
-            <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-30 animate-ping-slow`}></div>
-            <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-20 animate-ping`}></div>
-          </>
-        )}
+        {/* Círculos pulsantes animados */}
+        <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-30 animate-ping-slow`}></div>
+        <div className={`absolute inset-0 rounded-full ${classes.bg} opacity-20 animate-ping`}></div>
       </div>
 
       {/* Texto do logo */}

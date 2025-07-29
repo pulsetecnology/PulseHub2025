@@ -27,6 +27,8 @@ export default function FormularioCliente({ clienteExistente = null }) {
     telefoneContato: '',
     limiteCredito: 0.00,
     condicoesPagamento: '',
+    tipo: 'pessoa_juridica',
+    status: 'ativo',
   });
 
   const [salvando, setSalvando] = useState(false);
@@ -53,6 +55,8 @@ export default function FormularioCliente({ clienteExistente = null }) {
         telefoneContato: clienteExistente.telefoneContato || '',
         limiteCredito: clienteExistente.limiteCredito || 0.00,
         condicoesPagamento: clienteExistente.condicoesPagamento || '',
+        tipo: clienteExistente.tipo || 'pessoa_juridica',
+        status: clienteExistente.status || 'ativo',
       });
     }
   }, [clienteExistente]);
@@ -144,7 +148,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.razaoSocial}
                 onChange={(e) => handleInputChange('razaoSocial', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white ${
                   erros.razaoSocial ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
                 placeholder="Ex: Empresa Exemplo Ltda."
@@ -161,7 +165,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.nomeFantasia}
                 onChange={(e) => handleInputChange('nomeFantasia', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
                 placeholder="Ex: Exemplo Comércio"
               />
             </div>
@@ -173,7 +177,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.cnpj}
                 onChange={(e) => handleInputChange('cnpj', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white ${
                   erros.cnpj ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
                 placeholder="00.000.000/0000-00"
@@ -190,7 +194,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.inscricaoEstadual}
                 onChange={(e) => handleInputChange('inscricaoEstadual', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -201,7 +205,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.telefoneComercial}
                 onChange={(e) => handleInputChange('telefoneComercial', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -212,7 +216,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="email"
                 value={dadosCliente.emailComercial}
                 onChange={(e) => handleInputChange('emailComercial', e.target.value)}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white ${
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white ${
                   erros.emailComercial ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
                 placeholder="contato@empresa.com"
@@ -220,6 +224,32 @@ export default function FormularioCliente({ clienteExistente = null }) {
               {erros.emailComercial && (
                 <p className="mt-1 text-sm text-red-600">{erros.emailComercial}</p>
               )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Tipo de Cliente
+              </label>
+              <select
+                value={dadosCliente.tipo}
+                onChange={(e) => handleInputChange('tipo', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
+              >
+                <option value="pessoa_juridica">Pessoa Jurídica</option>
+                <option value="pessoa_fisica">Pessoa Física</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Status do Cliente
+              </label>
+              <select
+                value={dadosCliente.status}
+                onChange={(e) => handleInputChange('status', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
+              >
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+              </select>
             </div>
           </div>
         </div>
@@ -238,7 +268,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.cep}
                 onChange={(e) => handleInputChange('cep', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -249,7 +279,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.rua}
                 onChange={(e) => handleInputChange('rua', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -260,7 +290,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.numero}
                 onChange={(e) => handleInputChange('numero', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -271,7 +301,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.complemento}
                 onChange={(e) => handleInputChange('complemento', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -282,7 +312,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.bairro}
                 onChange={(e) => handleInputChange('bairro', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -293,7 +323,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.cidade}
                 onChange={(e) => handleInputChange('cidade', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -304,7 +334,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.estado}
                 onChange={(e) => handleInputChange('estado', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
           </div>
@@ -324,7 +354,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.nomeContato}
                 onChange={(e) => handleInputChange('nomeContato', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -335,7 +365,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="email"
                 value={dadosCliente.emailContato}
                 onChange={(e) => handleInputChange('emailContato', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -346,7 +376,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.telefoneContato}
                 onChange={(e) => handleInputChange('telefoneContato', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
           </div>
@@ -367,7 +397,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 step="0.01"
                 value={dadosCliente.limiteCredito}
                 onChange={(e) => handleInputChange('limiteCredito', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
             <div>
@@ -378,7 +408,7 @@ export default function FormularioCliente({ clienteExistente = null }) {
                 type="text"
                 value={dadosCliente.condicoesPagamento}
                 onChange={(e) => handleInputChange('condicoesPagamento', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-700 bg-white dark:text-white"
               />
             </div>
           </div>

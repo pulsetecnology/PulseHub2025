@@ -95,7 +95,7 @@ export default function FormularioRegistro({ aoSubmeter, erro, carregando }: For
             placeholder="Seu nome completo"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errosValidacao.nome ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
           />
@@ -117,7 +117,7 @@ export default function FormularioRegistro({ aoSubmeter, erro, carregando }: For
             placeholder="seu@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errosValidacao.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
           />
@@ -139,7 +139,7 @@ export default function FormularioRegistro({ aoSubmeter, erro, carregando }: For
             placeholder="********"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errosValidacao.senha ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
           />
@@ -161,7 +161,7 @@ export default function FormularioRegistro({ aoSubmeter, erro, carregando }: For
             placeholder="********"
             value={confirmarSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
-            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 bg-white leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               errosValidacao.confirmarSenha ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
             }`}
           />

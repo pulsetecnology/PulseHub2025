@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { usarCorTema } from '../../utils/coresTema';
+import { usarCorTemaSeguro } from '../../hooks/usarCorTemaSeguro';
 
 export default function NotificacaoToast({ notificacao, onFechar, duracao = 5000 }) {
   const [visivel, setVisivel] = useState(true);
   const [progresso, setProgresso] = useState(100);
-  const { classes } = usarCorTema();
+  const { classes, mounted } = usarCorTemaSeguro();
 
   useEffect(() => {
     // Timer para fechar automaticamente

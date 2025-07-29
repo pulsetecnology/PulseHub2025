@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { CORES_DISPONIVEIS, obterCorTema, definirCorTema } from '../../utils/coresTema';
+import { useMounted } from '../../hooks/useMounted';
 
 export default function SeletorCores({ onCorAlterada }) {
   const [corSelecionada, setCorSelecionada] = useState('purple');
+  const mounted = useMounted();
 
   useEffect(() => {
-    const corAtual = obterCorTema();
-    setCorSelecionada(corAtual);
-  }, []);
+    if (mounted) {
+      const corAtual = obterCorTema();
+      setCorSelecionada(corAtual);
+    }
+  }, [mounted]);
 
   const alterarCor = (novaCor) => {
     setCorSelecionada(novaCor);
     definirCorTema(novaCor);
-    
+
     // Notificar o componente pai sobre a mudança
     if (onCorAlterada) {
       onCorAlterada(novaCor);
     }
-    
-    
+
+
   };
 
   return (
@@ -33,10 +37,10 @@ export default function SeletorCores({ onCorAlterada }) {
             `}
             title={cor.nome}
           >
-            <div 
+            <div
               className={`w-full h-full ${cor.classes.bg} rounded-md`}
             />
-            
+
             {corSelecionada === chave && (
               <div className="absolute">
                 <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -48,7 +52,7 @@ export default function SeletorCores({ onCorAlterada }) {
         ))}
       </div>
 
-      
+
     </div>
   );
 }

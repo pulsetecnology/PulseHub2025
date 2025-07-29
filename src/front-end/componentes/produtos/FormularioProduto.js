@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import ServicoProdutos from '../../servicos/ServicoProdutos';
 import ServicoCategorias from '../../servicos/ServicoCategorias';
@@ -9,6 +9,7 @@ export default function FormularioProduto({ produto = null }) {
   const router = useRouter();
   const isEdicao = !!produto;
   const { classes } = usarCorTema();
+  const servicoProdutos = new ServicoProdutos();
   
   const [dadosProduto, setDadosProduto] = useState({
     nome: '',
@@ -16,7 +17,7 @@ export default function FormularioProduto({ produto = null }) {
     preco: '',
     precoOriginal: '',
     descricao: '',
-    ativo: true,
+    disponivel: true,
     destaque: false,
     sku: '',
     cores: [],
@@ -54,7 +55,7 @@ export default function FormularioProduto({ produto = null }) {
         preco: produto.preco?.toString() || '',
         precoOriginal: produto.precoOriginal?.toString() || '',
         descricao: produto.descricao || '',
-        ativo: produto.ativo !== undefined ? produto.ativo : true,
+        disponivel: produto.disponivel !== undefined ? produto.disponivel : true,
         destaque: produto.destaque !== undefined ? produto.destaque : false,
         sku: produto.sku || '',
         cores: produto.cores || [],
@@ -185,20 +186,21 @@ export default function FormularioProduto({ produto = null }) {
 
     try {
       // Processar imagens antes de salvar
-      const imagensProcessadas = await ServicoProdutos.processarImagens(dadosProduto.imagens);
+      const imagensProcessadas = await servicoProdutos.processarImagens(dadosProduto.imagens);
       
       const dadosParaSalvar = {
         ...dadosProduto,
         imagens: imagensProcessadas
       };
       
+      const servicoProdutos = new ServicoProdutos();
       if (isEdicao) {
         // Atualizar produto existente
-        await ServicoProdutos.atualizar(produto.id, dadosParaSalvar);
+        await servicoProdutos.atualizar(produto.id, dadosParaSalvar);
         console.log('Produto atualizado com sucesso!');
       } else {
         // Criar novo produto
-        await ServicoProdutos.criar(dadosParaSalvar);
+        await servicoProdutos.criar(dadosParaSalvar);
         console.log('Produto criado com sucesso!');
       }
       
@@ -229,7 +231,7 @@ export default function FormularioProduto({ produto = null }) {
         }
         
         // Converter para base64 e adicionar à lista
-        const base64 = await ServicoProdutos.converterImagemParaBase64(file);
+        const base64 = await servicoProdutos.converterImagemParaBase64(file);
         setDadosProduto(prev => ({
           ...prev,
           imagens: [...prev.imagens, base64]
@@ -273,7 +275,7 @@ export default function FormularioProduto({ produto = null }) {
                     type="text"
                     value={dadosProduto.nome}
                     onChange={(e) => handleInputChange('nome', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white ${
                       erros.nome ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
                     placeholder="Ex: Vestido Floral Primavera"
@@ -291,7 +293,7 @@ export default function FormularioProduto({ produto = null }) {
                     type="text"
                     value={dadosProduto.sku}
                     onChange={(e) => handleInputChange('sku', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white ${
                       erros.sku ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
                     placeholder="Ex: VES-001"
@@ -308,7 +310,7 @@ export default function FormularioProduto({ produto = null }) {
                   <select
                     value={dadosProduto.categoria}
                     onChange={(e) => handleInputChange('categoria', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white ${
                       erros.categoria ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
@@ -331,20 +333,7 @@ export default function FormularioProduto({ produto = null }) {
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Status
-                  </label>
-                  <select
-                    value={dadosProduto.status}
-                    onChange={(e) => handleInputChange('status', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="ativo">Ativo</option>
-                    <option value="inativo">Inativo</option>
-                    <option value="rascunho">Rascunho</option>
-                  </select>
-                </div>
+                
               </div>
 
               <div className="mt-4">
@@ -355,7 +344,7 @@ export default function FormularioProduto({ produto = null }) {
                   value={dadosProduto.descricao}
                   onChange={(e) => handleInputChange('descricao', e.target.value)}
                   rows={4}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white ${
                     erros.descricao ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                   }`}
                   placeholder="Descreva o produto detalhadamente..."
@@ -380,7 +369,7 @@ export default function FormularioProduto({ produto = null }) {
                   <InputPreco
                     value={dadosProduto.preco}
                     onChange={(valor) => handleInputChange('preco', valor)}
-                    className={`w-full pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    className={`w-full pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white ${
                       erros.preco ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
                     placeholder="0,00"
@@ -397,7 +386,7 @@ export default function FormularioProduto({ produto = null }) {
                   <InputPreco
                     value={dadosProduto.precoOriginal}
                     onChange={(valor) => handleInputChange('precoOriginal', valor)}
-                    className="w-full pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="w-full pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white"
                     placeholder="0,00"
                   />
                   <p className="mt-1 text-xs text-gray-500">Para mostrar desconto</p>
@@ -412,7 +401,7 @@ export default function FormularioProduto({ produto = null }) {
                     min="1"
                     value={dadosProduto.prazoProducao}
                     onChange={(e) => handleInputChange('prazoProducao', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white ${
                       erros.prazoProducao ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
                     placeholder="15"
@@ -431,7 +420,7 @@ export default function FormularioProduto({ produto = null }) {
                     min="1"
                     value={dadosProduto.quantidadeMinima}
                     onChange={(e) => handleInputChange('quantidadeMinima', e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white ${
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white ${
                       erros.quantidadeMinima ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                     }`}
                     placeholder="1"
@@ -459,7 +448,7 @@ export default function FormularioProduto({ produto = null }) {
                     type="text"
                     value={novaCor}
                     onChange={(e) => setNovaCor(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white"
                     placeholder="Ex: Azul, Vermelho, Verde..."
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), adicionarCor())}
                   />
@@ -500,7 +489,7 @@ export default function FormularioProduto({ produto = null }) {
                     type="text"
                     value={novoTamanho}
                     onChange={(e) => setNovoTamanho(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white"
                     placeholder="Ex: P, M, G, 36, 38..."
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), adicionarTamanho())}
                   />
@@ -549,7 +538,7 @@ export default function FormularioProduto({ produto = null }) {
                   type="file"
                   accept="image/*"
                   onChange={handleUploadImagem}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white"
                 />
               </div>
 
@@ -563,7 +552,7 @@ export default function FormularioProduto({ produto = null }) {
                     type="url"
                     value={novaImagem}
                     onChange={(e) => setNovaImagem(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white"
                     placeholder="https://exemplo.com/imagem.jpg"
                   />
                   <button
@@ -589,7 +578,7 @@ export default function FormularioProduto({ produto = null }) {
                         e.target.nextSibling.style.display = 'flex';
                       }}
                     />
-                    <div className="w-full h-32 hidden items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-lg">
+                    <div className="w-full h-32 hidden items-center justify-center bg-gray-200 dark:bg-gray-700 bg-white rounded-lg">
                       <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -635,7 +624,7 @@ export default function FormularioProduto({ produto = null }) {
                       ...dadosProduto.especificacoesTecnicas,
                       material: e.target.value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white"
                     placeholder="Ex: 100% Algodão, Poliéster..."
                   />
                 </div>
@@ -650,7 +639,7 @@ export default function FormularioProduto({ produto = null }) {
                       ...dadosProduto.especificacoesTecnicas,
                       origem: e.target.value
                     })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white"
                   >
                     <option value="Nacional">Nacional</option>
                     <option value="Importado">Importado</option>
@@ -669,7 +658,7 @@ export default function FormularioProduto({ produto = null }) {
                     cuidados: e.target.value
                   })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 bg-white dark:text-white"
                   placeholder="Ex: Lavar à mão, não usar alvejante, secar à sombra..."
                 />
               </div>
@@ -678,12 +667,12 @@ export default function FormularioProduto({ produto = null }) {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={dadosProduto.ativo}
-                    onChange={(e) => handleInputChange('ativo', e.target.checked)}
+                    checked={dadosProduto.disponivel}
+                    onChange={(e) => handleInputChange('disponivel', e.target.checked)}
                     className="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50"
                   />
                   <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                    Produto ativo para venda
+                    Produto disponível para venda
                   </span>
                 </label>
 

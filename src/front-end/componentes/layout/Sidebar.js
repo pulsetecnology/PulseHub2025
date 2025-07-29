@@ -3,13 +3,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Logotipo from '../Logotipo';
 import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
-import { usarCorTema } from '../../utils/coresTema';
+import { usarCorTemaSeguro } from '../../hooks/usarCorTemaSeguro';
 
 export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuario = 'Fornecedor', estadoInicialRecolhido = false, onToggleRecolhido }) {
   const router = useRouter();
   const [papelUsuario, setPapelUsuario] = useState(PAPEIS.REPRESENTANTE);
   const [menuRecolhido, setMenuRecolhido] = useState(estadoInicialRecolhido);
-  const { classes } = usarCorTema();
+  const { classes, mounted } = usarCorTemaSeguro();
 
   useEffect(() => {
     // Obter o papel do usuário logado
@@ -243,7 +243,7 @@ export default function Sidebar({ temaSidebar = 'claro', alternarTema, tipoUsuar
                 <a 
                   className={`flex items-center px-4 py-3 transition-colors ${
                     isActive(item.href) 
-                      ? `${classes.bgLight} ${classes.text} border-l-4 ${classes.border} ${classes.bgLightDark} ${classes.textDark}` 
+                      ? `${classes.bgLight} ${classes.text} border-l-4 ${classes.border} ${classes.bgLightDark} ${classes.textDark}`
                       : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                   title={menuRecolhido ? item.label : ''}

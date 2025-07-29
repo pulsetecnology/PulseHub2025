@@ -10,12 +10,14 @@ export default function PaginaDetalheProduto() {
   const [produto, setProduto] = useState(null);
   const [carregando, setCarregando] = useState(true);
 
+  const servicoProdutos = new ServicoProdutos();
+
   useEffect(() => {
     if (id) {
       setCarregando(true);
       
       setTimeout(() => {
-        const produtoCarregado = ServicoProdutos.obterPorId(id);
+        const produtoCarregado = servicoProdutos.obterPorId(id);
         setProduto(produtoCarregado);
         setCarregando(false);
       }, 500);

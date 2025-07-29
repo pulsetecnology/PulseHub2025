@@ -253,9 +253,14 @@ export const definirCorTema = (cor) => {
 
 // Hook personalizado para usar cores do tema
 export const usarCorTema = () => {
-  const [corAtual, setCorAtual] = useState(obterCorTema());
+  const [corAtual, setCorAtual] = useState('purple'); // Inicializar com valor padrão
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Só definir a cor após a hidratação
+    setMounted(true);
+    setCorAtual(obterCorTema());
+
     const handleThemeChange = () => {
       setCorAtual(obterCorTema());
     };
@@ -275,6 +280,7 @@ export const usarCorTema = () => {
     corAtual,
     corConfig,
     definirCor: definirCorTema,
-    classes: corConfig.classes
+    classes: corConfig.classes,
+    mounted
   };
 };

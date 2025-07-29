@@ -142,7 +142,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="text"
                     value={configuracoes.sistema.nomeEmpresa}
                     onChange={(e) => handleAlterarConfiguracao('sistema', 'nomeEmpresa', e.target.value)}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -154,7 +154,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="email"
                     value={configuracoes.sistema.emailContato}
                     onChange={(e) => handleAlterarConfiguracao('sistema', 'emailContato', e.target.value)}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -166,7 +166,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="tel"
                     value={configuracoes.sistema.telefoneContato}
                     onChange={(e) => handleAlterarConfiguracao('sistema', 'telefoneContato', e.target.value)}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -178,7 +178,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="text"
                     value={configuracoes.sistema.enderecoEmpresa}
                     onChange={(e) => handleAlterarConfiguracao('sistema', 'enderecoEmpresa', e.target.value)}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -217,7 +217,7 @@ export default function ConfiguracoesAdministrativas() {
                     step="0.1"
                     value={configuracoes.comissoes.taxaPadraoFornecedor}
                     onChange={(e) => handleAlterarConfiguracao('comissoes', 'taxaPadraoFornecedor', parseFloat(e.target.value))}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -232,7 +232,7 @@ export default function ConfiguracoesAdministrativas() {
                     step="0.1"
                     value={configuracoes.comissoes.taxaPadraoRepresentante}
                     onChange={(e) => handleAlterarConfiguracao('comissoes', 'taxaPadraoRepresentante', parseFloat(e.target.value))}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -247,7 +247,7 @@ export default function ConfiguracoesAdministrativas() {
                     step="0.1"
                     value={configuracoes.comissoes.limiteMaximoComissao}
                     onChange={(e) => handleAlterarConfiguracao('comissoes', 'limiteMaximoComissao', parseFloat(e.target.value))}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -282,7 +282,7 @@ export default function ConfiguracoesAdministrativas() {
                   <select
                     value={configuracoes.pedidos.statusPadrao}
                     onChange={(e) => handleAlterarConfiguracao('pedidos', 'statusPadrao', e.target.value)}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   >
                     <option value="pendente">Pendente</option>
                     <option value="aprovado">Aprovado</option>
@@ -300,7 +300,7 @@ export default function ConfiguracoesAdministrativas() {
                     max="168"
                     value={configuracoes.pedidos.tempoLimiteAprovacao}
                     onChange={(e) => handleAlterarConfiguracao('pedidos', 'tempoLimiteAprovacao', parseInt(e.target.value))}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -378,7 +378,7 @@ export default function ConfiguracoesAdministrativas() {
                   <select
                     value={configuracoes.notificacoes.frequenciaResumo}
                     onChange={(e) => handleAlterarConfiguracao('notificacoes', 'frequenciaResumo', e.target.value)}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   >
                     <option value="diario">Diário</option>
                     <option value="semanal">Semanal</option>
@@ -395,7 +395,7 @@ export default function ConfiguracoesAdministrativas() {
                     type="time"
                     value={configuracoes.notificacoes.horarioEnvioResumo}
                     onChange={(e) => handleAlterarConfiguracao('notificacoes', 'horarioEnvioResumo', e.target.value)}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -420,7 +420,7 @@ export default function ConfiguracoesAdministrativas() {
                     max="168"
                     value={configuracoes.seguranca.tempoExpiracaoSessao}
                     onChange={(e) => handleAlterarConfiguracao('seguranca', 'tempoExpiracaoSessao', parseInt(e.target.value))}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -434,7 +434,7 @@ export default function ConfiguracoesAdministrativas() {
                     max="10"
                     value={configuracoes.seguranca.tentativasLoginMax}
                     onChange={(e) => handleAlterarConfiguracao('seguranca', 'tentativasLoginMax', parseInt(e.target.value))}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
 
@@ -448,7 +448,7 @@ export default function ConfiguracoesAdministrativas() {
                     max="1440"
                     value={configuracoes.seguranca.bloqueioTemporario}
                     onChange={(e) => handleAlterarConfiguracao('seguranca', 'bloqueioTemporario', parseInt(e.target.value))}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 dark:border-gray-600 dark:text-white`}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:${classes.ring} focus:${classes.border} dark:bg-gray-700 bg-white dark:border-gray-600 dark:text-white`}
                   />
                 </div>
               </div>
@@ -485,7 +485,7 @@ export default function ConfiguracoesAdministrativas() {
         </div>
 
         {/* Botões de Ação */}
-        <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex justify-end space-x-3">
+        <div className="bg-gray-50 dark:bg-gray-700 bg-white px-6 py-4 flex justify-end space-x-3">
           <button
             type="button"
             className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"

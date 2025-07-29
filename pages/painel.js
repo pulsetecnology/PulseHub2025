@@ -161,7 +161,7 @@ export default function Painel() {
   ];
 
   return (
-    <LayoutPrincipal titulo="Painel do Fornecedor" subtitulo="Gerencie seus produtos, pedidos e revendedores em um só lugar">
+    <LayoutPrincipal titulo="Painel do Fornecedor" subtitulo="Gerencie seus produtos, pedidos e representantes em um só lugar">
       {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {estatisticas.map((estatistica, index) => (

@@ -1,371 +1,343 @@
 import React, { useState, useEffect } from 'react';
+import FiltrosCatalogo from './FiltrosCatalogo';
 import CardProdutoCatalogo from './CardProdutoCatalogo';
 import ServicoProdutos from '../../servicos/ServicoProdutos';
-import { obterPapelUsuario, PAPEIS } from '../../utils/papelUsuario';
-import InputPreco from '../comum/InputPreco';
+import { usarCorTema } from '../../utils/coresTema';
 
 export default function CatalogoProdutos() {
+  const { classes } = usarCorTema();
   const [produtos, setProdutos] = useState([]);
+  const [produtosFiltrados, setProdutosFiltrados] = useState([]);
   const [carregando, setCarregando] = useState(true);
-  const [filtros, setFiltros] = useState({
+  const [filtrosAtivos, setFiltrosAtivos] = useState({
+    busca: '',
     categoria: '',
     precoMin: '',
     precoMax: '',
-    busca: '',
-    fornecedor: ''
+    disponivel: '',
+    ordenacao: 'nome',
+    visualizacao: 'grid'
   });
-  const [ordenacao, setOrdenacao] = useState('nome');
-  const [visualizacao, setVisualizacao] = useState('grid'); // grid ou lista
-  const [agruparPorFornecedor, setAgruparPorFornecedor] = useState(false);
-  const [filtrosVisiveis, setFiltrosVisiveis] = useState(false);
-  const [papelUsuario, setPapelUsuario] = useState(PAPEIS.REPRESENTANTE);
+  const [erro, setErro] = useState(null);
 
-  // Carregar produtos reais do ServicoProdutos
+  const servicoProdutos = new ServicoProdutos();
+
+  // Carregar produtos iniciais
   useEffect(() => {
-    const carregarProdutos = async () => {
-      setCarregando(true);
-      
-      // Obter papel do usuário
-      const papel = obterPapelUsuario();
-      setPapelUsuario(papel);
-      
-      // Simular delay de carregamento
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Carregar produtos do serviço
-      let produtosCarregados = ServicoProdutos.filtrar({});
-      
-      // Filtrar produtos baseado no papel do usuário
-      if (papel === PAPEIS.FORNECEDOR) {
-        // Fornecedor vê apenas seus próprios produtos
-        const usuarioAtual = JSON.parse(localStorage.getItem('usuario') || '{}');
-        produtosCarregados = produtosCarregados.filter(produto => 
-          produto.fornecedor === usuarioAtual.nome || produto.fornecedor === usuarioAtual.empresa
-        );
-      }
-      // Representantes e Administradores veem todos os produtos
-      
-      // Converter formato para compatibilidade com o catálogo
-      const produtosFormatados = produtosCarregados.map(produto => ({
-        ...produto,
-        avaliacoes: produto.avaliacoes || 4.0 + Math.random() * 1, // Simular avaliações
-        totalAvaliacoes: produto.totalAvaliacoes || Math.floor(Math.random() * 50) + 5,
-        cores: produto.cores || ['Padrão'],
-        tamanhos: produto.tamanhos || ['Único']
-      }));
-      
-      setProdutos(produtosFormatados);
-      setCarregando(false);
-    };
-
     carregarProdutos();
   }, []);
 
-  // Filtrar produtos
-  const produtosFiltrados = produtos.filter(produto => {
-    const matchBusca = produto.nome.toLowerCase().includes(filtros.busca.toLowerCase()) ||
-                      produto.descricao.toLowerCase().includes(filtros.busca.toLowerCase());
-    const matchCategoria = !filtros.categoria || produto.categoria === filtros.categoria;
-    const matchPrecoMin = !filtros.precoMin || produto.preco >= parseFloat(filtros.precoMin);
-    const matchPrecoMax = !filtros.precoMax || produto.preco <= parseFloat(filtros.precoMax);
-    const matchFornecedor = !filtros.fornecedor || produto.fornecedor === filtros.fornecedor;
-    
-    return matchBusca && matchCategoria && matchPrecoMin && matchPrecoMax && matchFornecedor;
-  });
-
-  // Ordenar produtos (produtos em destaque sempre primeiro)
-  const produtosOrdenados = [...produtosFiltrados].sort((a, b) => {
-    // Primeiro critério: produtos em destaque
-    if (a.destaque && !b.destaque) return -1;
-    if (!a.destaque && b.destaque) return 1;
-    
-    // Segundo critério: ordenação selecionada
-    switch (ordenacao) {
-      case 'nome':
-        return a.nome.localeCompare(b.nome);
-      case 'preco-asc':
-        return a.preco - b.preco;
-      case 'preco-desc':
-        return b.preco - a.preco;
-      case 'avaliacao':
-        return b.avaliacoes - a.avaliacoes;
-      default:
-        return 0;
+  const carregarProdutos = async () => {
+    try {
+      setCarregando(true);
+      setErro(null);
+      
+      // Simular delay de carregamento
+      setTimeout(() => {
+        const produtosCarregados = servicoProdutos.listar();
+        setProdutos(produtosCarregados);
+        aplicarFiltros(produtosCarregados, filtrosAtivos);
+        setCarregando(false);
+      }, 500);
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error);
+      setErro('Erro ao carregar catálogo. Tente novamente.');
+      setCarregando(false);
     }
-  });
-
-  const produtosAgrupados = produtosOrdenados.reduce((acc, produto) => {
-    const fornecedor = produto.fornecedor || 'Outros';
-    if (!acc[fornecedor]) {
-      acc[fornecedor] = [];
-    }
-    acc[fornecedor].push(produto);
-    return acc;
-  }, {});
-
-  const categorias = ServicoProdutos.obterCategorias();
-  const fornecedores = ServicoProdutos.obterFornecedores();
-
-  const handleFiltroChange = (campo, valor) => {
-    setFiltros(prev => ({
-      ...prev,
-      [campo]: valor
-    }));
   };
 
-  const limparFiltros = () => {
-    setFiltros({
-      categoria: '',
-      precoMin: '',
-      precoMax: '',
-      busca: '',
-      fornecedor: ''
+  const aplicarFiltros = (produtosBase, filtros) => {
+    try {
+      let produtosFiltrados = [...produtosBase];
+
+      // Filtro por busca
+      if (filtros.busca) {
+        const termoBusca = filtros.busca.toLowerCase().trim();
+        produtosFiltrados = produtosFiltrados.filter(produto => 
+          produto.nome.toLowerCase().includes(termoBusca) ||
+          produto.descricao.toLowerCase().includes(termoBusca) ||
+          produto.sku.toLowerCase().includes(termoBusca)
+        );
+      }
+
+      // Filtro por categoria
+      if (filtros.categoria) {
+        produtosFiltrados = produtosFiltrados.filter(produto => 
+          produto.categoria === filtros.categoria
+        );
+      }
+
+      // Filtro por preço mínimo
+      if (filtros.precoMin) {
+        produtosFiltrados = produtosFiltrados.filter(produto => 
+          produto.preco >= parseFloat(filtros.precoMin)
+        );
+      }
+
+      // Filtro por preço máximo
+      if (filtros.precoMax) {
+        produtosFiltrados = produtosFiltrados.filter(produto => 
+          produto.preco <= parseFloat(filtros.precoMax)
+        );
+      }
+
+      // Filtro por disponibilidade
+      if (filtros.disponivel) {
+        produtosFiltrados = produtosFiltrados.filter(produto => 
+          filtros.disponivel === 'sim' ? produto.disponivel : !produto.disponivel
+        );
+      }
+
+      // Ordenação
+      produtosFiltrados = ordenarProdutos(produtosFiltrados, filtros.ordenacao);
+
+      setProdutosFiltrados(produtosFiltrados);
+    } catch (error) {
+      console.error('Erro ao aplicar filtros:', error);
+      setProdutosFiltrados(produtosBase);
+    }
+  };
+
+  const ordenarProdutos = (produtos, criterio) => {
+    return [...produtos].sort((a, b) => {
+      switch (criterio) {
+        case 'nome':
+          return a.nome.localeCompare(b.nome);
+        case 'preco_asc':
+          return a.preco - b.preco;
+        case 'preco_desc':
+          return b.preco - a.preco;
+        case 'categoria':
+          return a.categoria.localeCompare(b.categoria);
+        case 'disponibilidade':
+          return b.disponivel - a.disponivel;
+        default:
+          return 0;
+      }
     });
+  };
+
+  const handleFiltroChange = (novosFiltros) => {
+    setFiltrosAtivos(novosFiltros);
+    aplicarFiltros(produtos, novosFiltros);
+  };
+
+  const handleRecarregar = () => {
+    carregarProdutos();
   };
 
   if (carregando) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
+          <div className="animate-pulse">
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-48 mb-2"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-32"></div>
+              </div>
+              <div className="flex space-x-3">
+                <div className="h-10 bg-gray-300 dark:bg-gray-600 rounded w-48"></div>
+                <div className="h-10 bg-gray-300 dark:bg-gray-600 rounded w-32"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex justify-center items-center h-64">
+          <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${classes.border}`}></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (erro) {
+    return (
+      <div className="space-y-6">
+        <FiltrosCatalogo 
+          onFiltroChange={handleFiltroChange}
+          totalProdutos={0}
+          carregando={false}
+        />
+        
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <svg
+            className="mx-auto h-12 w-12 text-red-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+            />
+          </svg>
+          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+            Erro ao carregar catálogo
+          </h3>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            {erro}
+          </p>
+          <button
+            onClick={handleRecarregar}
+            className={`mt-4 px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors`}
+          >
+            Tentar novamente
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Barra de busca e filtros */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Filtros</h2>
-          <button 
-            onClick={() => setFiltrosVisiveis(!filtrosVisiveis)}
-            className="text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300"
+      {/* Filtros */}
+      <FiltrosCatalogo 
+        onFiltroChange={handleFiltroChange}
+        totalProdutos={produtosFiltrados.length}
+        carregando={carregando}
+      />
+
+      {/* Catálogo de produtos */}
+      {produtosFiltrados.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            {filtrosVisiveis ? 'Ocultar Filtros' : 'Mostrar Filtros'}
-          </button>
-        </div>
-
-        {filtrosVisiveis && (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
-            {/* Busca */}
-            <div className="md:col-span-1 lg:col-span-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Buscar produtos
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={filtros.busca}
-                  onChange={(e) => handleFiltroChange('busca', e.target.value)}
-                  placeholder="Nome ou descrição..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                />
-                <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Categoria */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Categoria
-              </label>
-              <select
-                value={filtros.categoria}
-                onChange={(e) => handleFiltroChange('categoria', e.target.value)}
-                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Todas</option>
-                {categorias.map(categoria => (
-                  <option key={categoria} value={categoria}>{categoria}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Fornecedor */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Fornecedor
-              </label>
-              <select
-                value={filtros.fornecedor}
-                onChange={(e) => handleFiltroChange('fornecedor', e.target.value)}
-                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Todos</option>
-                {fornecedores.map(fornecedor => (
-                  <option key={fornecedor} value={fornecedor}>{fornecedor}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Preço */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Preço Mín.
-                </label>
-                <InputPreco
-                  value={filtros.precoMin}
-                  onChange={(valor) => handleFiltroChange('precoMin', valor)}
-                  placeholder="0,00"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Preço Máx.
-                </label>
-                <InputPreco
-                  value={filtros.precoMax}
-                  onChange={(valor) => handleFiltroChange('precoMax', valor)}
-                  placeholder="1.000,00"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Botões de ação */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <button
-            onClick={limparFiltros}
-            className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-          >
-            Limpar filtros
-          </button>
-
-          <div className="flex items-center space-x-4">
-            {/* Agrupar por Fornecedor */}
-            <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
-              <input
-                type="checkbox"
-                checked={agruparPorFornecedor}
-                onChange={(e) => setAgruparPorFornecedor(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-              />
-              <span className="ml-2">Agrupar por fornecedor</span>
-            </label>
-
-            {/* Ordenação */}
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Ordenar por:
-              </label>
-              <select
-                value={ordenacao}
-                onChange={(e) => setOrdenacao(e.target.value)}
-                className="px-3 py-1 pr-10 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
-              >
-                <option value="nome">Nome</option>
-                <option value="preco-asc">Menor preço</option>
-                <option value="preco-desc">Maior preço</option>
-                <option value="avaliacao">Melhor avaliação</option>
-              </select>
-            </div>
-
-            {/* Visualização */}
-            <div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-              <button
-                onClick={() => setVisualizacao('grid')}
-                className={`p-2 rounded ${visualizacao === 'grid' 
-                  ? 'bg-white dark:bg-gray-600 shadow' 
-                  : 'hover:bg-gray-200 dark:hover:bg-gray-600'
-                } transition-colors`}
-                title="Visualização em grade"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setVisualizacao('lista')}
-                className={`p-2 rounded ${visualizacao === 'lista' 
-                  ? 'bg-white dark:bg-gray-600 shadow' 
-                  : 'hover:bg-gray-200 dark:hover:bg-gray-600'
-                } transition-colors`}
-                title="Visualização em lista"
-              >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Resultados */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-all duration-200 border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-              {papelUsuario === PAPEIS.FORNECEDOR ? 'Meus Produtos no Catálogo' : 'Catálogo de Produtos'} ({produtosOrdenados.length})
-            </h2>
-            {papelUsuario === PAPEIS.FORNECEDOR && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Visualização de como seus produtos aparecem para os representantes
-              </p>
-            )}
-          </div>
-          {filtros.busca && (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Resultados para "{filtros.busca}"
-            </p>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            />
+          </svg>
+          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+            Nenhum produto encontrado
+          </h3>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            {Object.values(filtrosAtivos).some(filtro => filtro && filtro !== 'nome' && filtro !== 'grid')
+              ? 'Tente ajustar os filtros de busca ou limpar os filtros ativos.'
+              : 'Não há produtos disponíveis no catálogo no momento.'}
+          </p>
+          
+          {Object.values(filtrosAtivos).some(filtro => filtro && filtro !== 'nome' && filtro !== 'grid') && (
+            <button
+              onClick={() => handleFiltroChange({
+                busca: '',
+                categoria: '',
+                precoMin: '',
+                precoMax: '',
+                disponivel: '',
+                ordenacao: 'nome',
+                visualizacao: filtrosAtivos.visualizacao
+              })}
+              className="mt-4 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+            >
+              Limpar todos os filtros
+            </button>
           )}
         </div>
-
-        {produtosOrdenados.length === 0 ? (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
-            <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
-              Nenhum produto encontrado
-            </h3>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Tente ajustar os filtros ou buscar por outros termos.
-            </p>
-          </div>
-        ) : (
-          agruparPorFornecedor ? (
-            Object.keys(produtosAgrupados).map(fornecedor => (
-              <div key={fornecedor} className="mb-8">
-                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 border-b pb-2">{fornecedor}</h2>
-                <div className={
-                  visualizacao === 'grid' 
-                    ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-                    : 'space-y-4'
-                }>
-                  {produtosAgrupados[fornecedor].map(produto => (
-                    <CardProdutoCatalogo 
-                      key={produto.id} 
-                      produto={produto} 
-                      visualizacao={visualizacao}
-                    />
-                  ))}
+      ) : (
+        <>
+          {/* Estatísticas rápidas */}
+          {produtos.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{produtos.length}</p>
+                  </div>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className={
-              visualizacao === 'grid' 
-                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-                : 'space-y-4'
-            }>
-              {produtosOrdenados.map(produto => (
-                <CardProdutoCatalogo 
-                  key={produto.id} 
-                  produto={produto} 
-                  visualizacao={visualizacao}
-                />
-              ))}
+              
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Disponíveis</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {produtos.filter(p => p.disponivel).length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Categorias</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {[...new Set(produtos.map(p => p.categoria))].length}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Preço médio</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(produtos.reduce((acc, p) => acc + p.preco, 0) / produtos.length)}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-          )
-        )}
-      </div>
+          )}
+
+          {/* Grid/Lista de produtos */}
+          <div className={
+            filtrosAtivos.visualizacao === 'grid' 
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+              : 'space-y-4'
+          }>
+            {produtosFiltrados.map(produto => (
+              <CardProdutoCatalogo 
+                key={produto.id} 
+                produto={produto} 
+                visualizacao={filtrosAtivos.visualizacao} 
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

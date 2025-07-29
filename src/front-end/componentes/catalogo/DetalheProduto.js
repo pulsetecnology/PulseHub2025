@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import ServicoProdutos from '../../servicos/ServicoProdutos';
 import ModalImagem from '../comum/ModalImagem';
-import { usarCorTema } from '../../utils/coresTema';
+import { usarCorTemaSeguro } from '../../hooks/usarCorTemaSeguro';
 
 export default function DetalheProduto({ produtoId, produto: produtoProp }) {
   const router = useRouter();
-  const { classes } = usarCorTema();
+  const { classes, mounted } = usarCorTemaSeguro();
   const [produto, setProduto] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [imagemSelecionada, setImagemSelecionada] = useState(0);

@@ -16,7 +16,8 @@ export default function EditarProduto() {
       
       // Simular delay de carregamento
       setTimeout(() => {
-        const produtoCarregado = ServicoProdutos.obterPorId(id);
+        const servicoProdutos = new ServicoProdutos();
+        const produtoCarregado = servicoProdutos.obterPorId(id);
         setProduto(produtoCarregado);
         setCarregando(false);
       }, 500);
