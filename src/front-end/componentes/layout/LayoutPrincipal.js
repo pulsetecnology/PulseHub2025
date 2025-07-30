@@ -8,6 +8,7 @@ import CentroNotificacoes from '../notificacoes/CentroNotificacoes';
 import IconeCarrinho from '../carrinho/IconeCarrinho';
 import Carrinho from '../carrinho/Carrinho';
 import { adicionarNotificacoesExemplo } from '../../utils/notificacoesExemplo';
+import { ehRepresentante, obterPapelUsuario } from '../../utils/papelUsuario';
 
 export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVoltar, botaoAcao }) {
   const [tema, setTema] = useState('claro');
@@ -16,6 +17,7 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
   const [mostrarDropdownUsuario, setMostrarDropdownUsuario] = useState(false);
   const [mostrarColorModal, setMostrarColorModal] = useState(false); // New state for color modal
   const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
+  const [papelUsuario, setPapelUsuario] = useState(null);
   const [sidebarRecolhido, setSidebarRecolhido] = useState(() => {
     // Recuperar estado do sidebar do localStorage
     if (typeof window !== 'undefined') {
@@ -45,6 +47,9 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
     const dadosUsuario = servicoAutenticacao.obterUsuario();
     if (dadosUsuario) {
       setUsuario(dadosUsuario);
+      // Obter papel do usuário usando a função utilitária
+      const papel = obterPapelUsuario();
+      setPapelUsuario(papel);
     }
 
     // Adicionar notificações de exemplo (apenas uma vez)
@@ -109,15 +114,17 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Ícone do carrinho */}
-            <div className="relative">
-              <IconeCarrinho onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
-              {mostrarCarrinho && (
-                <div ref={carrinhoModalRef} className="absolute top-full mt-2 right-0 z-50">
-                  <Carrinho onClose={() => setMostrarCarrinho(false)} />
-                </div>
-              )}
-            </div>
+            {/* Ícone do carrinho - apenas para representantes */}
+            {papelUsuario === 'REPRESENTANTE' && (
+              <div className="relative">
+                <IconeCarrinho onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
+                {mostrarCarrinho && (
+                  <div ref={carrinhoModalRef} className="absolute top-full mt-2 right-0 z-50">
+                    <Carrinho onClose={() => setMostrarCarrinho(false)} />
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Centro de notificações */}
             <CentroNotificacoes />

@@ -2,7 +2,9 @@
 
 ## 🎯 Visão Geral
 
-O sistema de carrinho do PulseHub foi desenvolvido para proporcionar uma experiência de compra fluida e intuitiva, integrando-se perfeitamente com o catálogo de produtos e o sistema de pedidos.
+O sistema de carrinho do PulseHub foi desenvolvido para proporcionar uma experiência de compra fluida e intuitiva aos **representantes**, integrando-se perfeitamente com o catálogo de produtos e o sistema de pedidos.
+
+> **⚠️ Importante**: O carrinho de compras está disponível **exclusivamente para usuários com papel de REPRESENTANTE**. Administradores e fornecedores não têm acesso a esta funcionalidade.
 
 ## 🛒 Funcionalidades Implementadas
 
@@ -75,6 +77,32 @@ O sistema de carrinho do PulseHub foi desenvolvido para proporcionar uma experi�
 - **Total**: Valor total formatado em reais
 - **Botão Limpar**: Remove todos os itens
 - **Botão Continuar**: Prossegue para criação do pedido
+
+## 🔐 Controle de Acesso
+
+### **Restrição por Papel de Usuário**
+O sistema implementa verificação rigorosa de papel do usuário:
+
+```javascript
+// LayoutPrincipal.js - Renderização condicional
+{papelUsuario === 'REPRESENTANTE' && (
+  <div className="relative">
+    <IconeCarrinho onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
+    {/* Modal do carrinho */}
+  </div>
+)}
+```
+
+### **Verificação de Papel**
+- Utiliza `obterPapelUsuario()` do utilitário `papelUsuario.js`
+- Verifica papel armazenado no `localStorage`
+- Fallback para análise de token JWT
+- Renderização condicional no `LayoutPrincipal.js`
+
+### **Usuários com Acesso**
+- ✅ **REPRESENTANTE**: Acesso completo ao carrinho
+- ❌ **ADMINISTRADOR**: Sem acesso ao carrinho
+- ❌ **FORNECEDOR**: Sem acesso ao carrinho
 
 ## 🔄 Fluxo de Funcionamento
 
