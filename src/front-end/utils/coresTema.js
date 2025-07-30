@@ -240,54 +240,54 @@ export const CORES_DISPONIVEIS = {
     nome: 'Bege',
     primary: 'stone',
     classes: {
-      bg: 'bg-stone-600',
-      bgHover: 'hover:bg-stone-700',
+      bg: 'bg-stone-300',
+      bgHover: 'hover:bg-stone-400',
       bgLight: 'bg-stone-50',
       bgLightDark: 'dark:bg-stone-900/20',
-      text: 'text-stone-600',
-      textDark: 'dark:text-stone-400',
-      textLight: 'text-stone-700',
-      textLightDark: 'dark:text-stone-300',
-      border: 'border-stone-600',
+      text: 'text-stone-300',
+      textDark: 'dark:text-stone-200',
+      textLight: 'text-stone-400',
+      textLightDark: 'dark:text-stone-100',
+      border: 'border-stone-300',
       borderLight: 'border-stone-200',
-      ring: 'ring-stone-500',
-      accent: 'accent-stone-600'
+      ring: 'ring-stone-300',
+      accent: 'accent-stone-300'
     }
   },
   slate: {
-    nome: 'Cinza Escuro',
+    nome: 'Cinza Claro',
     primary: 'slate',
     classes: {
-      bg: 'bg-slate-700',
-      bgHover: 'hover:bg-slate-800',
+      bg: 'bg-slate-400',
+      bgHover: 'hover:bg-slate-500',
       bgLight: 'bg-slate-50',
       bgLightDark: 'dark:bg-slate-900/20',
-      text: 'text-slate-700',
+      text: 'text-slate-400',
       textDark: 'dark:text-slate-300',
-      textLight: 'text-slate-800',
+      textLight: 'text-slate-500',
       textLightDark: 'dark:text-slate-200',
-      border: 'border-slate-700',
+      border: 'border-slate-400',
       borderLight: 'border-slate-200',
-      ring: 'ring-slate-500',
-      accent: 'accent-slate-700'
+      ring: 'ring-slate-400',
+      accent: 'accent-slate-400'
     }
   },
   amber: {
     nome: 'Salmon',
     primary: 'amber',
     classes: {
-      bg: 'bg-amber-500',
-      bgHover: 'hover:bg-amber-600',
+      bg: 'bg-amber-300',
+      bgHover: 'hover:bg-amber-400',
       bgLight: 'bg-amber-50',
       bgLightDark: 'dark:bg-amber-900/20',
-      text: 'text-amber-500',
-      textDark: 'dark:text-amber-400',
-      textLight: 'text-amber-600',
-      textLightDark: 'dark:text-amber-300',
-      border: 'border-amber-500',
+      text: 'text-amber-300',
+      textDark: 'dark:text-amber-200',
+      textLight: 'text-amber-400',
+      textLightDark: 'dark:text-amber-100',
+      border: 'border-amber-300',
       borderLight: 'border-amber-200',
-      ring: 'ring-amber-500',
-      accent: 'accent-amber-500'
+      ring: 'ring-amber-300',
+      accent: 'accent-amber-300'
     }
   }
 };
