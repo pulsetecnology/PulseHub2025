@@ -235,6 +235,7 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 
 **Critérios de Aceitação:**
 - Clientes compartilhados entre partes vinculadas
+- Representante não pode ver clientes de outros representantes
 - Acesso controlado adequadamente
 - Sincronização funcionando
 - Testes passando
