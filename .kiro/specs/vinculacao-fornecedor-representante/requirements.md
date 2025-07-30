@@ -92,6 +92,21 @@ Este documento define os requisitos para implementar o sistema de vinculação e
 5. QUANDO um fornecedor visualiza detalhes de representante ENTÃO o sistema DEVE mostrar métricas de performance e histórico
 6. QUANDO um fornecedor define configurações específicas ENTÃO o sistema DEVE permitir personalizar comissões e preços por representante
 
+### Requisito 7: Sistema de Convites Bidirecionais
+
+**História do Usuário:** Como fornecedor ou representante, quero poder enviar e receber convites de parceria, para que eu possa estabelecer relacionamentos comerciais de forma controlada e consensual.
+
+#### Critérios de Aceitação
+
+1. QUANDO um fornecedor convida um representante ENTÃO o sistema DEVE enviar notificação ao representante para aceitar ou recusar
+2. QUANDO um representante busca fornecedores ENTÃO o sistema DEVE permitir enviar solicitação de parceria
+3. QUANDO um representante solicita parceria com fornecedor ENTÃO o sistema DEVE notificar o fornecedor para aceitar ou recusar
+4. QUANDO um convite é enviado ENTÃO o sistema DEVE criar registro com status "pendente"
+5. QUANDO um convite é aceito ENTÃO o sistema DEVE ativar a vinculação e notificar ambas as partes
+6. QUANDO um convite é recusado ENTÃO o sistema DEVE registrar a recusa e notificar o solicitante
+7. QUANDO um convite expira ENTÃO o sistema DEVE inativar automaticamente após prazo definido
+8. QUANDO um usuário visualiza convites ENTÃO o sistema DEVE mostrar convites enviados e recebidos separadamente
+
 ## Regras de Negócio
 
 ### RN001: Relacionamento Many-to-Many
@@ -113,6 +128,13 @@ Este documento define os requisitos para implementar o sistema de vinculação e
 - Remoção de vinculação não deve afetar dados históricos
 - Pedidos existentes mantêm referências mesmo após desvinculação
 - Auditoria completa de todas as operações de vinculação
+
+### RN005: Sistema de Convites
+- Convites têm prazo de expiração de 30 dias por padrão
+- Apenas um convite ativo por par fornecedor-representante
+- Convites recusados podem ser reenviados após 7 dias
+- Sistema deve registrar histórico completo de convites
+- Notificações automáticas para todos os eventos de convite
 
 ## Considerações Técnicas
 

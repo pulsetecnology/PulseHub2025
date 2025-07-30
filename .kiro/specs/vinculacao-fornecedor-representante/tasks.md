@@ -615,7 +615,74 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 
 ---
 
-### TASK-021: Deploy em Produção
+### TASK-021: Sistema de Convites Bidirecionais
+**Prioridade:** Alta  
+**Estimativa:** 8 horas  
+**Responsável:** Backend Developer
+
+**Descrição:** Implementar sistema completo de convites entre fornecedores e representantes
+
+**Subtarefas:**
+- [ ] Atualizar modelo de dados para suportar convites
+- [ ] Criar API para fornecedor convidar representante
+- [ ] Criar API para representante solicitar parceria
+- [ ] Implementar listagem de convites recebidos/enviados
+- [ ] Criar endpoints para aceitar/recusar convites
+- [ ] Implementar sistema de expiração automática
+- [ ] Adicionar notificações para convites
+- [ ] Criar testes unitários e integração
+
+**Critérios de Aceitação:**
+- Fornecedores podem convidar representantes
+- Representantes podem solicitar parcerias
+- Sistema de aceite/recusa funcionando
+- Notificações enviadas corretamente
+- Convites expiram automaticamente
+- Histórico completo de convites
+- Testes passando
+
+**Arquivos Afetados:**
+- `pages/api/fornecedores/convites/` (novos)
+- `pages/api/representantes/solicitacoes/` (novos)
+- `pages/api/convites/` (novos)
+- `src/funcionalidades/vinculacoes/` (novos)
+
+---
+
+### TASK-022: Interface de Convites
+**Prioridade:** Alta  
+**Estimativa:** 6 horas  
+**Responsável:** Frontend Developer
+
+**Descrição:** Criar interfaces para gerenciar convites e solicitações
+
+**Subtarefas:**
+- [ ] Criar componente de envio de convites
+- [ ] Criar componente de solicitação de parceria
+- [ ] Implementar listagem de convites recebidos
+- [ ] Implementar listagem de convites enviados
+- [ ] Criar modal de aceite/recusa
+- [ ] Adicionar notificações visuais
+- [ ] Implementar busca de fornecedores/representantes
+- [ ] Criar testes de componentes
+
+**Critérios de Aceitação:**
+- Interface intuitiva para enviar convites
+- Listagens claras e organizadas
+- Modal de aceite/recusa funcional
+- Busca eficiente implementada
+- Notificações visuais adequadas
+- Responsivo em todos os dispositivos
+- Testes passando
+
+**Arquivos Afetados:**
+- `src/front-end/componentes/convites/` (novos)
+- `src/front-end/paginas/ConvitesRecebidos.js` (novo)
+- `src/front-end/paginas/ConvitesEnviados.js` (novo)
+
+---
+
+### TASK-023: Deploy em Produção
 **Prioridade:** Alta  
 **Estimativa:** 4 horas  
 **Responsável:** DevOps Engineer
@@ -655,8 +722,9 @@ Este documento detalha todas as tarefas necessárias para implementar o sistema 
 | Fase 3: Interface | 5 | 19 horas |
 | Fase 4: Notificações | 3 | 15 horas |
 | Fase 5: Testes | 3 | 13 horas |
-| Fase 6: Deploy | 2 | 7 horas |
-| **Total** | **22** | **92 horas** |
+| Fase 6: Convites Bidirecionais | 2 | 14 horas |
+| Fase 7: Deploy | 1 | 4 horas |
+| **Total** | **23** | **103 horas** |
 
 ## Dependências
 

@@ -13,11 +13,14 @@ CREATE TABLE fornecedor_representante (
   id SERIAL PRIMARY KEY,
   fornecedor_id INTEGER NOT NULL REFERENCES usuarios(id),
   representante_id INTEGER NOT NULL REFERENCES usuarios(id),
-  status ENUM('ativo', 'inativo', 'pendente') DEFAULT 'pendente',
+  status ENUM('ativo', 'inativo', 'pendente', 'recusado', 'expirado') DEFAULT 'pendente',
   comissao_padrao DECIMAL(5,2) DEFAULT 0.00,
   data_vinculacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   data_inativacao TIMESTAMP NULL,
+  data_expiracao TIMESTAMP NULL,
   criado_por INTEGER REFERENCES usuarios(id),
+  tipo_solicitacao ENUM('fornecedor_convida', 'representante_solicita') NOT NULL,
+  motivo_recusa TEXT NULL,
   configuracoes JSON DEFAULT '{}',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -26,7 +29,10 @@ CREATE TABLE fornecedor_representante (
   INDEX idx_fornecedor (fornecedor_id),
   INDEX idx_representante (representante_id),
   INDEX idx_status (status),
-  INDEX idx_data_vinculacao (data_vinculacao)
+  INDEX idx_tipo_solicitacao (tipo_solicitacao),
+  INDEX idx_criado_por (criado_por),
+  INDEX idx_data_vinculacao (data_vinculacao),
+  INDEX idx_data_expiracao (data_expiracao)
 );
 ```
 
@@ -130,6 +136,100 @@ CREATE TABLE cliente_acesso (
 {
   "motivo": "Término de contrato",
   "data_inativacao": "2024-12-31T23:59:59Z"
+}
+```
+
+### Convites e Solicitações
+
+#### POST /api/fornecedores/convites/enviar
+```javascript
+// Fornecedor convida representante
+{
+  "representante_id": 123,
+  "comissao_padrao": 5.00,
+  "mensagem": "Gostaria de convidá-lo para ser nosso representante",
+  "configuracoes": {
+    "desconto_maximo": 10.00,
+    "prazo_pagamento": 30
+  }
+}
+```
+
+#### POST /api/representantes/solicitacoes/enviar
+```javascript
+// Representante solicita parceria com fornecedor
+{
+  "fornecedor_id": 456,
+  "mensagem": "Tenho interesse em representar seus produtos",
+  "experiencia": "5 anos no setor de moda",
+  "regiao_atuacao": "Sul do Brasil"
+}
+```
+
+#### GET /api/convites/recebidos
+```javascript
+// Listar convites recebidos
+{
+  "convites": [
+    {
+      "id": 789,
+      "tipo": "fornecedor_convida",
+      "remetente": {
+        "id": 456,
+        "nome": "Confecções ABC",
+        "email": "contato@confeccoesabc.com"
+      },
+      "mensagem": "Gostaria de convidá-lo para ser nosso representante",
+      "comissao_padrao": 5.00,
+      "data_envio": "2024-01-15T10:30:00Z",
+      "data_expiracao": "2024-02-15T10:30:00Z",
+      "status": "pendente"
+    }
+  ],
+  "total": 1
+}
+```
+
+#### GET /api/convites/enviados
+```javascript
+// Listar convites enviados
+{
+  "convites": [
+    {
+      "id": 790,
+      "tipo": "representante_solicita",
+      "destinatario": {
+        "id": 123,
+        "nome": "João Silva",
+        "email": "joao@exemplo.com"
+      },
+      "mensagem": "Tenho interesse em representar seus produtos",
+      "data_envio": "2024-01-10T14:20:00Z",
+      "data_expiracao": "2024-02-10T14:20:00Z",
+      "status": "pendente"
+    }
+  ],
+  "total": 1
+}
+```
+
+#### POST /api/convites/:id/aceitar
+```javascript
+// Aceitar convite
+{
+  "mensagem_resposta": "Aceito a parceria com prazer!",
+  "configuracoes_adicionais": {
+    "observacoes": "Pronto para começar imediatamente"
+  }
+}
+```
+
+#### POST /api/convites/:id/recusar
+```javascript
+// Recusar convite
+{
+  "motivo": "Já tenho muitos fornecedores na carteira",
+  "mensagem_resposta": "Obrigado pelo convite, mas não posso aceitar no momento"
 }
 ```
 
