@@ -237,21 +237,21 @@ export const CORES_DISPONIVEIS = {
     }
   },
   stone: {
-    nome: 'Bege',
+    nome: 'Vinho',
     primary: 'stone',
     classes: {
-      bg: 'bg-stone-300',
-      bgHover: 'hover:bg-stone-400',
-      bgLight: 'bg-stone-50',
-      bgLightDark: 'dark:bg-stone-900/20',
-      text: 'text-stone-300',
-      textDark: 'dark:text-stone-200',
-      textLight: 'text-stone-400',
-      textLightDark: 'dark:text-stone-100',
-      border: 'border-stone-300',
-      borderLight: 'border-stone-200',
-      ring: 'ring-stone-300',
-      accent: 'accent-stone-300'
+      bg: 'bg-red-800',
+      bgHover: 'hover:bg-red-900',
+      bgLight: 'bg-red-50',
+      bgLightDark: 'dark:bg-red-900/20',
+      text: 'text-red-800',
+      textDark: 'dark:text-red-300',
+      textLight: 'text-red-900',
+      textLightDark: 'dark:text-red-200',
+      border: 'border-red-800',
+      borderLight: 'border-red-200',
+      ring: 'ring-red-800',
+      accent: 'accent-red-800'
     }
   },
   slate: {
@@ -273,21 +273,21 @@ export const CORES_DISPONIVEIS = {
     }
   },
   amber: {
-    nome: 'Salmon',
+    nome: 'Azul Marinho',
     primary: 'amber',
     classes: {
-      bg: 'bg-amber-300',
-      bgHover: 'hover:bg-amber-400',
-      bgLight: 'bg-amber-50',
-      bgLightDark: 'dark:bg-amber-900/20',
-      text: 'text-amber-300',
-      textDark: 'dark:text-amber-200',
-      textLight: 'text-amber-400',
-      textLightDark: 'dark:text-amber-100',
-      border: 'border-amber-300',
-      borderLight: 'border-amber-200',
-      ring: 'ring-amber-300',
-      accent: 'accent-amber-300'
+      bg: 'bg-blue-900',
+      bgHover: 'hover:bg-blue-950',
+      bgLight: 'bg-blue-50',
+      bgLightDark: 'dark:bg-blue-900/20',
+      text: 'text-blue-900',
+      textDark: 'dark:text-blue-300',
+      textLight: 'text-blue-950',
+      textLightDark: 'dark:text-blue-200',
+      border: 'border-blue-900',
+      borderLight: 'border-blue-200',
+      ring: 'ring-blue-900',
+      accent: 'accent-blue-900'
     }
   }
 };
