@@ -41,11 +41,13 @@ export default function DetalhesPedido({ pedidoId }) {
   const carregarPedido = async () => {
     try {
       setCarregando(true);
+      console.log('Tentando carregar pedido com ID:', pedidoId);
       const pedidoData = await servicoPedidos.obterPorId(pedidoId);
       setPedido(pedidoData);
     } catch (error) {
       console.error('Erro ao carregar pedido:', error);
-      setErro('Pedido não encontrado');
+      console.log('ID do pedido que não foi encontrado:', pedidoId);
+      setErro(`Pedido com ID "${pedidoId}" não foi encontrado. Verifique se o pedido existe ou se o link está correto.`);
     } finally {
       setCarregando(false);
     }

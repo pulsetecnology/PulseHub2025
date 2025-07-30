@@ -10,8 +10,8 @@ export const adicionarNotificacoesExemplo = () => {
   // Adicionar notificações de exemplo
   servicoNotificacoes.notificarPedido(
     'Novo Pedido Recebido',
-    'Pedido #1001 foi criado pelo cliente João Silva',
-    '1001'
+    'Pedido PED-001 foi criado pelo cliente João Silva',
+    '1'
   );
 
   servicoNotificacoes.notificarProduto(

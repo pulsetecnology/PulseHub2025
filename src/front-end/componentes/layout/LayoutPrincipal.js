@@ -9,6 +9,7 @@ import IconeCarrinho from '../carrinho/IconeCarrinho';
 import Carrinho from '../carrinho/Carrinho';
 import { adicionarNotificacoesExemplo } from '../../utils/notificacoesExemplo';
 import { ehRepresentante, obterPapelUsuario } from '../../utils/papelUsuario';
+import { corrigirNotificacoes } from '../../utils/corrigirNotificacoes';
 
 export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVoltar, botaoAcao }) {
   const [tema, setTema] = useState('claro');
@@ -52,8 +53,8 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
       setPapelUsuario(papel);
     }
 
-    // Adicionar notificações de exemplo (apenas uma vez)
-    adicionarNotificacoesExemplo();
+    // Corrigir notificações com IDs inválidos e adicionar exemplos corretos
+    corrigirNotificacoes();
 
     // Fechar dropdowns e modais quando clicar fora
     const handleClickOutside = (event) => {
