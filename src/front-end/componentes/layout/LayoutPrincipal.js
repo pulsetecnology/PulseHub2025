@@ -10,6 +10,7 @@ import Carrinho from '../carrinho/Carrinho';
 import { adicionarNotificacoesExemplo } from '../../utils/notificacoesExemplo';
 import { ehRepresentante, obterPapelUsuario } from '../../utils/papelUsuario';
 import { corrigirNotificacoes } from '../../utils/corrigirNotificacoes';
+import { verificarExcessoNotificacoes, limparNotificacoesTeste } from '../../utils/limparNotificacoesTeste';
 
 export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVoltar, botaoAcao }) {
   const [tema, setTema] = useState('claro');
@@ -55,6 +56,12 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
 
     // Corrigir notificações com IDs inválidos e adicionar exemplos corretos
     corrigirNotificacoes();
+    
+    // Verificar se há excesso de notificações e limpar se necessário
+    if (verificarExcessoNotificacoes()) {
+      console.log('🧹 Detectado excesso de notificações, limpando notificações de teste...');
+      limparNotificacoesTeste();
+    }
 
     // Fechar dropdowns e modais quando clicar fora
     const handleClickOutside = (event) => {

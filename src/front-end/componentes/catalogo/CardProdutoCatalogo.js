@@ -40,16 +40,11 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
       // Se não tem opções, adicionar diretamente
       await servicoCarrinho.adicionarProduto(produto.id, 1);
       
-      // Feedback visual
-      const button = event.target.closest('button');
-      const originalText = button.innerHTML;
-      button.innerHTML = '✓ Adicionado!';
-      button.disabled = true;
-      
-      setTimeout(() => {
-        button.innerHTML = originalText;
-        button.disabled = false;
-      }, 2000);
+      // Notificação de sucesso
+      servicoNotificacoes.notificarSucesso(
+        'Produto adicionado!',
+        `${produto.nome} foi adicionado ao carrinho com sucesso`
+      );
       
     } catch (error) {
       console.error('Erro ao adicionar ao carrinho:', error);

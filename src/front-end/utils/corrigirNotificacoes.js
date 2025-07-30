@@ -34,11 +34,10 @@ export const corrigirNotificacoes = () => {
     console.log(`Removida notificação inválida: ${notificacao.titulo}`);
   });
   
-  // Limpar flag de notificações de exemplo para permitir recriação
-  localStorage.removeItem('notificacoesExemploAdicionadas');
-  
-  // Recriar notificações de exemplo com IDs corretos
-  adicionarNotificacoesExemplo();
+  // Só adicionar notificações de exemplo se ainda não foram adicionadas
+  if (!localStorage.getItem('notificacoesExemploAdicionadas')) {
+    adicionarNotificacoesExemplo();
+  }
   
   console.log('✅ Notificações corrigidas com sucesso!');
 };

@@ -85,20 +85,16 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
        
        await servicoCarrinho.adicionarProduto(produto.id, quantidade, opcoes);
        
-       // Efeito visual no botão
-       const button = document.querySelector('[data-add-to-cart]');
-       if (button) {
-         const originalText = button.innerHTML;
-         button.innerHTML = '✓ Adicionado!';
-         button.style.backgroundColor = '#10B981';
-         button.style.color = 'white';
-         
-         setTimeout(() => {
-           button.innerHTML = originalText;
-           button.style.backgroundColor = '';
-           button.style.color = '';
-         }, 2000);
-       }
+       // Notificação de sucesso
+       servicoNotificacoes.notificarSucesso(
+         'Produto adicionado!',
+         `${produto.nome} foi adicionado ao carrinho com sucesso`
+       );
+       
+       // Redirecionar de volta para o catálogo após um breve delay
+       setTimeout(() => {
+         router.push('/catalogo');
+       }, 1000);
      } catch (error) {
       console.error('Erro ao adicionar ao carrinho:', error);
       servicoNotificacoes.adicionarNotificacao({
