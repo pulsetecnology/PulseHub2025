@@ -1,5 +1,6 @@
 import ServicoClientes from './ServicoClientes';
 import { LocalStorageManager } from '../utils/localStorage';
+import servicoStatusPedido from './ServicoStatusPedido';
 
 export default class ServicoPedidos {
   constructor() {
@@ -202,6 +203,15 @@ export default class ServicoPedidos {
     this.pedidos.push(novoPedido);
     this.salvarPedidos();
 
+    // Se o pedido foi criado com status 'pendente', processar notificações
+    if (novoPedido.status === 'pendente') {
+      await servicoStatusPedido.processarMudancaStatus(
+        novoPedido,
+        'pendente',
+        'rascunho'
+      );
+    }
+
     return novoPedido;
   }
 
@@ -246,7 +256,34 @@ export default class ServicoPedidos {
   }
 
   async atualizarStatus(id, novoStatus) {
-    return this.atualizar(id, { status: novoStatus });
+    // Obter pedido atual para verificar status anterior
+    const pedidoAtual = await this.obterPorId(id);
+    if (!pedidoAtual) {
+      throw new Error('Pedido não encontrado');
+    }
+    
+    const statusAnterior = pedidoAtual.status;
+    
+    // Processar mudança de status com lógica automática e notificações
+    const resultado = await servicoStatusPedido.processarMudancaStatus(
+      pedidoAtual,
+      novoStatus,
+      statusAnterior
+    );
+    
+    if (!resultado.sucesso) {
+      throw new Error(resultado.erro || 'Erro ao processar mudança de status');
+    }
+    
+    // Atualizar o pedido com o status final (pode ser diferente do solicitado devido à lógica automática)
+    const pedidoAtualizado = await this.atualizar(id, { 
+      status: resultado.statusFinal,
+      dataUltimaAlteracao: new Date().toISOString()
+    });
+    
+    console.log(`📊 Status atualizado: ${statusAnterior} → ${resultado.statusFinal}`);
+    
+    return pedidoAtualizado;
   }
 
   // Métodos para estatísticas

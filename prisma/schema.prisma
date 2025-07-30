@@ -58,6 +58,7 @@ model Pedido {
 
 enum StatusPedido {
   EM_ABERTO
+  EM_ANALISE
   APROVADO
   RECUSADO
   CANCELADO
