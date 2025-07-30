@@ -17,25 +17,25 @@ const JWT_SECRET = process.env.JWT_SECRET || 'chave-secreta-temporaria';
 
 // Banco de dados simulado para usuários
 const usuarios = {
-  'admin@exemplo.com': { 
+  'admin@pulsehub.com': { 
     id: 'user-admin', 
-    nome: 'Administrador', 
-    email: 'admin@exemplo.com', 
-    senha: bcrypt.hashSync('senha123', 10),
+    nome: 'Carlos Oliveira', 
+    email: 'admin@pulsehub.com', 
+    senha: bcrypt.hashSync('admin123', 10),
     papel: 'ADMINISTRADOR'
   },
   'fornecedor@exemplo.com': { 
     id: 'user-fornecedor', 
-    nome: 'Fornecedor Teste', 
+    nome: 'João Silva', 
     email: 'fornecedor@exemplo.com', 
-    senha: bcrypt.hashSync('senha123', 10),
+    senha: bcrypt.hashSync('fornecedor123', 10),
     papel: 'FORNECEDOR'
   },
   'representante@exemplo.com': { 
     id: 'user-representante', 
-    nome: 'Representante Teste', 
+    nome: 'Maria Santos', 
     email: 'representante@exemplo.com', 
-    senha: bcrypt.hashSync('senha123', 10),
+    senha: bcrypt.hashSync('representante123', 10),
     papel: 'REPRESENTANTE'
   }
 };
@@ -158,6 +158,33 @@ const redefinirSenha = (token, novaSenha) => {
   return true;
 };
 
+// Função para registrar usuário com papel específico (para desenvolvimento)
+const registrarUsuarioComPapel = (nome, email, senha, papel) => {
+  // Verificar se o email já está em uso
+  if (usuarios[email]) {
+    return null;
+  }
+  
+  // Criar novo usuário
+  const id = `user-${Math.random().toString(36).substring(2, 9)}`;
+  const hashSenha = bcrypt.hashSync(senha, 10);
+  
+  const novoUsuario = {
+    id,
+    nome,
+    email,
+    senha: hashSenha,
+    papel: papel || 'REPRESENTANTE' // Papel padrão
+  };
+  
+  // Adicionar ao "banco de dados"
+  usuarios[email] = novoUsuario;
+  
+  // Retornar usuário sem a senha
+  const { senha: _, ...usuarioSemSenha } = novoUsuario;
+  return usuarioSemSenha;
+};
+
 // Rota de registro
 app.post('/registrar', (req, res) => {
   try {
@@ -179,6 +206,69 @@ app.post('/registrar', (req, res) => {
     }
   } catch (error) {
     console.error('Erro no registro:', error);
+    res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+});
+
+// Rota especial para criar usuários de desenvolvimento
+app.post('/dev/criar-usuario', (req, res) => {
+  try {
+    const { nome, email, senha, papel } = req.body;
+    
+    if (!nome || !email || !senha || !papel) {
+      return res.status(400).json({ message: 'Nome, email, senha e papel são obrigatórios.' });
+    }
+    
+    // Validar papel
+    const papeisValidos = ['ADMINISTRADOR', 'FORNECEDOR', 'REPRESENTANTE'];
+    if (!papeisValidos.includes(papel)) {
+      return res.status(400).json({ message: 'Papel inválido. Use: ADMINISTRADOR, FORNECEDOR ou REPRESENTANTE' });
+    }
+    
+    const novoUsuario = registrarUsuarioComPapel(nome, email, senha, papel);
+    
+    if (novoUsuario) {
+      res.status(201).json({ 
+        message: 'Usuário de desenvolvimento criado com sucesso!', 
+        usuario: novoUsuario
+      });
+    } else {
+      res.status(400).json({ message: 'Erro ao criar usuário. E-mail já em uso.' });
+    }
+  } catch (error) {
+    console.error('Erro ao criar usuário de desenvolvimento:', error);
+    res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+});
+
+// Rota para listar todos os usuários (apenas para desenvolvimento)
+app.get('/dev/usuarios', (req, res) => {
+  try {
+    const usuariosLista = Object.values(usuarios).map(usuario => {
+      const { senha, ...usuarioSemSenha } = usuario;
+      return usuarioSemSenha;
+    });
+    
+    res.status(200).json({ usuarios: usuariosLista });
+  } catch (error) {
+    console.error('Erro ao listar usuários:', error);
+    res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+});
+
+// Rota para deletar usuário (apenas para desenvolvimento)
+app.delete('/dev/usuarios/:email', (req, res) => {
+  try {
+    const { email } = req.params;
+    
+    if (usuarios[email]) {
+      delete usuarios[email];
+      res.status(200).json({ message: 'Usuário deletado com sucesso!' });
+    } else {
+      res.status(404).json({ message: 'Usuário não encontrado.' });
+    }
+  } catch (error) {
+    console.error('Erro ao deletar usuário:', error);
     res.status(500).json({ message: 'Erro interno do servidor.' });
   }
 });
@@ -328,11 +418,45 @@ app.post('/login-google', (req, res) => {
 });
 
 // Rota pública para verificar se o servidor está online
+// Rota pública para verificar se o servidor está online
 app.get('/verificar', (req, res) => {
   res.json({
     message: 'Servidor de autenticação online!',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    status: 'healthy'
   });
+});
+
+// Rota para verificar token e retornar informações do usuário
+app.get('/verificar-token', (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Token não fornecido' });
+    }
+    
+    const token = authHeader.substring(7); // Remove 'Bearer '
+    const decoded = verificarToken(token);
+    
+    // Buscar informações completas do usuário
+    const usuario = buscarUsuarioPorEmail(decoded.email);
+    
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
+    
+    // Retornar dados do usuário sem a senha
+    const { senha, ...usuarioSemSenha } = usuario;
+    
+    res.json({
+      message: 'Token válido',
+      usuario: usuarioSemSenha
+    });
+  } catch (error) {
+    console.error('Erro na verificação do token:', error);
+    res.status(401).json({ message: 'Token inválido ou expirado' });
+  }
 });
 
 // Rota protegida para verificar autenticação

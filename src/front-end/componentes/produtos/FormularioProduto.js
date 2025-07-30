@@ -185,6 +185,8 @@ export default function FormularioProduto({ produto = null }) {
     setSalvando(true);
 
     try {
+      const servicoProdutos = new ServicoProdutos();
+      
       // Processar imagens antes de salvar
       const imagensProcessadas = await servicoProdutos.processarImagens(dadosProduto.imagens);
       
@@ -192,8 +194,6 @@ export default function FormularioProduto({ produto = null }) {
         ...dadosProduto,
         imagens: imagensProcessadas
       };
-      
-      const servicoProdutos = new ServicoProdutos();
       if (isEdicao) {
         // Atualizar produto existente
         await servicoProdutos.atualizar(produto.id, dadosParaSalvar);

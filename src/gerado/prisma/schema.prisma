@@ -49,11 +49,18 @@ model Pedido {
   id         String       @id @default(uuid())
   clienteId  String
   dataPedido DateTime     @default(now())
-  status     String
+  status     StatusPedido @default(EM_ABERTO)
   valorTotal Float
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   itens      ItemPedido[]
+}
+
+enum StatusPedido {
+  EM_ABERTO
+  APROVADO
+  RECUSADO
+  CANCELADO
 }
 
 model ItemPedido {
@@ -79,12 +86,27 @@ model Comissao {
 }
 
 model Cliente {
-  id        String   @id @default(uuid())
-  nome      String
-  email     String   @unique
-  cpfCnpj   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String   @id @default(uuid())
+  razaoSocial        String
+  nomeFantasia       String?
+  cnpj               String   @unique
+  inscricaoEstadual  String?
+  telefoneComercial  String?
+  emailComercial     String   @unique
+  cep                String?
+  rua                String?
+  numero             String?
+  complemento        String?
+  bairro             String?
+  cidade             String?
+  estado             String?
+  nomeContato        String?
+  emailContato       String?
+  telefoneContato    String?
+  limiteCredito      Float?   @default(0.00)
+  condicoesPagamento String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 model Notificacao {

@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import ServicoProdutos from '../../servicos/ServicoProdutos';
+import ServicoCarrinho from '../../servicos/ServicoCarrinho';
 import ModalImagem from '../comum/ModalImagem';
 import { usarCorTemaSeguro } from '../../hooks/usarCorTemaSeguro';
+import servicoNotificacoes from '../../servicos/ServicoNotificacoes';
+
+// Instância singleton do serviço de carrinho
+const servicoCarrinho = new ServicoCarrinho();
 
 export default function DetalheProduto({ produtoId, produto: produtoProp }) {
   const router = useRouter();
@@ -14,6 +19,7 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState('');
   const [modalImagemAberto, setModalImagemAberto] = useState(false);
   const [quantidade, setQuantidade] = useState(1);
+  const [adicionandoCarrinho, setAdicionandoCarrinho] = useState(false);
 
   useEffect(() => {
     if (produtoProp) {
@@ -58,21 +64,52 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
     }
   }, [produtoId, produtoProp]);
 
-  const handleAdicionarCarrinho = () => {
+  const handleAdicionarCarrinho = async () => {
     if (!corSelecionada || !tamanhoSelecionado) {
-      alert('Por favor, selecione cor e tamanho');
+      servicoNotificacoes.adicionarNotificacao({
+        tipo: 'aviso',
+        titulo: 'Seleção obrigatória',
+        mensagem: 'Por favor, selecione cor e tamanho antes de adicionar ao carrinho',
+        cor: 'yellow'
+      });
       return;
     }
     
-    const item = {
-      produto: produto,
-      cor: corSelecionada,
-      tamanho: tamanhoSelecionado,
-      quantidade: quantidade
-    };
+    setAdicionandoCarrinho(true);
     
-    console.log('Adicionar ao carrinho:', item);
-    // Implementar lógica de adicionar ao carrinho
+    try {
+       const opcoes = {
+         cor: corSelecionada,
+         tamanho: tamanhoSelecionado
+       };
+       
+       await servicoCarrinho.adicionarProduto(produto.id, quantidade, opcoes);
+       
+       // Efeito visual no botão
+       const button = document.querySelector('[data-add-to-cart]');
+       if (button) {
+         const originalText = button.innerHTML;
+         button.innerHTML = '✓ Adicionado!';
+         button.style.backgroundColor = '#10B981';
+         button.style.color = 'white';
+         
+         setTimeout(() => {
+           button.innerHTML = originalText;
+           button.style.backgroundColor = '';
+           button.style.color = '';
+         }, 2000);
+       }
+     } catch (error) {
+      console.error('Erro ao adicionar ao carrinho:', error);
+      servicoNotificacoes.adicionarNotificacao({
+        tipo: 'erro',
+        titulo: 'Erro ao adicionar produto',
+        mensagem: error.message || 'Não foi possível adicionar o produto ao carrinho',
+        cor: 'red'
+      });
+    } finally {
+      setAdicionandoCarrinho(false);
+    }
   };
 
   if (carregando) {
@@ -289,13 +326,13 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
               </button>
               <span className="text-lg font-medium w-12 text-center">{quantidade}</span>
               <button
-                onClick={() => setQuantidade(Math.min(produto.estoque, quantidade + 1))}
+                onClick={() => setQuantidade(quantidade + 1)}
                 className="w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 +
               </button>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                ({produto.estoque} disponíveis)
+                Disponível
               </span>
             </div>
           </div>
@@ -304,10 +341,11 @@ export default function DetalheProduto({ produtoId, produto: produtoProp }) {
           <div className="space-y-3">
             <button
               onClick={handleAdicionarCarrinho}
-              disabled={!produto.ativo || !corSelecionada || !tamanhoSelecionado}
+              disabled={!produto.ativo || !corSelecionada || !tamanhoSelecionado || adicionandoCarrinho}
               className={`w-full px-6 py-3 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium`}
+              data-add-to-cart
             >
-              {produto.ativo ? 'Solicitar Orçamento' : 'Produto Indisponível'}
+              {adicionandoCarrinho ? 'Adicionando...' : produto.ativo ? 'Adicionar ao Carrinho' : 'Produto Indisponível'}
             </button>
             <button
               onClick={() => router.back()}

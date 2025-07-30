@@ -184,9 +184,24 @@ exports.Prisma.ComissaoScalarFieldEnum = {
 
 exports.Prisma.ClienteScalarFieldEnum = {
   id: 'id',
-  nome: 'nome',
-  email: 'email',
-  cpfCnpj: 'cpfCnpj',
+  razaoSocial: 'razaoSocial',
+  nomeFantasia: 'nomeFantasia',
+  cnpj: 'cnpj',
+  inscricaoEstadual: 'inscricaoEstadual',
+  telefoneComercial: 'telefoneComercial',
+  emailComercial: 'emailComercial',
+  cep: 'cep',
+  rua: 'rua',
+  numero: 'numero',
+  complemento: 'complemento',
+  bairro: 'bairro',
+  cidade: 'cidade',
+  estado: 'estado',
+  nomeContato: 'nomeContato',
+  emailContato: 'emailContato',
+  telefoneContato: 'telefoneContato',
+  limiteCredito: 'limiteCredito',
+  condicoesPagamento: 'condicoesPagamento',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -222,6 +237,16 @@ exports.Prisma.JsonNullValueFilter = {
   AnyNull: Prisma.AnyNull
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+exports.StatusPedido = exports.$Enums.StatusPedido = {
+  EM_ABERTO: 'EM_ABERTO',
+  APROVADO: 'APROVADO',
+  RECUSADO: 'RECUSADO',
+  CANCELADO: 'CANCELADO'
+};
 
 exports.Prisma.ModelName = {
   Usuario: 'Usuario',

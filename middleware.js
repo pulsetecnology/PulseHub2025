@@ -3,68 +3,77 @@ import { NextResponse } from 'next/server';
 // Rotas que não precisam de autenticação
 const rotasPublicas = ['/login', '/registrar', '/recuperar-senha'];
 
-// Função para decodificar o papel do usuário do token (simulação)
-// Nota: No middleware, não temos acesso ao localStorage, então analisamos apenas o token
+// Função para decodificar o papel do usuário do token
 function obterPapelUsuario(token) {
-  // Em um cenário real, você decodificaria o JWT aqui
-  // Por enquanto, vamos simular baseado no conteúdo do token
-  
   // Debug apenas em desenvolvimento
   if (process.env.NODE_ENV === 'development') {
     console.log('Token no middleware:', token);
   }
   
-  // Verificar se o token contém o papel diretamente (formato: simulado-PAPEL-hash-timestamp-random)
-  const partes = token.split('-');
-  if (partes.length >= 2 && partes[0] === 'simulado') {
-    const papel = partes[1];
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Papel extraído do token:', papel);
+  try {
+    // Primeiro, tentar decodificar como JWT real
+    if (token.startsWith('eyJ')) { // JWT tokens começam com 'eyJ'
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Detectado token JWT, tentando decodificar...');
+      }
+      
+      // Decodificar o payload do JWT (sem verificar assinatura no middleware por performance)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Payload decodificado:', payload);
+      }
+      
+      if (payload.papel) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Papel extraído do JWT:', payload.papel);
+        }
+        return payload.papel;
+      } else {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Papel não encontrado no payload JWT');
+        }
+      }
+    } else {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Token não é JWT (não começa com eyJ)');
+      }
     }
     
-    if (papel === 'ADMINISTRADOR') {
+    // Fallback: verificar se é token simulado (formato: simulado-PAPEL-hash-timestamp-random)
+    const partes = token.split('-');
+    if (partes.length >= 2 && partes[0] === 'simulado') {
+      const papel = partes[1];
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Papel extraído do token simulado:', papel);
+      }
+      
+      if (['ADMINISTRADOR', 'FORNECEDOR', 'REPRESENTANTE'].includes(papel)) {
+        return papel;
+      }
+    }
+    
+    // Fallback adicional: verificar se o token contém palavras-chave
+    if (token.includes('ADMINISTRADOR') || token.includes('admin')) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Papel detectado (fallback): ADMINISTRADOR');
+      }
       return 'ADMINISTRADOR';
-    } else if (papel === 'FORNECEDOR') {
+    } else if (token.includes('FORNECEDOR') || token.includes('fornecedor')) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Papel detectado (fallback): FORNECEDOR');
+      }
       return 'FORNECEDOR';
-    } else if (papel === 'REPRESENTANTE') {
+    } else if (token.includes('REPRESENTANTE') || token.includes('representante')) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Papel detectado (fallback): REPRESENTANTE');
+      }
       return 'REPRESENTANTE';
     }
-  }
-  
-  // Fallback: verificar se o token contém palavras-chave
-  if (token.includes('ADMINISTRADOR')) {
+  } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.log('Papel detectado (fallback): ADMINISTRADOR');
+      console.error('Erro ao decodificar token:', error);
     }
-    return 'ADMINISTRADOR';
-  } else if (token.includes('FORNECEDOR')) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Papel detectado (fallback): FORNECEDOR');
-    }
-    return 'FORNECEDOR';
-  } else if (token.includes('REPRESENTANTE')) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Papel detectado (fallback): REPRESENTANTE');
-    }
-    return 'REPRESENTANTE';
-  }
-  
-  // Fallback adicional: verificar palavras-chave mais genéricas
-  if (token.includes('admin')) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Papel detectado (fallback 2): ADMINISTRADOR');
-    }
-    return 'ADMINISTRADOR';
-  } else if (token.includes('fornecedor')) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Papel detectado (fallback 2): FORNECEDOR');
-    }
-    return 'FORNECEDOR';
-  } else if (token.includes('representante')) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Papel detectado (fallback 2): REPRESENTANTE');
-    }
-    return 'REPRESENTANTE';
   }
   
   // Padrão para representante se não conseguir determinar

@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { usarCorTema } from '../../utils/coresTema';
+import ServicoCarrinho from '../../servicos/ServicoCarrinho';
+import servicoNotificacoes from '../../servicos/ServicoNotificacoes';
+
+// Instância singleton do serviço de carrinho
+const servicoCarrinho = new ServicoCarrinho();
 
 export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) {
   const { classes } = usarCorTema();
+  const [adicionando, setAdicionando] = useState(false);
 
   const formatarMoeda = (valor) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -17,10 +23,45 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
       : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
   };
 
-  const handleAdicionarCarrinho = () => {
-    // Implementar lógica de adicionar ao carrinho
-    console.log('Adicionar ao carrinho:', produto);
-    alert(`${produto.nome} adicionado ao carrinho!`);
+  const handleAdicionarCarrinho = async () => {
+    try {
+      setAdicionando(true);
+      
+      // Verificar se produto tem opções obrigatórias
+      const temCores = produto.cores && produto.cores.length > 0;
+      const temTamanhos = produto.tamanhos && produto.tamanhos.length > 0;
+      
+      if (temCores || temTamanhos) {
+        // Se tem opções, redirecionar para página de detalhes
+        window.location.href = `/produtos/${produto.id}`;
+        return;
+      }
+      
+      // Se não tem opções, adicionar diretamente
+      await servicoCarrinho.adicionarProduto(produto.id, 1);
+      
+      // Feedback visual
+      const button = event.target.closest('button');
+      const originalText = button.innerHTML;
+      button.innerHTML = '✓ Adicionado!';
+      button.disabled = true;
+      
+      setTimeout(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Erro ao adicionar ao carrinho:', error);
+      servicoNotificacoes.adicionarNotificacao({
+        tipo: 'erro',
+        titulo: 'Erro ao adicionar produto',
+        mensagem: error.message || 'Não foi possível adicionar o produto ao carrinho',
+        cor: 'red'
+      });
+    } finally {
+      setAdicionando(false);
+    }
   };
 
   const handleVerDetalhes = () => {
@@ -81,13 +122,26 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
             {produto.disponivel && (
               <button
                 onClick={handleAdicionarCarrinho}
-                className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors flex items-center gap-2`}
+                disabled={adicionando}
+                className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed`}
                 title="Adicionar ao carrinho"
               >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
-                </svg>
-                Adicionar
+                {adicionando ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Adicionando...
+                  </>
+                ) : (
+                  <>
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                    </svg>
+                    Adicionar
+                  </>
+                )}
               </button>
             )}
           </div>
@@ -162,12 +216,25 @@ export default function CardProdutoCatalogo({ produto, visualizacao = 'grid' }) 
           {produto.disponivel ? (
             <button
               onClick={handleAdicionarCarrinho}
-              className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors flex items-center gap-2 text-sm`}
+              disabled={adicionando}
+              className={`px-4 py-2 ${classes.bg} text-white rounded-lg ${classes.bgHover} transition-colors flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
-              </svg>
-              Adicionar
+              {adicionando ? (
+                <>
+                  <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Adicionando...
+                </>
+              ) : (
+                <>
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                  </svg>
+                  Adicionar
+                </>
+              )}
             </button>
           ) : (
             <span className="px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-sm">

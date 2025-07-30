@@ -5,6 +5,8 @@ import { usarCorTema, definirCorTema } from '../../utils/coresTema';
 import { usarCorTemaSeguro } from '../../hooks/usarCorTemaSeguro';
 import MiniModalSeletorCores from '../comum/MiniModalSeletorCores';
 import CentroNotificacoes from '../notificacoes/CentroNotificacoes';
+import IconeCarrinho from '../carrinho/IconeCarrinho';
+import Carrinho from '../carrinho/Carrinho';
 import { adicionarNotificacoesExemplo } from '../../utils/notificacoesExemplo';
 
 export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVoltar, botaoAcao }) {
@@ -13,6 +15,7 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
   const [usuario, setUsuario] = useState(null);
   const [mostrarDropdownUsuario, setMostrarDropdownUsuario] = useState(false);
   const [mostrarColorModal, setMostrarColorModal] = useState(false); // New state for color modal
+  const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
   const [sidebarRecolhido, setSidebarRecolhido] = useState(() => {
     // Recuperar estado do sidebar do localStorage
     if (typeof window !== 'undefined') {
@@ -24,6 +27,7 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
   const servicoAutenticacao = new ServicoAutenticacao();
 
   const colorModalRef = useRef(null);
+  const carrinhoModalRef = useRef(null);
 
   useEffect(() => {
     // Verificar tema salvo
@@ -53,6 +57,9 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
       }
       if (colorModalRef.current && !colorModalRef.current.contains(event.target) && !event.target.closest('.color-palette-button')) {
         setMostrarColorModal(false);
+      }
+      if (carrinhoModalRef.current && !carrinhoModalRef.current.contains(event.target) && !event.target.closest('.icone-carrinho')) {
+        setMostrarCarrinho(false);
       }
     };
 
@@ -102,7 +109,17 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Centro de Notificações */}
+            {/* Ícone do carrinho */}
+            <div className="relative">
+              <IconeCarrinho onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
+              {mostrarCarrinho && (
+                <div ref={carrinhoModalRef} className="absolute top-full mt-2 right-0 z-50">
+                  <Carrinho onClose={() => setMostrarCarrinho(false)} />
+                </div>
+              )}
+            </div>
+
+            {/* Centro de notificações */}
             <CentroNotificacoes />
             
             {/* Color Palette Button and Modal */}
@@ -113,8 +130,13 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
                 aria-label="Selecionar cor do tema"
                 title="Selecionar cor do tema"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22c3.31 0 6-2.69 6-6 0-4.5-6-14-6-14s-6 9.5-6 14c0 3.31 2.69 6 6 6z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20">
+                  {/* Gota azul (frente) */}
+                  <path d="M10 0.5c0 0-5 7-5 11a5 5 0 1010 0c0-4-5-11-5-11z" fill="#3B82F6" />
+                  {/* Gota vermelha (atrás esquerda) */}
+                  <path d="M4 2c0 0-3.5 5-3.5 7.5a3.5 3.5 0 107 0c0-2.5-3.5-7.5-3.5-7.5z" fill="#EF4444" />
+                  {/* Gota amarela (atrás direita) */}
+                  <path d="M16 2c0 0-3.5 5-3.5 7.5a3.5 3.5 0 107 0c0-2.5-3.5-7.5-3.5-7.5z" fill="#F59E0B" />
                 </svg>
               </button>
               <div ref={colorModalRef} className="absolute top-full mt-2 left-0 z-50">
@@ -138,7 +160,7 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
                 </svg>
               ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                  <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" />
                 </svg>
               )}
             </button>
@@ -229,8 +251,8 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
           {children}
         </main>
       </div>
-
       
+
     </div>
   );
 }

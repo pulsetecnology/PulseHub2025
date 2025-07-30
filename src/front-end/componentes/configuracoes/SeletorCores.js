@@ -26,19 +26,19 @@ export default function SeletorCores({ onCorAlterada }) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-6 gap-px">
+    <div>
+      <div className="grid grid-cols-8 gap-2">
         {Object.entries(CORES_DISPONIVEIS).map(([chave, cor]) => (
           <button
             key={chave}
             onClick={() => alterarCor(chave)}
             className={`
-              relative w-8 h-8 transition-all duration-200 flex items-center justify-center rounded-md
+              relative w-10 h-10 transition-all duration-200 flex items-center justify-center rounded-lg hover:scale-105
             `}
             title={cor.nome}
           >
             <div
-              className={`w-full h-full ${cor.classes.bg} rounded-md`}
+              className={`w-full h-full ${cor.classes.bg} rounded-lg`}
             />
 
             {corSelecionada === chave && (

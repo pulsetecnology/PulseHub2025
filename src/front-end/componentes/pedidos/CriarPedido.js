@@ -37,7 +37,46 @@ export default function CriarPedido() {
 
   useEffect(() => {
     carregarDados();
+    verificarDadosCarrinho();
   }, []);
+
+  // Atualizar cliente selecionado quando clienteId mudar
+  useEffect(() => {
+    if (pedido.clienteId && clientes.length > 0) {
+      const cliente = clientes.find(c => c.id === pedido.clienteId);
+      setClienteSelecionado(cliente || null);
+    }
+  }, [pedido.clienteId, clientes]);
+
+  const verificarDadosCarrinho = () => {
+    try {
+      const dadosCarrinho = localStorage.getItem('pedido_temp_carrinho');
+      if (dadosCarrinho) {
+        const dadosPedido = JSON.parse(dadosCarrinho);
+        
+        // Pré-preencher o pedido com dados do carrinho
+        setPedido({
+          clienteId: dadosPedido.clienteId,
+          observacoes: dadosPedido.observacoes || '',
+          itens: dadosPedido.itens || [],
+          desconto: dadosPedido.desconto || 0,
+          frete: dadosPedido.frete || 0
+        });
+        
+        // Avançar para a etapa de revisão se há itens
+        if (dadosPedido.itens && dadosPedido.itens.length > 0) {
+          setEtapaAtual(3); // Pular para etapa de revisão
+        }
+        
+        // Limpar dados temporários
+        localStorage.removeItem('pedido_temp_carrinho');
+        
+        console.log('Dados do carrinho carregados:', dadosPedido);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados do carrinho:', error);
+    }
+  };
 
   const carregarDados = async () => {
     try {

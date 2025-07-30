@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ServicoAutenticacao } from '../servicos/ServicoAutenticacao';
 import Logotipo from '../componentes/Logotipo';
 import { usarCorTema } from '../utils/coresTema';
+import CriadorUsuarioRapido from '../componentes/dev/CriadorUsuarioRapido';
+import { redirecionarAutomatico } from '../utils/redirecionamentoPorPapel';
 
 export default function LoginTailwind() {
   const { classes } = usarCorTema();
@@ -11,37 +13,11 @@ export default function LoginTailwind() {
   const [carregando, setCarregando] = useState(false);
   const [carregandoGoogle, setCarregandoGoogle] = useState(false);
   const [mcpDisponivel, setMcpDisponivel] = useState(false);
-  const [mostrarUsuariosDemo, setMostrarUsuariosDemo] = useState(false);
+
   const [tema, setTema] = useState('claro');
   const servicoAutenticacao = new ServicoAutenticacao();
 
-  // Usuários de demonstração
-  const usuariosDemo = [
-    {
-      tipo: 'Administrador',
-      nome: 'Carlos Oliveira',
-      email: 'admin@pulsehub.com',
-      senha: 'admin123',
-      cor: 'purple',
-      descricao: 'Acesso completo ao sistema'
-    },
-    {
-      tipo: 'Fornecedor',
-      nome: 'João Silva',
-      email: 'fornecedor@exemplo.com',
-      senha: 'fornecedor123',
-      cor: 'blue',
-      descricao: 'Gerenciar produtos e pedidos'
-    },
-    {
-      tipo: 'Representante',
-      nome: 'Maria Santos',
-      email: 'representante@exemplo.com',
-      senha: 'representante123',
-      cor: 'orange',
-      descricao: 'Gerenciar clientes e vendas'
-    }
-  ];
+
 
   useEffect(() => {
     // Verificar se estamos no cliente antes de acessar localStorage
@@ -86,9 +62,16 @@ export default function LoginTailwind() {
     setCarregando(true);
 
     try {
-      await servicoAutenticacao.login(email, senha);
-      // Redirecionar para a página inicial após o login bem-sucedido
-      window.location.href = '/painel';
+      const resultado = await servicoAutenticacao.login(email, senha);
+      
+      // Verificar se o resultado contém informações do usuário
+      if (resultado && typeof resultado === 'object' && resultado.usuario) {
+        // Redirecionar baseado no papel do usuário
+        redirecionarAutomatico(true);
+      } else {
+        // Fallback para o comportamento antigo se não houver informações do usuário
+        window.location.href = '/painel';
+      }
     } catch (error) {
       setErro(error.message || 'Ocorreu um erro durante o login. Tente novamente.');
     } finally {
@@ -101,9 +84,16 @@ export default function LoginTailwind() {
     setCarregandoGoogle(true);
 
     try {
-      await servicoAutenticacao.loginComGoogle();
-      // Redirecionar para a página inicial após o login bem-sucedido
-      window.location.href = '/painel';
+      const resultado = await servicoAutenticacao.loginComGoogle();
+      
+      // Verificar se o resultado contém informações do usuário
+      if (resultado && typeof resultado === 'object' && resultado.usuario) {
+        // Redirecionar baseado no papel do usuário
+        redirecionarAutomatico(true);
+      } else {
+        // Fallback para o comportamento antigo se não houver informações do usuário
+        window.location.href = '/painel';
+      }
     } catch (error) {
       setErro(error.message || 'Falha ao entrar com Google. Tente novamente.');
     } finally {
@@ -111,11 +101,7 @@ export default function LoginTailwind() {
     }
   };
 
-  const handleLoginDemo = (usuario) => {
-    setEmail(usuario.email);
-    setSenha(usuario.senha);
-    setMostrarUsuariosDemo(false);
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
@@ -305,69 +291,16 @@ export default function LoginTailwind() {
                 </button>
               </form>
           
-              {/* Usuários de Demonstração */}
-              <div className="mt-6 border-t border-gray-200 dark:border-gray-600 pt-6">
-                <button
-                  type="button"
-                  onClick={() => setMostrarUsuariosDemo(!mostrarUsuariosDemo)}
-                  className={`w-full text-sm text-gray-600 dark:text-gray-400 hover:${classes.text} dark:hover:${classes.textDark} transition-colors flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700`}
-                >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-              </svg>
-              {mostrarUsuariosDemo ? 'Ocultar' : 'Mostrar'} usuários de demonstração
-              <svg className={`w-4 h-4 ml-2 transition-transform ${mostrarUsuariosDemo ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
 
-                {mostrarUsuariosDemo && (
-                  <div className="mt-4 space-y-3">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-3">
-                      Clique em um usuário para preencher automaticamente
-                    </p>
-                    {usuariosDemo.map((usuario, index) => {
-                      const corClasses = {
-                        purple: 'border-purple-200 dark:border-purple-700 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30',
-                        blue: 'border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30',
-                        orange: 'border-orange-200 dark:border-orange-700 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30'
-                      };
-                      
-                      const indicadorCores = {
-                        purple: 'bg-purple-500',
-                        blue: 'bg-blue-500',
-                        orange: 'bg-orange-500'
-                      };
-                      
-                      return (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => handleLoginDemo(usuario)}
-                          className={`w-full p-3 rounded-lg border-2 ${corClasses[usuario.cor]} transition-colors text-left`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="flex items-center">
-                                <span className={`inline-block w-3 h-3 rounded-full ${indicadorCores[usuario.cor]} mr-2`}></span>
-                                <span className="font-medium text-gray-900 dark:text-white">{usuario.tipo}</span>
-                              </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{usuario.nome}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">{usuario.descricao}</p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs text-gray-500 dark:text-gray-400">Email:</p>
-                              <p className="text-xs font-mono text-gray-700 dark:text-gray-300">{usuario.email}</p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Senha:</p>
-                              <p className="text-xs font-mono text-gray-700 dark:text-gray-300">{usuario.senha}</p>
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+
+              {/* Criador de usuários rápido para desenvolvimento */}
+              <CriadorUsuarioRapido 
+                onUsuarioCriado={(usuario) => {
+                  // Preencher automaticamente os campos quando um usuário for criado
+                  setEmail(usuario.email);
+                  setSenha(usuario.senha);
+                }}
+              />
 
               {/* Footer do card */}
               <div className="text-center mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">

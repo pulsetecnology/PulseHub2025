@@ -75,7 +75,7 @@ export class ServicoAutenticacao {
    * @returns Token JWT em caso de sucesso
    * @throws Error em caso de falha
    */
-  public async login(email: string, senha: string): Promise<string> {
+  public async login(email: string, senha: string): Promise<{ token: string; usuario: any } | string> {
     // Se estiver em modo de simulação, usar dados simulados
     if (this.modoSimulacao) {
       console.log('Usando modo de simulação para login');
@@ -108,14 +108,17 @@ export class ServicoAutenticacao {
       // Armazenar o token no localStorage e em cookies
       localStorage.setItem('token', token);
       document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 dias
-      localStorage.setItem('usuario', JSON.stringify({
+      
+      const usuarioInfo = {
         id: `user-${Math.random().toString(36).substring(2, 9)}`,
         nome: usuario.nome,
         email: usuario.email,
         papel: papel
-      }));
+      };
       
-      return token;
+      localStorage.setItem('usuario', JSON.stringify(usuarioInfo));
+      
+      return { token: token, usuario: usuarioInfo };
     }
     
     // Se não estiver em modo de simulação, tentar conectar ao servidor real
@@ -143,13 +146,15 @@ export class ServicoAutenticacao {
         const usuarioInfo = await this.obterInformacoesUsuario(dados.token);
         if (usuarioInfo) {
           localStorage.setItem('usuario', JSON.stringify(usuarioInfo));
+          // Retornar tanto o token quanto as informações do usuário
+          return { token: dados.token, usuario: usuarioInfo };
         }
       } catch (erroUsuario) {
         console.error('Erro ao obter informações do usuário:', erroUsuario);
         // Continuar mesmo se não conseguir obter informações do usuário
       }
       
-      return dados.token;
+      return { token: dados.token, usuario: null };
     } catch (erro) {
       console.error('Erro no login:', erro);
       
@@ -171,7 +176,7 @@ export class ServicoAutenticacao {
    */
   private async obterInformacoesUsuario(token: string): Promise<any> {
     try {
-      const resposta = await fetch(`${this.baseUrl}/verificar`, {
+      const resposta = await fetch(`${this.baseUrl}/verificar-token`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
