@@ -15,22 +15,95 @@ datasource db {
 }
 
 model Usuario {
-  id        String   @id @default(uuid())
+  id        String       @id @default(uuid())
   nome      String
-  email     String   @unique
+  email     String       @unique
   senha     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  papel     PapelUsuario @default(CLIENTE)
+  ativo     Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // Relacionamentos com perfis específicos
+  fornecedor    Fornecedor?
+  representante Representante?
+  notificacoes  Notificacao[]  @relation("NotificacoesUsuario")
+
+  @@map("usuarios")
+}
+
+enum PapelUsuario {
+  ADMINISTRADOR
+  FORNECEDOR
+  REPRESENTANTE
+  CLIENTE
+}
+
+model Fornecedor {
+  id                String   @id @default(uuid())
+  usuarioId         String   @unique
+  usuario           Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  razaoSocial       String
+  nomeFantasia      String?
+  cnpj              String   @unique
+  inscricaoEstadual String?
+  telefone          String?
+  segmento          String
+  endereco          Json? // {cep, rua, numero, complemento, bairro, cidade, estado}
+  configuracoes     Json? // Configurações específicas do fornecedor
+  ativo             Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relacionamentos
+  produtos         Produto[]    @relation("FornecedorProdutos")
+  vinculacoes      Vinculacao[] @relation("FornecedorVinculacoes")
+  convitesEnviados Convite[]    @relation("ConvitesFornecedor")
+
+  @@map("fornecedores")
 }
 
 model Produto {
-  id        String            @id @default(uuid())
-  nome      String
-  descricao String
-  precoBase Float
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  variantes VarianteProduto[]
+  id           String   @id @default(uuid())
+  nome         String
+  descricao    String
+  precoBase    Float
+  fornecedorId String?
+  categoria    String?
+  ativo        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relacionamentos
+  fornecedor Fornecedor?       @relation("FornecedorProdutos", fields: [fornecedorId], references: [id])
+  variantes  VarianteProduto[]
+  itens      ItemPedido[]      @relation("ProdutoItens")
+
+  @@map("produtos")
+}
+
+model Representante {
+  id             String   @id @default(uuid())
+  usuarioId      String   @unique
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  cpf            String?  @unique
+  telefone       String?
+  regiao         String
+  especialidades String[] // Array de especialidades/segmentos
+  endereco       Json? // {cep, rua, numero, complemento, bairro, cidade, estado}
+  configuracoes  Json? // Configurações específicas do representante
+  avaliacaoMedia Float?   @default(0.0)
+  ativo          Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relacionamentos
+  vinculacoes      Vinculacao[] @relation("RepresentanteVinculacoes")
+  comissoes        Comissao[]   @relation("RepresentanteComissoes")
+  pedidos          Pedido[]     @relation("RepresentantePedidos")
+  convitesEnviados Convite[]    @relation("ConvitesRepresentante")
+
+  @@map("representantes")
 }
 
 model VarianteProduto {
@@ -40,49 +113,149 @@ model VarianteProduto {
   estoque   Int
   atributos Json
   productId String
-  product   Produto  @relation(fields: [productId], references: [id])
+  product   Produto  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("variantes_produto")
+}
+
+model Vinculacao {
+  id               String           @id @default(uuid())
+  fornecedorId     String
+  fornecedor       Fornecedor       @relation("FornecedorVinculacoes", fields: [fornecedorId], references: [id], onDelete: Cascade)
+  representanteId  String
+  representante    Representante    @relation("RepresentanteVinculacoes", fields: [representanteId], references: [id], onDelete: Cascade)
+  status           StatusVinculacao @default(ATIVO)
+  comissaoPercent  Float            @default(5.0)
+  precoEspecial    Boolean          @default(false)
+  acessoRelatorios Boolean          @default(true)
+  configuracoes    Json? // Configurações específicas da vinculação
+  dataVinculacao   DateTime         @default(now())
+  dataInativacao   DateTime?
+  motivoInativacao String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Relacionamentos
+  comissoes Comissao[] @relation("VinculacaoComissoes")
+
+  // Índices únicos para evitar vinculações duplicadas
+  @@unique([fornecedorId, representanteId])
+  @@map("vinculacoes")
+}
+
+enum StatusVinculacao {
+  ATIVO
+  INATIVO
+  SUSPENSO
+  PENDENTE
 }
 
 model Pedido {
-  id         String       @id @default(uuid())
-  clienteId  String
-  dataPedido DateTime     @default(now())
-  status     StatusPedido @default(EM_ABERTO)
-  valorTotal Float
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  itens      ItemPedido[]
+  id              String       @id @default(uuid())
+  clienteId       String
+  cliente         Cliente      @relation("ClientePedidos", fields: [clienteId], references: [id])
+  representanteId String?
+  dataPedido      DateTime     @default(now())
+  status          StatusPedido @default(EM_ABERTO)
+  valorTotal      Float
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relacionamentos
+  representante Representante? @relation("RepresentantePedidos", fields: [representanteId], references: [id])
+  itens         ItemPedido[]
+  comissoes     Comissao[]     @relation("PedidoComissoes")
+
+  @@map("pedidos")
 }
 
 enum StatusPedido {
   EM_ABERTO
+  EM_ANALISE
   APROVADO
   RECUSADO
   CANCELADO
 }
 
+model Convite {
+  id              String         @id @default(uuid())
+  remetenteId     String // ID do usuário que enviou (fornecedor ou representante)
+  destinatarioId  String // ID do usuário que recebeu
+  tipoRemetente   TipoConvite // FORNECEDOR ou REPRESENTANTE
+  fornecedorId    String?
+  fornecedor      Fornecedor?    @relation("ConvitesFornecedor", fields: [fornecedorId], references: [id], onDelete: Cascade)
+  representanteId String?
+  representante   Representante? @relation("ConvitesRepresentante", fields: [representanteId], references: [id], onDelete: Cascade)
+  status          StatusConvite  @default(PENDENTE)
+  mensagem        String?
+  comissaoPercent Float?         @default(5.0)
+  configuracoes   Json? // Configurações propostas
+  dataEnvio       DateTime       @default(now())
+  dataResposta    DateTime?
+  motivoRecusa    String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@map("convites")
+}
+
+enum TipoConvite {
+  FORNECEDOR
+  REPRESENTANTE
+}
+
+enum StatusConvite {
+  PENDENTE
+  ACEITO
+  RECUSADO
+  EXPIRADO
+}
+
 model ItemPedido {
   id            String   @id @default(uuid())
   produtoId     String
+  produto       Produto  @relation("ProdutoItens", fields: [produtoId], references: [id])
+  varianteId    String?
   quantidade    Int
   precoUnitario Float
-  orderId       String
-  order         Pedido   @relation(fields: [orderId], references: [id])
+  desconto      Float?   @default(0.0)
+  valorTotal    Float
+  observacoes   String?
+  pedidoId      String
+  pedido        Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@map("itens_pedido")
 }
 
 model Comissao {
-  id              String   @id @default(uuid())
+  id              String         @id @default(uuid())
+  vinculacaoId    String
+  vinculacao      Vinculacao     @relation("VinculacaoComissoes", fields: [vinculacaoId], references: [id], onDelete: Cascade)
   representanteId String
+  representante   Representante  @relation("RepresentanteComissoes", fields: [representanteId], references: [id])
   pedidoId        String
+  pedido          Pedido         @relation("PedidoComissoes", fields: [pedidoId], references: [id])
   percentual      Float
   valorCalculado  Float
-  dataEfetivacao  DateTime
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  status          StatusComissao @default(PENDENTE)
+  dataEfetivacao  DateTime?
+  dataPagamento   DateTime?
+  observacoes     String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@map("comissoes")
+}
+
+enum StatusComissao {
+  PENDENTE
+  APROVADA
+  PAGA
+  CANCELADA
 }
 
 model Cliente {
@@ -105,17 +278,48 @@ model Cliente {
   telefoneContato    String?
   limiteCredito      Float?   @default(0.00)
   condicoesPagamento String?
+  representanteId    String? // Cliente pode ter um representante preferencial
+  ativo              Boolean  @default(true)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  // Relacionamentos
+  pedidos Pedido[] @relation("ClientePedidos")
+
+  @@map("clientes")
 }
 
 model Notificacao {
-  id             String   @id @default(uuid())
+  id             String                @id @default(uuid())
   destinatarioId String
+  usuario        Usuario               @relation("NotificacoesUsuario", fields: [destinatarioId], references: [id], onDelete: Cascade)
+  titulo         String
   mensagem       String
-  dataEnvio      DateTime @default(now())
-  lida           Boolean  @default(false)
-  tipo           String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  tipo           TipoNotificacao
+  prioridade     PrioridadeNotificacao @default(NORMAL)
+  dataEnvio      DateTime              @default(now())
+  lida           Boolean               @default(false)
+  dataLeitura    DateTime?
+  metadados      Json? // Dados adicionais específicos do tipo de notificação
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  @@map("notificacoes")
+}
+
+enum TipoNotificacao {
+  CONVITE_VINCULACAO
+  VINCULACAO_ACEITA
+  VINCULACAO_RECUSADA
+  NOVO_PEDIDO
+  COMISSAO_DISPONIVEL
+  SISTEMA
+  PROMOCAO
+}
+
+enum PrioridadeNotificacao {
+  BAIXA
+  NORMAL
+  ALTA
+  URGENTE
 }

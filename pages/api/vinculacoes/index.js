@@ -1,182 +1,339 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient } from '../../../src/gerado/prisma';
+
+const prisma = new PrismaClient();
 
 /**
  * API para gerenciar vinculações entre fornecedores e representantes
  * 
- * @param {NextApiRequest} req - Requisição Next.js
- * @param {NextApiResponse} res - Resposta Next.js
+ * @param {import('next').NextApiRequest} req - Requisição Next.js
+ * @param {import('next').NextApiResponse} res - Resposta Next.js
  */
-export default function handler(req, res) {
-  // Simulação de autenticação e autorização
-  const usuarioAutenticado = true;
-  const papelUsuario = req.headers['x-user-role'] || 'FORNECEDOR';
-  
-  if (!usuarioAutenticado) {
-    return res.status(401).json({ message: 'Não autorizado' });
-  }
+export default async function handler(req, res) {
+  try {
+    // Simulação de autenticação e autorização (será integrada depois)
+    const usuarioAutenticado = true;
+    const papelUsuario = req.headers['x-user-role'] || 'FORNECEDOR';
+    
+    if (!usuarioAutenticado) {
+      return res.status(401).json({ message: 'Não autorizado' });
+    }
 
-  // Roteamento baseado no método HTTP
-  switch (req.method) {
-    case 'GET':
-      return getVinculacoes(req, res, papelUsuario);
-    case 'POST':
-      return criarVinculacao(req, res, papelUsuario);
-    case 'PUT':
-      return atualizarVinculacao(req, res, papelUsuario);
-    case 'DELETE':
-      return removerVinculacao(req, res, papelUsuario);
-    default:
-      return res.status(405).json({ message: 'Método não permitido' });
+    // Roteamento baseado no método HTTP
+    switch (req.method) {
+      case 'GET':
+        return await getVinculacoes(req, res, papelUsuario);
+      case 'POST':
+        return await criarVinculacao(req, res, papelUsuario);
+      case 'PUT':
+        return await atualizarVinculacao(req, res, papelUsuario);
+      case 'DELETE':
+        return await removerVinculacao(req, res, papelUsuario);
+      default:
+        return res.status(405).json({ message: 'Método não permitido' });
+    }
+  } catch (error) {
+    console.error('Erro na API de vinculações:', error);
+    return res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 }
 
 /**
  * Obter vinculações
  */
-function getVinculacoes(req, res, papelUsuario) {
-  const { fornecedorId, representanteId, status } = req.query;
+async function getVinculacoes(req, res, papelUsuario) {
+  const { fornecedorId, representanteId, status, page = 1, limit = 10 } = req.query;
   
-  // Simulação de dados
-  let vinculacoes = [
-    {
-      id: 'vinc_001',
-      fornecedorId: 'forn_001',
-      fornecedorNome: 'TechSupply Ltda',
-      representanteId: 'repr_001',
-      representanteNome: 'João Silva',
-      representanteEmail: 'joao@example.com',
-      status: 'ativo',
-      dataVinculacao: '2024-01-15T10:00:00Z',
-      configuracoes: {
-        comissaoPersonalizada: 5.5,
-        precoEspecial: false,
-        acessoRelatorios: true
-      },
+  try {
+    const where = {};
+    
+    // Aplicar filtros baseados no papel do usuário e parâmetros
+    if (fornecedorId) where.fornecedorId = fornecedorId;
+    if (representanteId) where.representanteId = representanteId;
+    if (status) where.status = status;
+    
+    // Busca paginada
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const take = parseInt(limit);
+    
+    const [vinculacoes, total] = await Promise.all([
+      prisma.vinculacao.findMany({
+        where,
+        skip,
+        take,
+        include: {
+          fornecedor: {
+            select: {
+              id: true,
+              nomeFantasia: true,
+              razaoSocial: true,
+              cnpj: true,
+              ativo: true
+            }
+          },
+          representante: {
+            select: {
+              id: true,
+              nome: true,
+              email: true,
+              telefone: true,
+              regiao: true,
+              ativo: true
+            }
+          }
+        },
+        orderBy: {
+          dataCriacao: 'desc'
+        }
+      }),
+      prisma.vinculacao.count({ where })
+    ]);
+    
+    // Formatar dados para compatibilidade com o frontend
+    const vinculacoesFormatadas = vinculacoes.map(vinculacao => ({
+      id: vinculacao.id,
+      fornecedorId: vinculacao.fornecedorId,
+      fornecedorNome: vinculacao.fornecedor.nomeFantasia,
+      representanteId: vinculacao.representanteId,
+      representanteNome: vinculacao.representante.nome,
+      representanteEmail: vinculacao.representante.email,
+      status: vinculacao.status,
+      dataVinculacao: vinculacao.dataCriacao,
+      comissaoPercent: vinculacao.comissaoPercent || 5.0,
+      precoEspecial: vinculacao.precoEspecial || false,
+      acessoRelatorios: vinculacao.acessoRelatorios || true,
       estatisticas: {
-        pedidosRealizados: 12,
-        valorTotalVendas: 45600.00,
-        ultimoPedido: '2024-01-20T14:30:00Z'
+        pedidosRealizados: 0, // TODO: calcular do banco
+        valorTotalVendas: 0.0, // TODO: calcular do banco
+        ultimoPedido: null // TODO: buscar do banco
       }
-    },
-    {
-      id: 'vinc_002',
-      fornecedorId: 'forn_001',
-      fornecedorNome: 'TechSupply Ltda',
-      representanteId: 'repr_002',
-      representanteNome: 'Maria Santos',
-      representanteEmail: 'maria@example.com',
-      status: 'ativo',
-      dataVinculacao: '2024-01-10T09:15:00Z',
-      configuracoes: {
-        comissaoPersonalizada: 6.0,
-        precoEspecial: true,
-        acessoRelatorios: false
-      },
-      estatisticas: {
-        pedidosRealizados: 8,
-        valorTotalVendas: 32100.00,
-        ultimoPedido: '2024-01-18T11:45:00Z'
+    }));
+    
+    return res.status(200).json({
+      vinculacoes: vinculacoesFormatadas,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
       }
-    }
-  ];
-
-  // Aplicar filtros
-  if (fornecedorId) {
-    vinculacoes = vinculacoes.filter(v => v.fornecedorId === fornecedorId);
+    });
+    
+  } catch (error) {
+    console.error('Erro ao buscar vinculações:', error);
+    return res.status(500).json({ message: 'Erro ao buscar vinculações' });
   }
-
-  if (representanteId) {
-    vinculacoes = vinculacoes.filter(v => v.representanteId === representanteId);
-  }
-
-  if (status) {
-    vinculacoes = vinculacoes.filter(v => v.status === status);
-  }
-
-  return res.status(200).json(vinculacoes);
 }
 
 /**
  * Criar nova vinculação
  */
-function criarVinculacao(req, res, papelUsuario) {
-  const { fornecedorId, fornecedorNome, representanteId, representanteNome, representanteEmail, configuracoes } = req.body;
+async function criarVinculacao(req, res, papelUsuario) {
+  const { 
+    fornecedorId, 
+    representanteId, 
+    comissaoPercent, 
+    precoEspecial = false, 
+    acessoRelatorios = true 
+  } = req.body;
 
   // Validação básica
   if (!fornecedorId || !representanteId) {
-    return res.status(400).json({ message: 'Dados incompletos. Fornecedor e representante são obrigatórios.' });
+    return res.status(400).json({ 
+      message: 'Dados incompletos. Fornecedor e representante são obrigatórios.' 
+    });
   }
 
   // Verificar permissão (apenas fornecedores podem criar vinculações diretamente)
   if (papelUsuario !== 'FORNECEDOR' && papelUsuario !== 'ADMINISTRADOR') {
-    return res.status(403).json({ message: 'Apenas fornecedores podem criar vinculações diretamente.' });
+    return res.status(403).json({ 
+      message: 'Apenas fornecedores podem criar vinculações diretamente.' 
+    });
   }
 
-  // Simulação de criação
-  const novaVinculacao = {
-    id: `vinc_${Date.now()}`,
-    fornecedorId,
-    fornecedorNome,
-    representanteId,
-    representanteNome,
-    representanteEmail,
-    status: 'ativo',
-    dataVinculacao: new Date().toISOString(),
-    configuracoes: configuracoes || {
-      comissaoPersonalizada: null,
-      precoEspecial: false,
-      acessoRelatorios: true
-    },
-    estatisticas: {
-      pedidosRealizados: 0,
-      valorTotalVendas: 0.00,
-      ultimoPedido: null
-    }
-  };
+  try {
+    // Verificar se fornecedor e representante existem
+    const [fornecedor, representante] = await Promise.all([
+      prisma.fornecedor.findUnique({ where: { id: fornecedorId } }),
+      prisma.representante.findUnique({ where: { id: representanteId } })
+    ]);
 
-  return res.status(201).json(novaVinculacao);
+    if (!fornecedor) {
+      return res.status(404).json({ message: 'Fornecedor não encontrado' });
+    }
+
+    if (!representante) {
+      return res.status(404).json({ message: 'Representante não encontrado' });
+    }
+
+    // Verificar se já existe vinculação ativa
+    const vinculacaoExistente = await prisma.vinculacao.findFirst({
+      where: {
+        fornecedorId,
+        representanteId,
+        status: 'ATIVO'
+      }
+    });
+
+    if (vinculacaoExistente) {
+      return res.status(409).json({ 
+        message: 'Já existe uma vinculação ativa entre este fornecedor e representante' 
+      });
+    }
+
+    // Criar nova vinculação
+    const novaVinculacao = await prisma.vinculacao.create({
+      data: {
+        fornecedorId,
+        representanteId,
+        status: 'ATIVO',
+        comissaoPercent: comissaoPercent || representante.comissaoPadrao || 5.0,
+        precoEspecial,
+        acessoRelatorios
+      },
+      include: {
+        fornecedor: {
+          select: {
+            id: true,
+            nomeFantasia: true,
+            razaoSocial: true
+          }
+        },
+        representante: {
+          select: {
+            id: true,
+            nome: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    return res.status(201).json({
+      message: 'Vinculação criada com sucesso',
+      vinculacao: {
+        id: novaVinculacao.id,
+        fornecedorId: novaVinculacao.fornecedorId,
+        fornecedorNome: novaVinculacao.fornecedor.nomeFantasia,
+        representanteId: novaVinculacao.representanteId,
+        representanteNome: novaVinculacao.representante.nome,
+        representanteEmail: novaVinculacao.representante.email,
+        status: novaVinculacao.status.toLowerCase(),
+        dataVinculacao: novaVinculacao.dataCriacao,
+        configuracoes: {
+          comissaoPercent: novaVinculacao.comissaoPercent,
+          precoEspecial: novaVinculacao.precoEspecial,
+          acessoRelatorios: novaVinculacao.acessoRelatorios
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Erro ao criar vinculação:', error);
+    return res.status(500).json({ message: 'Erro ao criar vinculação' });
+  }
 }
 
 /**
  * Atualizar vinculação existente
  */
-function atualizarVinculacao(req, res, papelUsuario) {
-  const { id, configuracoes, status } = req.body;
+async function atualizarVinculacao(req, res, papelUsuario) {
+  const { id, comissaoPercent, precoEspecial, acessoRelatorios, status } = req.body;
 
   // Validação básica
   if (!id) {
     return res.status(400).json({ message: 'ID da vinculação é obrigatório.' });
   }
 
-  // Simulação de atualização
-  const vinculacaoAtualizada = {
-    id,
-    fornecedorId: 'forn_001',
-    fornecedorNome: 'TechSupply Ltda',
-    representanteId: 'repr_001',
-    representanteNome: 'João Silva',
-    representanteEmail: 'joao@example.com',
-    status: status || 'ativo',
-    dataVinculacao: '2024-01-15T10:00:00Z',
-    configuracoes: configuracoes || {
-      comissaoPersonalizada: 5.5,
-      precoEspecial: false,
-      acessoRelatorios: true
-    },
-    estatisticas: {
-      pedidosRealizados: 12,
-      valorTotalVendas: 45600.00,
-      ultimoPedido: '2024-01-20T14:30:00Z'
-    }
-  };
+  // Verificar permissão
+  if (papelUsuario !== 'FORNECEDOR' && papelUsuario !== 'ADMINISTRADOR') {
+    return res.status(403).json({ 
+      message: 'Apenas fornecedores podem atualizar vinculações.' 
+    });
+  }
 
-  return res.status(200).json(vinculacaoAtualizada);
+  try {
+    // Verificar se a vinculação existe
+    const vinculacaoExistente = await prisma.vinculacao.findUnique({
+      where: { id }
+    });
+
+    if (!vinculacaoExistente) {
+      return res.status(404).json({ message: 'Vinculação não encontrada' });
+    }
+
+    // Preparar dados para atualização
+    const dadosAtualizacao = {
+      dataAtualizacao: new Date()
+    };
+
+    if (comissaoPercent !== undefined) dadosAtualizacao.comissaoPercent = comissaoPercent;
+    if (precoEspecial !== undefined) dadosAtualizacao.precoEspecial = precoEspecial;
+    if (acessoRelatorios !== undefined) dadosAtualizacao.acessoRelatorios = acessoRelatorios;
+    if (status !== undefined) {
+      // Validar status
+      const statusValidos = ['ATIVO', 'INATIVO', 'SUSPENSO'];
+      if (!statusValidos.includes(status.toUpperCase())) {
+        return res.status(400).json({ 
+          message: 'Status inválido. Use: ATIVO, INATIVO ou SUSPENSO' 
+        });
+      }
+      dadosAtualizacao.status = status.toUpperCase();
+    }
+
+    // Atualizar vinculação
+    const vinculacaoAtualizada = await prisma.vinculacao.update({
+      where: { id },
+      data: dadosAtualizacao,
+      include: {
+        fornecedor: {
+          select: {
+            id: true,
+            nomeFantasia: true,
+            razaoSocial: true
+          }
+        },
+        representante: {
+          select: {
+            id: true,
+            nome: true,
+            email: true
+          }
+        }
+      }
+    });
+
+    return res.status(200).json({
+      message: 'Vinculação atualizada com sucesso',
+      vinculacao: {
+        id: vinculacaoAtualizada.id,
+        fornecedorId: vinculacaoAtualizada.fornecedorId,
+        fornecedorNome: vinculacaoAtualizada.fornecedor.nomeFantasia,
+        representanteId: vinculacaoAtualizada.representanteId,
+        representanteNome: vinculacaoAtualizada.representante.nome,
+        representanteEmail: vinculacaoAtualizada.representante.email,
+        status: vinculacaoAtualizada.status.toLowerCase(),
+        dataVinculacao: vinculacaoAtualizada.dataCriacao,
+        configuracoes: {
+          comissaoPercent: vinculacaoAtualizada.comissaoPercent,
+          precoEspecial: vinculacaoAtualizada.precoEspecial,
+          acessoRelatorios: vinculacaoAtualizada.acessoRelatorios
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Erro ao atualizar vinculação:', error);
+    return res.status(500).json({ message: 'Erro ao atualizar vinculação' });
+  }
 }
 
 /**
  * Remover vinculação
  */
-function removerVinculacao(req, res, papelUsuario) {
+async function removerVinculacao(req, res, papelUsuario) {
   const { id } = req.query;
 
   // Validação básica
@@ -189,6 +346,56 @@ function removerVinculacao(req, res, papelUsuario) {
     return res.status(403).json({ message: 'Apenas fornecedores podem remover vinculações.' });
   }
 
-  // Simulação de remoção (soft delete)
-  return res.status(200).json({ message: 'Vinculação removida com sucesso.' });
-}
+  try {
+    // Verificar se a vinculação existe
+    const vinculacao = await prisma.vinculacao.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            pedidos: true,
+            comissoes: true
+          }
+        }
+      }
+    });
+
+    if (!vinculacao) {
+      return res.status(404).json({ message: 'Vinculação não encontrada' });
+    }
+
+    // Verificar se há dependências ativas
+    if (vinculacao._count.pedidos > 0 || vinculacao._count.comissoes > 0) {
+      // Soft delete - apenas inativar
+      await prisma.vinculacao.update({
+        where: { id },
+        data: {
+          status: 'INATIVO',
+          dataAtualizacao: new Date()
+        }
+      });
+
+      return res.status(200).json({
+        message: 'Vinculação inativada com sucesso (possui pedidos ou comissões associadas)'
+      });
+    } else {
+      // Hard delete se não há dependências
+      await prisma.vinculacao.delete({
+        where: { id }
+      });
+
+      return res.status(200).json({
+        message: 'Vinculação removida com sucesso'
+      });
+    }
+
+  } catch (error) {
+     console.error('Erro ao remover vinculação:', error);
+     return res.status(500).json({ message: 'Erro ao remover vinculação' });
+   }
+ }
+
+// Fechar conexão Prisma quando o processo terminar
+process.on('beforeExit', async () => {
+  await prisma.$disconnect();
+});

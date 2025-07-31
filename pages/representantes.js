@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import LayoutPrincipal from '../src/front-end/componentes/layout/LayoutPrincipal';
-import ServicoVinculacoes from '../src/front-end/servicos/ServicoVinculacoes';
+import ServicoVinculacoesReal from '../src/front-end/servicos/ServicoVinculacoesReal';
 import { obterPapelUsuario, PAPEIS } from '../src/front-end/utils/papelUsuario';
 import { usarCorTema } from '../src/front-end/utils/coresTema';
 
@@ -22,9 +22,8 @@ export default function RepresentantesPage() {
   useEffect(() => {
     // Inicializar serviço apenas no cliente
     if (typeof window !== 'undefined') {
-      const servico = new ServicoVinculacoes();
-      setServicoVinculacoes(servico);
-      carregarDados(servico);
+      setServicoVinculacoes(ServicoVinculacoesReal);
+      carregarDados(ServicoVinculacoesReal);
     }
   }, []);
 
@@ -32,27 +31,40 @@ export default function RepresentantesPage() {
     if (!servico) return;
     
     setCarregando(true);
-    try {
-      // Simular ID do usuário logado
-      const usuarioId = 'forn_001';
-      
+    
+    // Simular ID do usuário logado (usando ID real do primeiro fornecedor)
+    const usuarioId = 'd97baa37-11d6-4e02-98e3-9727be74e18c';
+    
+    // Carregar cada API independentemente para evitar que uma falha impeça as outras
+    const promises = [
       // Carregar vinculações do fornecedor
-      const vinculacoesData = servico.obterVinculacoesPorFornecedor(usuarioId);
-      setVinculacoes(vinculacoesData);
+      servico.obterVinculacoesPorFornecedor(usuarioId)
+        .then(data => setVinculacoes(data))
+        .catch(error => {
+          console.error('Erro ao carregar vinculações:', error);
+          setVinculacoes([]);
+        }),
       
       // Carregar convites recebidos
-      const convitesData = servico.obterConvitesRecebidos(usuarioId);
-      setConvitesRecebidos(convitesData);
+      servico.obterConvitesRecebidos(usuarioId)
+        .then(data => setConvitesRecebidos(data))
+        .catch(error => {
+          console.error('Erro ao carregar convites:', error);
+          setConvitesRecebidos([]);
+        }),
       
       // Carregar representantes disponíveis
-      const representantesData = servico.buscarRepresentantesDisponiveis();
-      setRepresentantesDisponiveis(representantesData);
-      
-    } catch (error) {
-      console.error('Erro ao carregar dados:', error);
-    } finally {
-      setCarregando(false);
-    }
+      servico.buscarRepresentantesDisponiveis()
+        .then(data => setRepresentantesDisponiveis(data))
+        .catch(error => {
+          console.error('Erro ao carregar representantes:', error);
+          setRepresentantesDisponiveis([]);
+        })
+    ];
+    
+    // Aguardar todas as promises terminarem (mesmo com erro)
+    await Promise.allSettled(promises);
+    setCarregando(false);
   };
 
   const handleEnviarConvite = async (representante) => {
@@ -64,8 +76,8 @@ export default function RepresentantesPage() {
         remetenteId: 'forn_001',
         remetenteNome: 'Empresa ABC Ltda',
         destinatarioId: representante.id,
-        destinatarioNome: representante.nome,
-        destinatarioEmail: representante.email,
+        destinatarioNome: representante.usuario?.nome || representante.nome,
+        destinatarioEmail: representante.usuario?.email || representante.email,
         mensagem: mensagemConvite || 'Gostaríamos de convidá-lo para representar nossos produtos em sua região.'
       };
       
@@ -122,10 +134,14 @@ export default function RepresentantesPage() {
   });
 
   const representantesFiltrados = representantesDisponiveis.filter(representante => {
+    const nome = representante.usuario?.nome || representante.nome || '';
+    const email = representante.usuario?.email || representante.email || '';
+    const regiao = representante.regiao || '';
+    
     const matchBusca = !filtros.busca || 
-      representante.nome.toLowerCase().includes(filtros.busca.toLowerCase()) ||
-      representante.email.toLowerCase().includes(filtros.busca.toLowerCase()) ||
-      representante.regiao.toLowerCase().includes(filtros.busca.toLowerCase());
+      nome.toLowerCase().includes(filtros.busca.toLowerCase()) ||
+      email.toLowerCase().includes(filtros.busca.toLowerCase()) ||
+      regiao.toLowerCase().includes(filtros.busca.toLowerCase());
     
     return matchBusca;
   });
@@ -434,7 +450,7 @@ export default function RepresentantesPage() {
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
                               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                {representante.nome}
+                                {representante.usuario?.nome || representante.nome}
                               </h3>
                               <div className="flex items-center gap-1">
                                 <svg className="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -446,15 +462,19 @@ export default function RepresentantesPage() {
                               </div>
                             </div>
                             <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                              {representante.email} • {representante.telefone}
+                              {representante.usuario?.email || representante.email} • {representante.telefone}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                              📍 {representante.regiao} • {representante.pedidosRealizados} pedidos realizados
+                              📍 {representante.regiao} • {representante._count?.pedidos || representante.pedidosRealizados || 0} pedidos realizados
                             </p>
                             
                             <div className="flex flex-wrap gap-2 mb-4">
-                              {representante.especialidades.map(especialidade => (
-                                <span key={especialidade} className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs font-medium">
+                              {(representante.especialidades ? 
+                                (Array.isArray(representante.especialidades) ? 
+                                  representante.especialidades : 
+                                  representante.especialidades.split(' ')) : 
+                                []).map((especialidade, index) => (
+                                <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs font-medium">
                                   {especialidade}
                                 </span>
                               ))}

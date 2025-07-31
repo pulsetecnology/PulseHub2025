@@ -1,114 +1,102 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient } from '../../../src/gerado/prisma';
+
+const prisma = new PrismaClient();
 
 /**
  * API para gerenciar convites de vinculação entre fornecedores e representantes
  * 
- * @param {NextApiRequest} req - Requisição Next.js
- * @param {NextApiResponse} res - Resposta Next.js
+ * @param {import('next').NextApiRequest} req - Requisição Next.js
+ * @param {import('next').NextApiResponse} res - Resposta Next.js
  */
-export default function handler(req, res) {
-  // Simulação de autenticação e autorização
-  const usuarioAutenticado = true;
-  const papelUsuario = req.headers['x-user-role'] || 'FORNECEDOR';
-  const usuarioId = req.headers['x-user-id'] || 'user_001';
-  
-  if (!usuarioAutenticado) {
-    return res.status(401).json({ message: 'Não autorizado' });
-  }
+export default async function handler(req, res) {
+  try {
+    // Simulação de autenticação e autorização (será integrada depois)
+    const usuarioAutenticado = true;
+    const papelUsuario = req.headers['x-user-role'] || 'FORNECEDOR';
+    const usuarioId = req.headers['x-user-id'] || 'user_001';
+    
+    if (!usuarioAutenticado) {
+      return res.status(401).json({ message: 'Não autorizado' });
+    }
 
-  // Roteamento baseado no método HTTP
-  switch (req.method) {
-    case 'GET':
-      return getConvites(req, res, papelUsuario, usuarioId);
-    case 'POST':
-      return enviarConvite(req, res, papelUsuario, usuarioId);
-    case 'PUT':
-      return responderConvite(req, res, papelUsuario, usuarioId);
-    case 'DELETE':
-      return cancelarConvite(req, res, papelUsuario, usuarioId);
-    default:
-      return res.status(405).json({ message: 'Método não permitido' });
+    // Roteamento baseado no método HTTP
+    switch (req.method) {
+      case 'GET':
+        return await getConvites(req, res, papelUsuario, usuarioId);
+      case 'POST':
+        return await enviarConvite(req, res, papelUsuario, usuarioId);
+      case 'PUT':
+        return await responderConvite(req, res, papelUsuario, usuarioId);
+      case 'DELETE':
+        return await cancelarConvite(req, res, papelUsuario, usuarioId);
+      default:
+        return res.status(405).json({ message: 'Método não permitido' });
+    }
+  } catch (error) {
+    console.error('Erro na API de convites:', error);
+    return res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 }
 
 /**
  * Obter convites (enviados e recebidos)
  */
-function getConvites(req, res, papelUsuario, usuarioId) {
+async function getConvites(req, res, papelUsuario, usuarioId) {
   const { tipo, status } = req.query;
   
-  // Simulação de dados de convites
-  let convites = [
-    {
-      id: 'conv_001',
-      tipo: 'fornecedor_para_representante',
-      remetenteId: 'forn_002',
-      remetenteNome: 'InnovaTech Solutions',
-      destinatarioId: 'repr_003',
-      destinatarioNome: 'Carlos Oliveira',
-      destinatarioEmail: 'carlos@example.com',
-      status: 'pendente',
-      dataEnvio: '2024-01-22T16:20:00Z',
-      dataExpiracao: '2024-02-21T16:20:00Z',
-      mensagem: 'Gostaríamos de convidá-lo para representar nossos produtos de tecnologia.'
-    },
-    {
-      id: 'conv_002',
-      tipo: 'representante_para_fornecedor',
-      remetenteId: 'repr_004',
-      remetenteNome: 'Ana Costa',
-      destinatarioId: 'forn_003',
-      destinatarioNome: 'Digital Pro Ltda',
-      destinatarioEmail: 'contato@digitalpro.com',
-      status: 'pendente',
-      dataEnvio: '2024-01-21T14:10:00Z',
-      dataExpiracao: '2024-02-20T14:10:00Z',
-      mensagem: 'Tenho interesse em representar seus produtos na região Sul.'
-    },
-    {
-      id: 'conv_003',
-      tipo: 'fornecedor_para_representante',
-      remetenteId: 'forn_001',
-      remetenteNome: 'TechSupply Ltda',
-      destinatarioId: 'repr_005',
-      destinatarioNome: 'Pedro Santos',
-      destinatarioEmail: 'pedro@example.com',
-      status: 'aceito',
-      dataEnvio: '2024-01-18T10:30:00Z',
-      dataExpiracao: '2024-02-17T10:30:00Z',
-      dataResposta: '2024-01-19T09:15:00Z',
-      mensagem: 'Convite para parceria comercial em nossa linha de produtos.'
+  try {
+    // Construir filtros para a consulta
+    let whereClause = {};
+    
+    // Filtrar por tipo (enviados ou recebidos)
+    if (tipo === 'enviados') {
+      whereClause.remetenteId = usuarioId;
+    } else if (tipo === 'recebidos') {
+      whereClause.destinatarioId = usuarioId;
+    } else {
+      // Retornar todos os convites relacionados ao usuário
+      whereClause.OR = [
+        { remetenteId: usuarioId },
+        { destinatarioId: usuarioId }
+      ];
     }
-  ];
 
-  // Filtrar por tipo (enviados ou recebidos)
-  if (tipo === 'enviados') {
-    convites = convites.filter(c => c.remetenteId === usuarioId);
-  } else if (tipo === 'recebidos') {
-    convites = convites.filter(c => c.destinatarioId === usuarioId);
-  } else {
-    // Retornar todos os convites relacionados ao usuário
-    convites = convites.filter(c => c.remetenteId === usuarioId || c.destinatarioId === usuarioId);
+    // Filtrar por status
+    if (status) {
+      whereClause.status = status;
+    }
+
+    // Buscar convites no banco de dados
+    const convites = await prisma.convite.findMany({
+      where: whereClause,
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // Adicionar informação se é enviado ou recebido
+    const convitesComDirecao = convites.map(convite => ({
+      ...convite,
+      direcao: convite.remetenteId === usuarioId ? 'enviado' : 'recebido',
+      dataEnvio: convite.dataEnvio || convite.createdAt,
+      id: convite.id.toString(),
+      tipo: convite.tipoRemetente === 'FORNECEDOR' ? 'fornecedor_para_representante' : 'representante_para_fornecedor'
+    }));
+
+    return res.status(200).json(convitesComDirecao);
+  } catch (error) {
+    console.error('Erro ao buscar convites:', error);
+    return res.status(500).json({ message: 'Erro ao buscar convites' });
   }
-
-  // Filtrar por status
-  if (status) {
-    convites = convites.filter(c => c.status === status);
-  }
-
-  // Adicionar informação se é enviado ou recebido
-  convites = convites.map(convite => ({
-    ...convite,
-    direcao: convite.remetenteId === usuarioId ? 'enviado' : 'recebido'
-  }));
-
-  return res.status(200).json(convites);
 }
 
 /**
  * Enviar novo convite
  */
-function enviarConvite(req, res, papelUsuario, usuarioId) {
+async function enviarConvite(req, res, papelUsuario, usuarioId) {
   const { destinatarioId, destinatarioNome, destinatarioEmail, mensagem } = req.body;
 
   // Validação básica
@@ -126,25 +114,38 @@ function enviarConvite(req, res, papelUsuario, usuarioId) {
     return res.status(403).json({ message: 'Apenas fornecedores e representantes podem enviar convites.' });
   }
 
-  // Simulação de verificação de convite existente
-  // Em uma implementação real, verificaria no banco de dados
-  
-  // Simulação de criação do convite
-  const novoConvite = {
-    id: `conv_${Date.now()}`,
-    tipo: tipoConvite,
-    remetenteId: usuarioId,
-    remetenteNome: papelUsuario === 'FORNECEDOR' ? 'Fornecedor Exemplo' : 'Representante Exemplo',
-    destinatarioId,
-    destinatarioNome,
-    destinatarioEmail,
-    status: 'pendente',
-    dataEnvio: new Date().toISOString(),
-    dataExpiracao: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 dias
-    mensagem: mensagem || 'Convite para estabelecer parceria comercial.'
-  };
+  try {
+    // Verificar se já existe um convite pendente entre os mesmos usuários
+    const conviteExistente = await prisma.convite.findFirst({
+      where: {
+        remetenteId: usuarioId,
+        destinatarioId: destinatarioId,
+        status: 'pendente'
+      }
+    });
 
-  return res.status(201).json(novoConvite);
+    if (conviteExistente) {
+      return res.status(400).json({ message: 'Já existe um convite pendente para este destinatário.' });
+    }
+
+    // Criar o convite no banco de dados
+    const novoConvite = await prisma.convite.create({
+      data: {
+        remetenteId: usuarioId,
+        destinatarioId,
+        tipoRemetente: papelUsuario === 'FORNECEDOR' ? 'FORNECEDOR' : 'REPRESENTANTE',
+        status: 'PENDENTE',
+        mensagem: mensagem || 'Convite para estabelecer parceria comercial.',
+        // Definir fornecedorId ou representanteId baseado no tipo
+        ...(papelUsuario === 'FORNECEDOR' ? { fornecedorId: usuarioId } : { representanteId: usuarioId })
+      }
+    });
+
+    return res.status(201).json(novoConvite);
+  } catch (error) {
+    console.error('Erro ao enviar convite:', error);
+    return res.status(500).json({ message: 'Erro ao enviar convite' });
+  }
 }
 
 /**

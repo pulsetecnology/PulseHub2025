@@ -1,6 +1,6 @@
 /**
  * Serviço de autenticação para o front-end
- * Responsável por comunicação com o MCP de autenticação
+ * Responsável por comunicação com a API de autenticação PostgreSQL
  */
 export class ServicoAutenticacao {
   private baseUrl: string;
@@ -11,33 +11,26 @@ export class ServicoAutenticacao {
     // URL base do MCP de autenticação
     this.baseUrl = process.env.NEXT_PUBLIC_AUTH_API_URL || 'http://localhost:3001';
     
-    // Por padrão, não usar o modo de simulação, apenas se explicitamente configurado ou se o servidor não estiver disponível
+    // Por padrão, não usar o modo de simulação
     this.modoSimulacao = process.env.NEXT_PUBLIC_MODO_SIMULACAO === 'true' || false;
     
-    // Usuários simulados para testes
+    // Usuários simulados para fallback
     this.usuariosSimulados = {
-      // Usuários de demonstração principais
       'admin@pulsehub.com': { nome: 'Carlos Oliveira', email: 'admin@pulsehub.com', senha: 'admin123', papel: 'ADMINISTRADOR' },
       'fornecedor@exemplo.com': { nome: 'João Silva', email: 'fornecedor@exemplo.com', senha: 'fornecedor123', papel: 'FORNECEDOR' },
       'representante@exemplo.com': { nome: 'Maria Santos', email: 'representante@exemplo.com', senha: 'representante123', papel: 'REPRESENTANTE' },
-      
-      // Usuários antigos para compatibilidade
       'admin@exemplo.com': { nome: 'Administrador', email: 'admin@exemplo.com', senha: 'senha123', papel: 'ADMINISTRADOR' },
       'usuario@gmail.com': { nome: 'Usuário Google', email: 'usuario@gmail.com', senha: 'google-auth', papel: 'REPRESENTANTE' }
     };
-    
-    // Verificar se o MCP está disponível ao inicializar
-    this.verificarDisponibilidadeMCP();
   }
   
   /**
    * Verifica se o MCP de autenticação está disponível
-   * @returns Promise<boolean> true se o MCP estiver disponível, false caso contrário
    */
   public async verificarDisponibilidadeMCP(): Promise<boolean> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000); // Timeout de 2 segundos
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
       
       const resposta = await fetch(`${this.baseUrl}/verificar`, {
         method: 'GET',
@@ -49,14 +42,12 @@ export class ServicoAutenticacao {
       
       clearTimeout(timeoutId);
       
-      // Se conseguir conectar, desativar o modo de simulação
       if (resposta.ok) {
         console.log('MCP de Autenticação disponível. Usando modo normal.');
         this.modoSimulacao = false;
         return true;
       }
       
-      // Se não conseguir conectar, ativar o modo de simulação
       console.log('MCP de Autenticação indisponível. Usando modo de simulação.');
       this.modoSimulacao = true;
       return false;
@@ -70,174 +61,117 @@ export class ServicoAutenticacao {
 
   /**
    * Realiza o login do usuário
-   * @param email Email do usuário
-   * @param senha Senha do usuário
-   * @returns Token JWT em caso de sucesso
-   * @throws Error em caso de falha
    */
   public async login(email: string, senha: string): Promise<{ token: string; usuario: any } | string> {
-    // Se estiver em modo de simulação, usar dados simulados
-    if (this.modoSimulacao) {
-      console.log('Usando modo de simulação para login');
-      
-      // Simular um pequeno atraso para parecer uma requisição real
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const usuario = this.usuariosSimulados[email];
-      
-      if (!usuario) {
-        throw new Error('Usuário não encontrado');
-      }
-      
-      if (usuario.senha !== senha) {
-        throw new Error('Senha incorreta');
-      }
-      
-      // Gerar um token simulado que inclui o papel do usuário e email
-      const papel = usuario.papel || 'FORNECEDOR';
-      const emailHash = btoa(email).substring(0, 8); // Base64 do email para identificação
-      const token = `simulado-${papel}-${emailHash}-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-      
-      // Debug apenas em desenvolvimento
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Token gerado:', token);
-        console.log('Papel do usuário:', papel);
-        console.log('Email do usuário:', email);
-      }
-      
-      // Armazenar o token no localStorage e em cookies
-      localStorage.setItem('token', token);
-      document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 dias
-      
-      const usuarioInfo = {
-        id: `user-${Math.random().toString(36).substring(2, 9)}`,
-        nome: usuario.nome,
-        email: usuario.email,
-        papel: papel
-      };
-      
-      localStorage.setItem('usuario', JSON.stringify(usuarioInfo));
-      
-      return { token: token, usuario: usuarioInfo };
-    }
-    
-    // Se não estiver em modo de simulação, tentar conectar ao servidor real
     try {
-      const resposta = await fetch(`${this.baseUrl}/login`, {
+      // Tentar fazer login via API do PostgreSQL
+      const resposta = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, senha }),
+        body: JSON.stringify({ email, senha })
       });
 
-      const dados = await resposta.json();
-
-      if (!resposta.ok) {
-        throw new Error(dados.message || 'Erro ao realizar login');
-      }
-
-      // Armazenar o token no localStorage e em cookies
-      localStorage.setItem('token', dados.token);
-      document.cookie = `token=${dados.token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 dias
-      
-      // Buscar informações do usuário usando o token
-      try {
-        const usuarioInfo = await this.obterInformacoesUsuario(dados.token);
-        if (usuarioInfo) {
-          localStorage.setItem('usuario', JSON.stringify(usuarioInfo));
-          // Retornar tanto o token quanto as informações do usuário
-          return { token: dados.token, usuario: usuarioInfo };
+      if (resposta.ok) {
+        const dados = await resposta.json();
+        
+        // Salvar token e dados do usuário no localStorage e cookies
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('token', dados.token);
+          localStorage.setItem('usuario', JSON.stringify(dados.usuario));
+          
+          // Salvar token nos cookies para o middleware
+          document.cookie = `token=${dados.token}; path=/; max-age=86400; SameSite=Lax`;
         }
-      } catch (erroUsuario) {
-        console.error('Erro ao obter informações do usuário:', erroUsuario);
-        // Continuar mesmo se não conseguir obter informações do usuário
+        
+        console.log('Login realizado com sucesso via PostgreSQL');
+        return {
+          token: dados.token,
+          usuario: dados.usuario
+        };
+      } else {
+        const erro = await resposta.json();
+        throw new Error(erro.message || 'Erro no login');
       }
+    } catch (error) {
+      console.log('Erro no login via PostgreSQL, tentando modo simulação:', error);
       
-      return { token: dados.token, usuario: null };
-    } catch (erro) {
-      console.error('Erro no login:', erro);
-      
-      // Se o erro for de conexão, tentar usar o modo de simulação
-      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
-        console.log('Servidor indisponível, alternando para modo de simulação');
-        this.modoSimulacao = true;
-        return this.login(email, senha);
-      }
-      
-      throw erro;
+      // Fallback para modo simulação se a API falhar
+      return this.loginSimulado(email, senha);
     }
   }
-  
+
   /**
-   * Obtém informações do usuário autenticado usando o token JWT
-   * @param token Token JWT
-   * @returns Informações do usuário ou null em caso de falha
+   * Login simulado como fallback
    */
-  private async obterInformacoesUsuario(token: string): Promise<any> {
-    try {
-      const resposta = await fetch(`${this.baseUrl}/verificar-token`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-      });
-
-      const dados = await resposta.json();
-
-      if (!resposta.ok) {
-        throw new Error(dados.message || 'Erro ao obter informações do usuário');
-      }
-
-      return dados.usuario;
-    } catch (erro) {
-      console.error('Erro ao obter informações do usuário:', erro);
-      return null;
+  private async loginSimulado(email: string, senha: string): Promise<{ token: string; usuario: any }> {
+    console.log('Usando modo de simulação para login');
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const usuario = this.usuariosSimulados[email];
+    
+    if (!usuario) {
+      throw new Error('Usuário não encontrado');
     }
+    
+    if (usuario.senha !== senha) {
+      throw new Error('Senha incorreta');
+    }
+    
+    const papel = usuario.papel || 'FORNECEDOR';
+    const emailHash = btoa(email).substring(0, 8);
+    const token = `simulado-${papel}-${emailHash}-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Token simulado gerado:', token);
+    }
+    
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', token);
+      localStorage.setItem('usuario', JSON.stringify({
+        nome: usuario.nome,
+        email: usuario.email,
+        papel: papel
+      }));
+      
+      // Salvar token nos cookies para o middleware
+      document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax`;
+    }
+    
+    return {
+      token,
+      usuario: {
+        nome: usuario.nome,
+        email: usuario.email,
+        papel: papel
+      }
+    };
   }
 
   /**
    * Registra um novo usuário
-   * @param nome Nome do usuário
-   * @param email Email do usuário
-   * @param senha Senha do usuário
-   * @returns Dados do usuário criado
-   * @throws Error em caso de falha
    */
   public async registrar(nome: string, email: string, senha: string): Promise<any> {
-    // Se estiver em modo de simulação, usar dados simulados
     if (this.modoSimulacao) {
-      console.log('Usando modo de simulação para registro');
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simular um pequeno atraso para parecer uma requisição real
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Verificar se o email já está em uso
       if (this.usuariosSimulados[email]) {
-        throw new Error('Este email já está em uso');
+        throw new Error('Usuário já existe');
       }
       
-      // Adicionar o novo usuário à lista de usuários simulados
-      this.usuariosSimulados[email] = { nome, email, senha };
-      
-      // Retornar os dados do usuário criado (sem a senha)
-      return {
-        id: `user-${Math.random().toString(36).substring(2, 9)}`,
-        nome,
-        email,
-        message: 'Usuário registrado com sucesso!'
-      };
+      this.usuariosSimulados[email] = { nome, email, senha, papel: 'FORNECEDOR' };
+      return { message: 'Usuário registrado com sucesso (simulação)' };
     }
-    
-    // Se não estiver em modo de simulação, tentar conectar ao servidor real
+
     try {
       const resposta = await fetch(`${this.baseUrl}/registrar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nome, email, senha }),
+        body: JSON.stringify({ nome, email, senha })
       });
 
       const dados = await resposta.json();
@@ -249,54 +183,31 @@ export class ServicoAutenticacao {
       return dados;
     } catch (erro) {
       console.error('Erro no registro:', erro);
-      
-      // Se o erro for de conexão, tentar usar o modo de simulação
-      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
-        console.log('Servidor indisponível, alternando para modo de simulação');
-        this.modoSimulacao = true;
-        return this.registrar(nome, email, senha);
-      }
-      
-      throw erro;
+      throw new Error('Serviço de registro indisponível. Tente novamente mais tarde.');
     }
   }
 
   /**
    * Solicita recuperação de senha
-   * @param email Email do usuário
-   * @returns Mensagem de sucesso
-   * @throws Error em caso de falha
    */
   public async recuperarSenha(email: string): Promise<string> {
-    // Se estiver em modo de simulação, usar dados simulados
     if (this.modoSimulacao) {
-      console.log('Usando modo de simulação para recuperação de senha');
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simular um pequeno atraso para parecer uma requisição real
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Verificar se o email existe
       if (!this.usuariosSimulados[email]) {
-        // Por segurança, não informamos se o email existe ou não
-        return 'Se o e-mail estiver cadastrado, enviaremos instruções para recuperação de senha.';
+        throw new Error('Usuário não encontrado');
       }
       
-      // Simular um token de recuperação
-      const token = `recuperacao-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-      
-      console.log(`Token de recuperação simulado para ${email}: ${token}`);
-      
-      return 'Se o e-mail estiver cadastrado, enviaremos instruções para recuperação de senha.';
+      return 'Email de recuperação enviado (simulação)';
     }
-    
-    // Se não estiver em modo de simulação, tentar conectar ao servidor real
+
     try {
       const resposta = await fetch(`${this.baseUrl}/recuperar-senha`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email })
       });
 
       const dados = await resposta.json();
@@ -308,52 +219,26 @@ export class ServicoAutenticacao {
       return dados.message;
     } catch (erro) {
       console.error('Erro na recuperação de senha:', erro);
-      
-      // Se o erro for de conexão, tentar usar o modo de simulação
-      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
-        console.log('Servidor indisponível, alternando para modo de simulação');
-        this.modoSimulacao = true;
-        return this.recuperarSenha(email);
-      }
-      
-      throw erro;
+      throw new Error('Serviço de recuperação indisponível. Tente novamente mais tarde.');
     }
   }
 
   /**
-   * Redefine a senha do usuário
-   * @param senha Nova senha
-   * @param token Token de redefinição de senha
-   * @returns Mensagem de sucesso
-   * @throws Error em caso de falha
+   * Redefine a senha usando token
    */
   public async redefinirSenha(senha: string, token: string): Promise<string> {
-    // Se estiver em modo de simulação, usar dados simulados
     if (this.modoSimulacao) {
-      console.log('Usando modo de simulação para redefinição de senha');
-      
-      // Simular um pequeno atraso para parecer uma requisição real
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Verificar se o token é válido (em um caso real, verificaríamos em um banco de dados)
-      if (!token.startsWith('recuperacao-')) {
-        throw new Error('Token inválido ou expirado');
-      }
-      
-      // Em um caso real, atualizaríamos a senha do usuário no banco de dados
-      console.log(`Senha redefinida com sucesso usando o token: ${token}`);
-      
-      return 'Senha redefinida com sucesso!';
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return 'Senha redefinida com sucesso (simulação)';
     }
-    
-    // Se não estiver em modo de simulação, tentar conectar ao servidor real
+
     try {
       const resposta = await fetch(`${this.baseUrl}/redefinir-senha`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ senha, token }),
+        body: JSON.stringify({ senha, token })
       });
 
       const dados = await resposta.json();
@@ -365,21 +250,12 @@ export class ServicoAutenticacao {
       return dados.message;
     } catch (erro) {
       console.error('Erro na redefinição de senha:', erro);
-      
-      // Se o erro for de conexão, tentar usar o modo de simulação
-      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
-        console.log('Servidor indisponível, alternando para modo de simulação');
-        this.modoSimulacao = true;
-        return this.redefinirSenha(senha, token);
-      }
-      
-      throw erro;
+      throw new Error('Serviço de redefinição indisponível. Tente novamente mais tarde.');
     }
   }
 
   /**
    * Verifica se o usuário está autenticado
-   * @returns true se o usuário estiver autenticado, false caso contrário
    */
   public estaAutenticado(): boolean {
     if (typeof window === 'undefined') {
@@ -391,24 +267,20 @@ export class ServicoAutenticacao {
   }
 
   /**
-   * Realiza o logout do usuário
+   * Faz logout do usuário
    */
   public logout(): void {
     if (typeof window === 'undefined') {
       return;
     }
     
-    // Remover do localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
-    
-    // Remover dos cookies
     document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT';
   }
 
   /**
-   * Obtém o token JWT armazenado
-   * @returns Token JWT ou null se não estiver autenticado
+   * Obtém o token do usuário
    */
   public obterToken(): string | null {
     if (typeof window === 'undefined') {
@@ -417,10 +289,9 @@ export class ServicoAutenticacao {
     
     return localStorage.getItem('token');
   }
-  
+
   /**
-   * Obtém os dados do usuário autenticado
-   * @returns Dados do usuário ou null se não estiver autenticado
+   * Obtém dados do usuário
    */
   public obterUsuario(): any {
     if (typeof window === 'undefined') {
@@ -435,79 +306,54 @@ export class ServicoAutenticacao {
     try {
       return JSON.parse(usuarioJson);
     } catch (erro) {
-      console.error('Erro ao obter dados do usuário:', erro);
+      console.error('Erro ao parsear dados do usuário:', erro);
       return null;
     }
   }
-  
+
   /**
-   * Realiza o login do usuário com o Google
-   * @returns Token JWT em caso de sucesso
-   * @throws Error em caso de falha
+   * Login com Google (simulado)
    */
   public async loginComGoogle(): Promise<string> {
-    // Se estiver em modo de simulação, usar dados simulados
     if (this.modoSimulacao) {
-      console.log('Usando modo de simulação para login com Google');
-      
-      // Simular um pequeno atraso para parecer uma requisição real
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const usuario = this.usuariosSimulados['usuario@gmail.com'];
+      const token = `simulado-REPRESENTANTE-google-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
       
-      // Gerar um token simulado
-      const token = `google-simulado-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-      
-      // Armazenar o token no localStorage e em cookies
       localStorage.setItem('token', token);
-      document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 dias
       localStorage.setItem('usuario', JSON.stringify({
-        id: `google-user-${Math.random().toString(36).substring(2, 9)}`,
         nome: usuario.nome,
         email: usuario.email,
-        papel: usuario.papel,
-        fotoUrl: 'https://lh3.googleusercontent.com/a/default-user'
+        papel: usuario.papel
       }));
       
       return token;
     }
-    
-    // Se não estiver em modo de simulação, tentar conectar ao servidor real
+
+    throw new Error('Login com Google não implementado ainda');
+  }
+
+  /**
+   * Obtém informações do usuário através do token
+   */
+  async obterInformacoesUsuario(token: string): Promise<any> {
     try {
-      // Em um cenário real, aqui seria implementada a integração com a API do Google
-      // Por enquanto, vamos simular uma resposta bem-sucedida
-      
-      const resposta = await fetch(`${this.baseUrl}/login-google`, {
+      const response = await fetch('/api/auth/verificar-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ provider: 'google' }),
+        body: JSON.stringify({ token }),
       });
 
-      const dados = await resposta.json();
-
-      if (!resposta.ok) {
-        throw new Error(dados.message || 'Erro ao realizar login com Google');
+      if (response.ok) {
+        const data = await response.json();
+        return data.valido ? data.usuario : null;
       }
-
-      // Armazenar o token no localStorage e em cookies
-      localStorage.setItem('token', dados.token);
-      document.cookie = `token=${dados.token}; path=/; max-age=${60 * 60 * 24 * 7}`; // 7 dias
-      localStorage.setItem('usuario', JSON.stringify(dados.usuario));
-      
-      return dados.token;
-    } catch (erro) {
-      console.error('Erro no login com Google:', erro);
-      
-      // Se o erro for de conexão, tentar usar o modo de simulação
-      if (erro instanceof TypeError && erro.message.includes('Failed to fetch')) {
-        console.log('Servidor indisponível, alternando para modo de simulação');
-        this.modoSimulacao = true;
-        return this.loginComGoogle();
-      }
-      
-      throw erro;
+    } catch (error) {
+      console.error('Erro ao obter informações do usuário:', error);
     }
+    return null;
   }
 }

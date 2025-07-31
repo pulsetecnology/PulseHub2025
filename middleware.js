@@ -40,12 +40,12 @@ function obterPapelUsuario(token) {
       }
     }
     
-    // Fallback: verificar se é token simulado (formato: simulado-PAPEL-hash-timestamp-random)
+    // Fallback: verificar se é token simulado ou auth (formato: simulado-PAPEL-hash ou auth-PAPEL-hash)
     const partes = token.split('-');
-    if (partes.length >= 2 && partes[0] === 'simulado') {
+    if (partes.length >= 2 && (partes[0] === 'simulado' || partes[0] === 'auth')) {
       const papel = partes[1];
       if (process.env.NODE_ENV === 'development') {
-        console.log('Papel extraído do token simulado:', papel);
+        console.log(`Papel extraído do token ${partes[0]}:`, papel);
       }
       
       if (['ADMINISTRADOR', 'FORNECEDOR', 'REPRESENTANTE'].includes(papel)) {

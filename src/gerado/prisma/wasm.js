@@ -127,6 +127,24 @@ exports.Prisma.UsuarioScalarFieldEnum = {
   nome: 'nome',
   email: 'email',
   senha: 'senha',
+  papel: 'papel',
+  ativo: 'ativo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FornecedorScalarFieldEnum = {
+  id: 'id',
+  usuarioId: 'usuarioId',
+  razaoSocial: 'razaoSocial',
+  nomeFantasia: 'nomeFantasia',
+  cnpj: 'cnpj',
+  inscricaoEstadual: 'inscricaoEstadual',
+  telefone: 'telefone',
+  segmento: 'segmento',
+  endereco: 'endereco',
+  configuracoes: 'configuracoes',
+  ativo: 'ativo',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -136,6 +154,24 @@ exports.Prisma.ProdutoScalarFieldEnum = {
   nome: 'nome',
   descricao: 'descricao',
   precoBase: 'precoBase',
+  fornecedorId: 'fornecedorId',
+  categoria: 'categoria',
+  ativo: 'ativo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RepresentanteScalarFieldEnum = {
+  id: 'id',
+  usuarioId: 'usuarioId',
+  cpf: 'cpf',
+  telefone: 'telefone',
+  regiao: 'regiao',
+  especialidades: 'especialidades',
+  endereco: 'endereco',
+  configuracoes: 'configuracoes',
+  avaliacaoMedia: 'avaliacaoMedia',
+  ativo: 'ativo',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -151,9 +187,26 @@ exports.Prisma.VarianteProdutoScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.VinculacaoScalarFieldEnum = {
+  id: 'id',
+  fornecedorId: 'fornecedorId',
+  representanteId: 'representanteId',
+  status: 'status',
+  comissaoPercent: 'comissaoPercent',
+  precoEspecial: 'precoEspecial',
+  acessoRelatorios: 'acessoRelatorios',
+  configuracoes: 'configuracoes',
+  dataVinculacao: 'dataVinculacao',
+  dataInativacao: 'dataInativacao',
+  motivoInativacao: 'motivoInativacao',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.PedidoScalarFieldEnum = {
   id: 'id',
   clienteId: 'clienteId',
+  representanteId: 'representanteId',
   dataPedido: 'dataPedido',
   status: 'status',
   valorTotal: 'valorTotal',
@@ -161,23 +214,49 @@ exports.Prisma.PedidoScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ConviteScalarFieldEnum = {
+  id: 'id',
+  remetenteId: 'remetenteId',
+  destinatarioId: 'destinatarioId',
+  tipoRemetente: 'tipoRemetente',
+  fornecedorId: 'fornecedorId',
+  representanteId: 'representanteId',
+  status: 'status',
+  mensagem: 'mensagem',
+  comissaoPercent: 'comissaoPercent',
+  configuracoes: 'configuracoes',
+  dataEnvio: 'dataEnvio',
+  dataResposta: 'dataResposta',
+  motivoRecusa: 'motivoRecusa',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ItemPedidoScalarFieldEnum = {
   id: 'id',
   produtoId: 'produtoId',
+  varianteId: 'varianteId',
   quantidade: 'quantidade',
   precoUnitario: 'precoUnitario',
-  orderId: 'orderId',
+  desconto: 'desconto',
+  valorTotal: 'valorTotal',
+  observacoes: 'observacoes',
+  pedidoId: 'pedidoId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ComissaoScalarFieldEnum = {
   id: 'id',
+  vinculacaoId: 'vinculacaoId',
   representanteId: 'representanteId',
   pedidoId: 'pedidoId',
   percentual: 'percentual',
   valorCalculado: 'valorCalculado',
+  status: 'status',
   dataEfetivacao: 'dataEfetivacao',
+  dataPagamento: 'dataPagamento',
+  observacoes: 'observacoes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -202,6 +281,8 @@ exports.Prisma.ClienteScalarFieldEnum = {
   telefoneContato: 'telefoneContato',
   limiteCredito: 'limiteCredito',
   condicoesPagamento: 'condicoesPagamento',
+  representanteId: 'representanteId',
+  ativo: 'ativo',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -209,10 +290,14 @@ exports.Prisma.ClienteScalarFieldEnum = {
 exports.Prisma.NotificacaoScalarFieldEnum = {
   id: 'id',
   destinatarioId: 'destinatarioId',
+  titulo: 'titulo',
   mensagem: 'mensagem',
+  tipo: 'tipo',
+  prioridade: 'prioridade',
   dataEnvio: 'dataEnvio',
   lida: 'lida',
-  tipo: 'tipo',
+  dataLeitura: 'dataLeitura',
+  metadados: 'metadados',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -220,6 +305,11 @@ exports.Prisma.NotificacaoScalarFieldEnum = {
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.JsonNullValueInput = {
@@ -241,18 +331,73 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.PapelUsuario = exports.$Enums.PapelUsuario = {
+  ADMINISTRADOR: 'ADMINISTRADOR',
+  FORNECEDOR: 'FORNECEDOR',
+  REPRESENTANTE: 'REPRESENTANTE',
+  CLIENTE: 'CLIENTE'
+};
+
+exports.StatusVinculacao = exports.$Enums.StatusVinculacao = {
+  ATIVO: 'ATIVO',
+  INATIVO: 'INATIVO',
+  SUSPENSO: 'SUSPENSO',
+  PENDENTE: 'PENDENTE'
+};
+
 exports.StatusPedido = exports.$Enums.StatusPedido = {
   EM_ABERTO: 'EM_ABERTO',
+  EM_ANALISE: 'EM_ANALISE',
   APROVADO: 'APROVADO',
   RECUSADO: 'RECUSADO',
   CANCELADO: 'CANCELADO'
 };
 
+exports.TipoConvite = exports.$Enums.TipoConvite = {
+  FORNECEDOR: 'FORNECEDOR',
+  REPRESENTANTE: 'REPRESENTANTE'
+};
+
+exports.StatusConvite = exports.$Enums.StatusConvite = {
+  PENDENTE: 'PENDENTE',
+  ACEITO: 'ACEITO',
+  RECUSADO: 'RECUSADO',
+  EXPIRADO: 'EXPIRADO'
+};
+
+exports.StatusComissao = exports.$Enums.StatusComissao = {
+  PENDENTE: 'PENDENTE',
+  APROVADA: 'APROVADA',
+  PAGA: 'PAGA',
+  CANCELADA: 'CANCELADA'
+};
+
+exports.TipoNotificacao = exports.$Enums.TipoNotificacao = {
+  CONVITE_VINCULACAO: 'CONVITE_VINCULACAO',
+  VINCULACAO_ACEITA: 'VINCULACAO_ACEITA',
+  VINCULACAO_RECUSADA: 'VINCULACAO_RECUSADA',
+  NOVO_PEDIDO: 'NOVO_PEDIDO',
+  COMISSAO_DISPONIVEL: 'COMISSAO_DISPONIVEL',
+  SISTEMA: 'SISTEMA',
+  PROMOCAO: 'PROMOCAO'
+};
+
+exports.PrioridadeNotificacao = exports.$Enums.PrioridadeNotificacao = {
+  BAIXA: 'BAIXA',
+  NORMAL: 'NORMAL',
+  ALTA: 'ALTA',
+  URGENTE: 'URGENTE'
+};
+
 exports.Prisma.ModelName = {
   Usuario: 'Usuario',
+  Fornecedor: 'Fornecedor',
   Produto: 'Produto',
+  Representante: 'Representante',
   VarianteProduto: 'VarianteProduto',
+  Vinculacao: 'Vinculacao',
   Pedido: 'Pedido',
+  Convite: 'Convite',
   ItemPedido: 'ItemPedido',
   Comissao: 'Comissao',
   Cliente: 'Cliente',
