@@ -154,7 +154,7 @@ export default function LayoutPrincipal({ children, titulo, subtitulo, botaoVolt
                   <path d="M16 2c0 0-3.5 5-3.5 7.5a3.5 3.5 0 107 0c0-2.5-3.5-7.5-3.5-7.5z" fill="#F59E0B" />
                 </svg>
               </button>
-              <div ref={colorModalRef} className="absolute top-full mt-2 left-0 z-50">
+              <div ref={colorModalRef} className="absolute top-full mt-2 right-0 z-50">
                 <MiniModalSeletorCores 
                   isOpen={mostrarColorModal}
                   onClose={() => setMostrarColorModal(false)}

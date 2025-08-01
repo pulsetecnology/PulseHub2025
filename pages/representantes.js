@@ -15,14 +15,17 @@ export default function RepresentantesPage() {
   const [representanteSelecionado, setRepresentanteSelecionado] = useState(null);
   const [mensagemConvite, setMensagemConvite] = useState('');
   const [servicoVinculacoes, setServicoVinculacoes] = useState(null);
+  const [papelUsuario, setPapelUsuario] = useState(null);
+  const [montado, setMontado] = useState(false);
   
   const { classes } = usarCorTema();
-  const papelUsuario = obterPapelUsuario();
 
   useEffect(() => {
     // Inicializar serviço apenas no cliente
     if (typeof window !== 'undefined') {
+      setPapelUsuario(obterPapelUsuario());
       setServicoVinculacoes(ServicoVinculacoesReal);
+      setMontado(true);
       carregarDados(ServicoVinculacoesReal);
     }
   }, []);
@@ -33,7 +36,7 @@ export default function RepresentantesPage() {
     setCarregando(true);
     
     // Simular ID do usuário logado (usando ID real do primeiro fornecedor)
-    const usuarioId = 'd97baa37-11d6-4e02-98e3-9727be74e18c';
+    const usuarioId = 'fef672d0-37b7-427a-859f-a7ee2702ce66';
     
     // Carregar cada API independentemente para evitar que uma falha impeça as outras
     const promises = [
@@ -145,6 +148,19 @@ export default function RepresentantesPage() {
     
     return matchBusca;
   });
+
+  // Mostrar loading enquanto não montou no cliente
+  if (!montado) {
+    return (
+      <LayoutPrincipal titulo="Carregando...">
+        <div className="text-center py-12">
+          <p className="text-gray-500 dark:text-gray-400">
+            Carregando...
+          </p>
+        </div>
+      </LayoutPrincipal>
+    );
+  }
 
   if (papelUsuario !== PAPEIS.FORNECEDOR && papelUsuario !== PAPEIS.ADMINISTRADOR) {
     return (
@@ -354,7 +370,7 @@ export default function RepresentantesPage() {
                               </div>
                             </div>
                             
-                            {vinculacao.configuracoes.comissaoPersonalizada && (
+                            {vinculacao.configuracoes?.comissaoPersonalizada && (
                               <div className="mb-2">
                                 <span className="text-xs text-gray-500 dark:text-gray-400">Comissão: </span>
                                 <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -394,19 +410,31 @@ export default function RepresentantesPage() {
                     </div>
                   ) : (
                     convitesRecebidos.map(convite => (
-                      <div key={convite.id} className="bg-blue-50 dark:bg-blue-900 rounded-lg p-6">
+                      <div key={convite.id} className="bg-blue-50 dark:bg-blue-900 rounded-lg p-6 border-l-4 border-blue-500">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                              Convite de {convite.remetenteNome}
-                            </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                              {convite.mensagem}
-                            </p>
-                            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                              <span>Enviado em: {new Date(convite.dataEnvio).toLocaleDateString('pt-BR')}</span>
-                              <span>Expira em: {new Date(convite.dataExpiracao).toLocaleDateString('pt-BR')}</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                                {convite.remetenteNome?.charAt(0)?.toUpperCase() || 'U'}
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                  {convite.remetenteNome || 'Usuário não identificado'}
+                                </h3>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {convite.remetenteTipo || 'Tipo não identificado'} • {convite.remetenteEmail || 'Email não disponível'}
+                                </p>
+                              </div>
                             </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 ml-10">
+                              {convite.mensagem || 'Convite para estabelecer parceria comercial.'}
+                            </p>
+                            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 ml-10">
+                               <span>📅 Enviado em: {new Date(convite.dataEnvio || convite.createdAt).toLocaleDateString('pt-BR')}</span>
+                               <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-xs font-medium">
+                                 {convite.status || 'PENDENTE'}
+                               </span>
+                             </div>
                           </div>
                           
                           <div className="flex gap-2">

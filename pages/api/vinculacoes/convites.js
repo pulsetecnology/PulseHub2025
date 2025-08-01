@@ -69,22 +69,67 @@ async function getConvites(req, res, papelUsuario, usuarioId) {
       whereClause.status = status;
     }
 
-    // Buscar convites no banco de dados
+    // Buscar convites no banco de dados com informações do remetente
     const convites = await prisma.convite.findMany({
       where: whereClause,
+      include: {
+        fornecedor: {
+          include: {
+            usuario: {
+              select: {
+                nome: true,
+                email: true
+              }
+            }
+          }
+        },
+        representante: {
+          include: {
+            usuario: {
+              select: {
+                nome: true,
+                email: true
+              }
+            }
+          }
+        }
+      },
       orderBy: {
         createdAt: 'desc'
       }
     });
 
-    // Adicionar informação se é enviado ou recebido
-    const convitesComDirecao = convites.map(convite => ({
-      ...convite,
-      direcao: convite.remetenteId === usuarioId ? 'enviado' : 'recebido',
-      dataEnvio: convite.dataEnvio || convite.createdAt,
-      id: convite.id.toString(),
-      tipo: convite.tipoRemetente === 'FORNECEDOR' ? 'fornecedor_para_representante' : 'representante_para_fornecedor'
-    }));
+    // Adicionar informação se é enviado ou recebido e dados do remetente
+    const convitesComDirecao = convites.map(convite => {
+      // Determinar informações do remetente baseado no tipo
+      let remetenteNome = 'Usuário não encontrado';
+      let remetenteEmail = '';
+      let remetenteTipo = '';
+      
+      if (convite.tipoRemetente === 'FORNECEDOR' && convite.fornecedor) {
+        remetenteNome = convite.fornecedor.usuario?.nome || convite.fornecedor.razaoSocial || 'Fornecedor';
+        remetenteEmail = convite.fornecedor.usuario?.email || convite.fornecedor.email || '';
+        remetenteTipo = 'Fornecedor';
+      } else if (convite.tipoRemetente === 'REPRESENTANTE' && convite.representante) {
+        remetenteNome = convite.representante.usuario?.nome || convite.representante.nome || 'Representante';
+        remetenteEmail = convite.representante.usuario?.email || convite.representante.email || '';
+        remetenteTipo = 'Representante';
+      }
+      
+      return {
+        ...convite,
+        direcao: convite.remetenteId === usuarioId ? 'enviado' : 'recebido',
+        dataEnvio: convite.dataEnvio || convite.createdAt,
+        id: convite.id.toString(),
+        tipo: convite.tipoRemetente === 'FORNECEDOR' ? 'fornecedor_para_representante' : 'representante_para_fornecedor',
+        remetenteNome,
+        remetenteEmail,
+        remetenteTipo,
+        // Remover dados sensíveis das relações
+        fornecedor: undefined,
+        representante: undefined
+      };
+    });
 
     return res.status(200).json(convitesComDirecao);
   } catch (error) {
@@ -98,6 +143,8 @@ async function getConvites(req, res, papelUsuario, usuarioId) {
  */
 async function enviarConvite(req, res, papelUsuario, usuarioId) {
   const { destinatarioId, destinatarioNome, destinatarioEmail, mensagem } = req.body;
+
+  console.log('🔍 enviarConvite - Dados recebidos:', { destinatarioId, destinatarioNome, destinatarioEmail, mensagem, papelUsuario, usuarioId });
 
   // Validação básica
   if (!destinatarioId || !destinatarioNome) {
@@ -115,31 +162,66 @@ async function enviarConvite(req, res, papelUsuario, usuarioId) {
   }
 
   try {
+    // Verificar se os usuários existem no banco de dados
+    console.log('🔍 Verificando se usuários existem...');
+    const [usuarioRemetente, usuarioDestinatario] = await Promise.all([
+      prisma.usuario.findUnique({ where: { id: usuarioId } }),
+      prisma.usuario.findUnique({ where: { id: destinatarioId } })
+    ]);
+    
+    if (!usuarioRemetente) {
+      return res.status(400).json({ message: 'Usuário remetente não encontrado.' });
+    }
+    
+    if (!usuarioDestinatario) {
+      return res.status(400).json({ message: 'Usuário destinatário não encontrado.' });
+    }
+    
+    // Buscar o remetente na tabela específica (fornecedor ou representante)
+    let remetente;
+    if (papelUsuario === 'FORNECEDOR') {
+      remetente = await prisma.fornecedor.findFirst({ where: { usuarioId } });
+    } else {
+      remetente = await prisma.representante.findFirst({ where: { usuarioId } });
+    }
+    
+    if (!remetente) {
+      return res.status(400).json({ message: `${papelUsuario.toLowerCase()} não encontrado.` });
+    }
+    
+    console.log('🔍 Usuários encontrados:', { remetente: remetente.nome, destinatario: usuarioDestinatario.nome });
+
     // Verificar se já existe um convite pendente entre os mesmos usuários
+    console.log('🔍 Verificando convite existente...');
     const conviteExistente = await prisma.convite.findFirst({
       where: {
         remetenteId: usuarioId,
         destinatarioId: destinatarioId,
-        status: 'pendente'
+        status: 'PENDENTE'
       }
     });
+    console.log('🔍 Convite existente:', conviteExistente);
 
     if (conviteExistente) {
       return res.status(400).json({ message: 'Já existe um convite pendente para este destinatário.' });
     }
 
     // Criar o convite no banco de dados
+    const dadosConvite = {
+      remetenteId: usuarioId,
+      destinatarioId,
+      tipoRemetente: papelUsuario === 'FORNECEDOR' ? 'FORNECEDOR' : 'REPRESENTANTE',
+      status: 'PENDENTE',
+      mensagem: mensagem || 'Convite para estabelecer parceria comercial.',
+      // Definir fornecedorId ou representanteId baseado no tipo
+      ...(papelUsuario === 'FORNECEDOR' ? { fornecedorId: remetente.id } : { representanteId: remetente.id })
+    };
+    
+    console.log('🔍 Criando convite com dados:', dadosConvite);
     const novoConvite = await prisma.convite.create({
-      data: {
-        remetenteId: usuarioId,
-        destinatarioId,
-        tipoRemetente: papelUsuario === 'FORNECEDOR' ? 'FORNECEDOR' : 'REPRESENTANTE',
-        status: 'PENDENTE',
-        mensagem: mensagem || 'Convite para estabelecer parceria comercial.',
-        // Definir fornecedorId ou representanteId baseado no tipo
-        ...(papelUsuario === 'FORNECEDOR' ? { fornecedorId: usuarioId } : { representanteId: usuarioId })
-      }
+      data: dadosConvite
     });
+    console.log('🔍 Convite criado:', novoConvite);
 
     return res.status(201).json(novoConvite);
   } catch (error) {
@@ -151,7 +233,7 @@ async function enviarConvite(req, res, papelUsuario, usuarioId) {
 /**
  * Responder a um convite (aceitar ou recusar)
  */
-function responderConvite(req, res, papelUsuario, usuarioId) {
+async function responderConvite(req, res, papelUsuario, usuarioId) {
   const { id, acao, motivo } = req.body;
 
   // Validação básica
@@ -163,108 +245,158 @@ function responderConvite(req, res, papelUsuario, usuarioId) {
     return res.status(400).json({ message: 'Ação deve ser "aceitar" ou "recusar".' });
   }
 
-  // Simulação de busca do convite
-  // Em uma implementação real, buscaria no banco de dados
-  const convite = {
-    id,
-    tipo: 'fornecedor_para_representante',
-    remetenteId: 'forn_001',
-    remetenteNome: 'TechSupply Ltda',
-    destinatarioId: usuarioId,
-    destinatarioNome: 'Representante Exemplo',
-    destinatarioEmail: 'representante@example.com',
-    status: 'pendente',
-    dataEnvio: '2024-01-22T16:20:00Z',
-    dataExpiracao: '2024-02-21T16:20:00Z',
-    mensagem: 'Convite para parceria comercial.'
-  };
-
-  // Verificar se o usuário é o destinatário do convite
-  if (convite.destinatarioId !== usuarioId) {
-    return res.status(403).json({ message: 'Você não tem permissão para responder a este convite.' });
-  }
-
-  // Verificar se o convite ainda está pendente
-  if (convite.status !== 'pendente') {
-    return res.status(400).json({ message: 'Este convite não está mais disponível para resposta.' });
-  }
-
-  // Verificar se o convite não expirou
-  if (new Date(convite.dataExpiracao) < new Date()) {
-    return res.status(400).json({ message: 'Este convite expirou.' });
-  }
-
-  // Atualizar status do convite
-  const conviteAtualizado = {
-    ...convite,
-    status: acao === 'aceitar' ? 'aceito' : 'recusado',
-    dataResposta: new Date().toISOString(),
-    ...(acao === 'recusar' && motivo && { motivoRecusa: motivo })
-  };
-
-  // Se aceito, simular criação da vinculação
-  let vinculacao = null;
-  if (acao === 'aceitar') {
-    vinculacao = {
-      id: `vinc_${Date.now()}`,
-      fornecedorId: convite.tipo === 'fornecedor_para_representante' ? convite.remetenteId : convite.destinatarioId,
-      fornecedorNome: convite.tipo === 'fornecedor_para_representante' ? convite.remetenteNome : convite.destinatarioNome,
-      representanteId: convite.tipo === 'fornecedor_para_representante' ? convite.destinatarioId : convite.remetenteId,
-      representanteNome: convite.tipo === 'fornecedor_para_representante' ? convite.destinatarioNome : convite.remetenteNome,
-      representanteEmail: convite.tipo === 'fornecedor_para_representante' ? convite.destinatarioEmail : convite.remetenteEmail,
-      status: 'ativo',
-      dataVinculacao: new Date().toISOString(),
-      configuracoes: {
-        comissaoPersonalizada: null,
-        precoEspecial: false,
-        acessoRelatorios: true
-      },
-      estatisticas: {
-        pedidosRealizados: 0,
-        valorTotalVendas: 0.00,
-        ultimoPedido: null
+  try {
+    // Buscar o convite no banco de dados
+    const convite = await prisma.convite.findUnique({
+      where: { id },
+      include: {
+        fornecedor: {
+          include: {
+            usuario: {
+              select: {
+                nome: true,
+                email: true
+              }
+            }
+          }
+        },
+        representante: {
+          include: {
+            usuario: {
+              select: {
+                nome: true,
+                email: true
+              }
+            }
+          }
+        }
       }
-    };
-  }
+    });
 
-  return res.status(200).json({
-    convite: conviteAtualizado,
-    vinculacao,
-    message: acao === 'aceitar' 
-      ? 'Convite aceito com sucesso! Vinculação criada.' 
-      : 'Convite recusado.'
-  });
+    if (!convite) {
+      return res.status(404).json({ message: 'Convite não encontrado.' });
+    }
+
+    // Verificar se o usuário é o destinatário do convite
+    if (convite.destinatarioId !== usuarioId) {
+      return res.status(403).json({ message: 'Você não tem permissão para responder a este convite.' });
+    }
+
+    // Verificar se o convite ainda está pendente
+    if (convite.status !== 'PENDENTE') {
+      return res.status(400).json({ message: 'Este convite não está mais disponível para resposta.' });
+    }
+
+    // Atualizar status do convite no banco de dados
+    const dadosAtualizacao = {
+      status: acao === 'aceitar' ? 'ACEITO' : 'RECUSADO',
+      dataResposta: new Date(),
+      ...(acao === 'recusar' && motivo && { motivoRecusa: motivo })
+    };
+
+    const conviteAtualizado = await prisma.convite.update({
+      where: { id },
+      data: dadosAtualizacao
+    });
+
+    // Se aceito, criar vinculação no banco de dados
+    let vinculacao = null;
+    if (acao === 'aceitar') {
+      const fornecedorId = convite.tipoRemetente === 'FORNECEDOR' ? convite.remetenteId : convite.destinatarioId;
+      const representanteId = convite.tipoRemetente === 'REPRESENTANTE' ? convite.remetenteId : convite.destinatarioId;
+      
+      // Verificar se já existe vinculação
+      const vinculacaoExistente = await prisma.vinculacao.findFirst({
+        where: {
+          fornecedorId,
+          representanteId
+        }
+      });
+      
+      if (vinculacaoExistente) {
+        // Se já existe, apenas reativar
+        vinculacao = await prisma.vinculacao.update({
+          where: { id: vinculacaoExistente.id },
+          data: {
+            status: 'ATIVO',
+            configuracoes: {
+              comissaoPersonalizada: convite.comissaoPercent || 5.0,
+              precoEspecial: false,
+              acessoRelatorios: true
+            }
+          }
+        });
+      } else {
+        // Criar nova vinculação
+        const dadosVinculacao = {
+          fornecedorId,
+          representanteId,
+          status: 'ATIVO',
+          configuracoes: {
+            comissaoPersonalizada: convite.comissaoPercent || 5.0,
+            precoEspecial: false,
+            acessoRelatorios: true
+          }
+        };
+
+        vinculacao = await prisma.vinculacao.create({
+          data: dadosVinculacao
+        });
+      }
+    }
+
+    return res.status(200).json({
+      convite: conviteAtualizado,
+      vinculacao,
+      message: acao === 'aceitar' 
+        ? 'Convite aceito com sucesso! Vinculação criada.' 
+        : 'Convite recusado.'
+    });
+  } catch (error) {
+    console.error('Erro ao responder convite:', error);
+    return res.status(500).json({ message: 'Erro ao responder convite' });
+  }
 }
 
 /**
  * Cancelar convite enviado
  */
-function cancelarConvite(req, res, papelUsuario, usuarioId) {
+async function cancelarConvite(req, res, papelUsuario, usuarioId) {
   const { id } = req.query;
 
-  // Validação básica
-  if (!id) {
-    return res.status(400).json({ message: 'ID do convite é obrigatório.' });
+  try {
+    // Validação básica
+    if (!id) {
+      return res.status(400).json({ message: 'ID do convite é obrigatório.' });
+    }
+
+    // Buscar o convite no banco de dados
+    const convite = await prisma.convite.findUnique({
+      where: { id }
+    });
+
+    if (!convite) {
+      return res.status(404).json({ message: 'Convite não encontrado.' });
+    }
+
+    // Verificar se o usuário é o remetente do convite
+    if (convite.remetenteId !== usuarioId) {
+      return res.status(403).json({ message: 'Você só pode cancelar convites que enviou.' });
+    }
+
+    // Verificar se o convite ainda está pendente
+    if (convite.status !== 'PENDENTE') {
+      return res.status(400).json({ message: 'Apenas convites pendentes podem ser cancelados.' });
+    }
+
+    // Cancelar o convite (deletar do banco)
+    await prisma.convite.delete({
+      where: { id }
+    });
+
+    return res.status(200).json({ message: 'Convite cancelado com sucesso.' });
+  } catch (error) {
+    console.error('Erro ao cancelar convite:', error);
+    return res.status(500).json({ message: 'Erro ao cancelar convite' });
   }
-
-  // Simulação de busca do convite
-  // Em uma implementação real, buscaria no banco de dados
-  const convite = {
-    id,
-    remetenteId: usuarioId,
-    status: 'pendente'
-  };
-
-  // Verificar se o usuário é o remetente do convite
-  if (convite.remetenteId !== usuarioId) {
-    return res.status(403).json({ message: 'Você só pode cancelar convites que enviou.' });
-  }
-
-  // Verificar se o convite ainda está pendente
-  if (convite.status !== 'pendente') {
-    return res.status(400).json({ message: 'Apenas convites pendentes podem ser cancelados.' });
-  }
-
-  // Simulação de cancelamento
-  return res.status(200).json({ message: 'Convite cancelado com sucesso.' });
 }

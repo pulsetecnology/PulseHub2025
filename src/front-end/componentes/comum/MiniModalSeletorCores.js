@@ -6,7 +6,8 @@ export default function MiniModalSeletorCores({ isOpen, onClose, onColorSelect }
 
   return (
     <div 
-      className="absolute mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 z-50 shadow-lg"
+      className="absolute mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 z-50 shadow-lg right-0 max-w-[calc(100vw-2rem)]"
+      style={{ transform: 'translateX(0)' }}
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">

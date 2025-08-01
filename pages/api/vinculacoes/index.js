@@ -46,6 +46,8 @@ export default async function handler(req, res) {
 async function getVinculacoes(req, res, papelUsuario) {
   const { fornecedorId, representanteId, status, page = 1, limit = 10 } = req.query;
   
+  console.log('🔍 getVinculacoes - Parâmetros:', { fornecedorId, representanteId, status, page, limit });
+  
   try {
     const where = {};
     
@@ -54,9 +56,13 @@ async function getVinculacoes(req, res, papelUsuario) {
     if (representanteId) where.representanteId = representanteId;
     if (status) where.status = status;
     
+    console.log('🔍 getVinculacoes - Where clause:', where);
+    
     // Busca paginada
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const take = parseInt(limit);
+    
+    console.log('🔍 getVinculacoes - Executando query Prisma...');
     
     const [vinculacoes, total] = await Promise.all([
       prisma.vinculacao.findMany({
@@ -76,16 +82,20 @@ async function getVinculacoes(req, res, papelUsuario) {
           representante: {
             select: {
               id: true,
-              nome: true,
-              email: true,
               telefone: true,
               regiao: true,
-              ativo: true
+              ativo: true,
+              usuario: {
+                select: {
+                  nome: true,
+                  email: true
+                }
+              }
             }
           }
         },
         orderBy: {
-          dataCriacao: 'desc'
+          createdAt: 'desc'
         }
       }),
       prisma.vinculacao.count({ where })
@@ -97,10 +107,10 @@ async function getVinculacoes(req, res, papelUsuario) {
       fornecedorId: vinculacao.fornecedorId,
       fornecedorNome: vinculacao.fornecedor.nomeFantasia,
       representanteId: vinculacao.representanteId,
-      representanteNome: vinculacao.representante.nome,
-      representanteEmail: vinculacao.representante.email,
+      representanteNome: vinculacao.representante.usuario.nome,
+      representanteEmail: vinculacao.representante.usuario.email,
       status: vinculacao.status,
-      dataVinculacao: vinculacao.dataCriacao,
+      dataVinculacao: vinculacao.dataVinculacao,
       comissaoPercent: vinculacao.comissaoPercent || 5.0,
       precoEspecial: vinculacao.precoEspecial || false,
       acessoRelatorios: vinculacao.acessoRelatorios || true,

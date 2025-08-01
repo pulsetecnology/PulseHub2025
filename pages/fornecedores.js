@@ -7,6 +7,7 @@ import { usarCorTema } from '../src/front-end/utils/coresTema';
 export default function FornecedoresPage() {
   const [vinculacoes, setVinculacoes] = useState([]);
   const [convitesRecebidos, setConvitesRecebidos] = useState([]);
+  const [convitesEnviados, setConvitesEnviados] = useState([]);
   const [fornecedoresDisponiveis, setFornecedoresDisponiveis] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [abaSelecionada, setAbaSelecionada] = useState('vinculacoes');
@@ -32,8 +33,8 @@ export default function FornecedoresPage() {
     
     setCarregando(true);
     
-    // Simular ID do usuário logado (usando ID real do primeiro representante)
-    const usuarioId = '41b1c52e-09b3-495c-9499-621552d0a20b';
+    // ID real do representante logado
+    const usuarioId = '61aac5a8-941d-47ef-8312-142a1843cb76';
     
     // Carregar cada API independentemente para evitar que uma falha impeça as outras
     const promises = [
@@ -49,8 +50,16 @@ export default function FornecedoresPage() {
       servico.obterConvitesRecebidos(usuarioId)
         .then(data => setConvitesRecebidos(data))
         .catch(error => {
-          console.error('Erro ao carregar convites:', error);
+          console.error('Erro ao carregar convites recebidos:', error);
           setConvitesRecebidos([]);
+        }),
+      
+      // Carregar convites enviados
+      servico.obterConvitesEnviados(usuarioId)
+        .then(data => setConvitesEnviados(data))
+        .catch(error => {
+          console.error('Erro ao carregar convites enviados:', error);
+          setConvitesEnviados([]);
         }),
       
       // Carregar fornecedores disponíveis
@@ -72,8 +81,6 @@ export default function FornecedoresPage() {
     try {
       const dadosConvite = {
         tipo: 'representante_para_fornecedor',
-        remetenteId: '41b1c52e-09b3-495c-9499-621552d0a20b',
-        remetenteNome: 'Representante 1',
         destinatarioId: fornecedor.id,
         destinatarioNome: fornecedor.nomeFantasia || fornecedor.razaoSocial || fornecedor.nome,
         destinatarioEmail: fornecedor.usuario?.email || fornecedor.email,
@@ -90,8 +97,52 @@ export default function FornecedoresPage() {
       
     } catch (error) {
       console.error('Erro ao enviar convite:', error);
-      alert(error.message || 'Erro ao enviar convite');
+      
+      if (error.message && error.message.includes('Já existe um convite pendente')) {
+        const confirmar = window.confirm(
+          'Já existe um convite pendente para este fornecedor. Deseja cancelar o convite anterior e enviar um novo?'
+        );
+        
+        if (confirmar) {
+          try {
+            // Buscar convites pendentes para este destinatário
+            const convites = await servicoVinculacoes.obterConvites();
+            const convitePendente = convites.find(c => 
+              c.destinatarioId === fornecedor.id && c.status === 'PENDENTE'
+            );
+            
+            if (convitePendente) {
+              // Cancelar convite existente
+              await servicoVinculacoes.cancelarConvite(convitePendente.id);
+              
+              // Enviar novo convite
+              await servicoVinculacoes.enviarConvite(dadosConvite);
+              
+              setMostrarModalConvite(false);
+              setFornecedorSelecionado(null);
+              setMensagemConvite('');
+              
+              // Recarregar dados
+              carregarDados();
+              
+              alert('Convite enviado com sucesso!');
+            }
+          } catch (cancelError) {
+            console.error('Erro ao cancelar convite anterior:', cancelError);
+            alert('Erro ao cancelar convite anterior: ' + (cancelError.message || 'Erro desconhecido'));
+          }
+        }
+      } else {
+        alert(error.message || 'Erro ao enviar convite');
+      }
     }
+  };
+
+  // Função para verificar se existe convite pendente para um fornecedor
+  const temConvitePendente = (fornecedorId) => {
+    return convitesEnviados.some(convite => 
+      convite.destinatarioId === fornecedorId && convite.status === 'PENDENTE'
+    );
   };
 
   const handleResponderConvite = async (conviteId, acao) => {
@@ -339,7 +390,7 @@ export default function FornecedoresPage() {
                               </div>
                             </div>
                             
-                            {vinculacao.configuracoes.comissaoPersonalizada && (
+                            {vinculacao.configuracoes?.comissaoPersonalizada && (
                               <div className="mb-2">
                                 <span className="text-xs text-gray-500 dark:text-gray-400">Comissão: </span>
                                 <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -379,19 +430,31 @@ export default function FornecedoresPage() {
                     </div>
                   ) : (
                     convitesRecebidos.map(convite => (
-                      <div key={convite.id} className="bg-blue-50 dark:bg-blue-900 rounded-lg p-6">
+                      <div key={convite.id} className="bg-blue-50 dark:bg-blue-900 rounded-lg p-6 border-l-4 border-blue-500">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                              Convite de {convite.remetenteNome}
-                            </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                              {convite.mensagem}
-                            </p>
-                            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                              <span>Enviado em: {new Date(convite.dataEnvio).toLocaleDateString('pt-BR')}</span>
-                              <span>Expira em: {new Date(convite.dataExpiracao).toLocaleDateString('pt-BR')}</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                                {convite.remetenteNome?.charAt(0)?.toUpperCase() || 'U'}
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                  {convite.remetenteNome || 'Usuário não identificado'}
+                                </h3>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {convite.remetenteTipo || 'Tipo não identificado'} • {convite.remetenteEmail || 'Email não disponível'}
+                                </p>
+                              </div>
                             </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 ml-10">
+                              {convite.mensagem || 'Convite para estabelecer parceria comercial.'}
+                            </p>
+                            <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 ml-10">
+                               <span>📅 Enviado em: {new Date(convite.dataEnvio || convite.createdAt).toLocaleDateString('pt-BR')}</span>
+                               <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-xs font-medium">
+                                 {convite.status || 'PENDENTE'}
+                               </span>
+                             </div>
                           </div>
                           
                           <div className="flex gap-2">
@@ -466,15 +529,24 @@ export default function FornecedoresPage() {
                           </div>
                           
                           <div>
-                            <button
-                              onClick={() => {
-                                setFornecedorSelecionado(fornecedor);
-                                setMostrarModalConvite(true);
-                              }}
-                              className={`px-4 py-2 text-sm font-medium text-white ${classes.bg} ${classes.bgHover} rounded-lg transition-colors`}
-                            >
-                              Solicitar Parceria
-                            </button>
+                            {temConvitePendente(fornecedor.id) ? (
+                              <button
+                                disabled
+                                className="px-4 py-2 text-sm font-medium text-gray-500 bg-gray-300 dark:bg-gray-600 dark:text-gray-400 rounded-lg cursor-not-allowed"
+                              >
+                                Convite Pendente
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setFornecedorSelecionado(fornecedor);
+                                  setMostrarModalConvite(true);
+                                }}
+                                className={`px-4 py-2 text-sm font-medium text-white ${classes.bg} ${classes.bgHover} rounded-lg transition-colors`}
+                              >
+                                Solicitar Parceria
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>

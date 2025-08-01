@@ -38,16 +38,56 @@ class ServicoVinculacoesReal {
    * Obter papel do usuário atual (temporário - será integrado com autenticação)
    */
   obterPapelUsuario() {
-    // TODO: Integrar com sistema de autenticação real
-    return localStorage.getItem('papel_usuario') || 'FORNECEDOR';
+    // Tentar obter do localStorage primeiro
+    if (typeof window !== 'undefined') {
+      try {
+        const usuarioJson = localStorage.getItem('usuario');
+        if (usuarioJson) {
+          const usuario = JSON.parse(usuarioJson);
+          if (usuario.papel) {
+            return usuario.papel;
+          }
+        }
+      } catch (erro) {
+        console.error('Erro ao obter papel do usuário:', erro);
+      }
+      
+      // Fallback para o método antigo
+      const papelAntigo = localStorage.getItem('papel_usuario');
+      if (papelAntigo) {
+        return papelAntigo;
+      }
+    }
+    
+    return 'REPRESENTANTE';
   }
 
   /**
    * Obter ID do usuário atual (temporário - será integrado com autenticação)
    */
   obterUsuarioId() {
-    // TODO: Integrar com sistema de autenticação real
-    return localStorage.getItem('usuario_id') || 'user_001';
+    // Tentar obter do localStorage primeiro
+    if (typeof window !== 'undefined') {
+      try {
+        const usuarioJson = localStorage.getItem('usuario');
+        if (usuarioJson) {
+          const usuario = JSON.parse(usuarioJson);
+          if (usuario.id) {
+            return usuario.id;
+          }
+        }
+      } catch (erro) {
+        console.error('Erro ao obter ID do usuário:', erro);
+      }
+      
+      // Fallback para o método antigo
+      const idAntigo = localStorage.getItem('usuario_id');
+      if (idAntigo) {
+        return idAntigo;
+      }
+    }
+    
+    return '61aac5a8-941d-47ef-8312-142a1843cb76';
   }
 
   // ==================== FORNECEDORES ====================
