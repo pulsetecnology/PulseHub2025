@@ -298,18 +298,16 @@ class ServicoVinculacoesReal {
    * Obter convites enviados
    */
   async obterConvitesEnviados(usuarioId = null) {
-    const convites = await this.obterConvites();
     const idUsuario = usuarioId || this.obterUsuarioId();
-    return convites.filter(c => c.remetenteId === idUsuario);
+    return await this.obterConvites({ tipo: 'enviados' });
   }
 
   /**
    * Obter convites recebidos
    */
   async obterConvitesRecebidos(usuarioId = null) {
-    const convites = await this.obterConvites();
     const idUsuario = usuarioId || this.obterUsuarioId();
-    return convites.filter(c => c.destinatarioId === idUsuario);
+    return await this.obterConvites({ tipo: 'recebidos' });
   }
 
   /**

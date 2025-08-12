@@ -169,12 +169,42 @@ async function enviarConvite(req, res, papelUsuario, usuarioId) {
       prisma.usuario.findUnique({ where: { id: destinatarioId } })
     ]);
     
-    if (!usuarioRemetente) {
+    // Para usuários de desenvolvimento, criar um usuário temporário se não existir
+    let remetenteReal = usuarioRemetente;
+    if (!usuarioRemetente && usuarioId.startsWith('user-')) {
+      console.log('🔍 Usuário de desenvolvimento detectado, usando dados temporários');
+      remetenteReal = {
+        id: usuarioId,
+        nome: 'Usuário Desenvolvimento',
+        email: 'dev@exemplo.com',
+        papel: papelUsuario
+      };
+    } else if (!usuarioRemetente) {
       return res.status(400).json({ message: 'Usuário remetente não encontrado.' });
     }
     
+    // Para usuários de desenvolvimento destinatários, criar um usuário temporário se não existir
+    let destinatarioReal = usuarioDestinatario;
     if (!usuarioDestinatario) {
-      return res.status(400).json({ message: 'Usuário destinatário não encontrado.' });
+      // Verificar se é um ID de representante (não de usuário)
+      const representanteDestinatario = await prisma.representante.findUnique({
+        where: { id: destinatarioId },
+        include: { usuario: true }
+      });
+      
+      if (representanteDestinatario) {
+        console.log('🔍 Representante encontrado:', representanteDestinatario.usuario?.nome);
+        destinatarioReal = representanteDestinatario.usuario;
+      } else if (destinatarioId.startsWith('user-')) {
+        console.log('🔍 Usuário destinatário de desenvolvimento detectado, usando dados temporários');
+        destinatarioReal = {
+          id: destinatarioId,
+          nome: destinatarioNome || 'Usuário Desenvolvimento',
+          email: destinatarioEmail || 'dev-destinatario@exemplo.com'
+        };
+      } else {
+        return res.status(400).json({ message: 'Usuário destinatário não encontrado.' });
+      }
     }
     
     // Buscar o remetente na tabela específica (fornecedor ou representante)
@@ -185,18 +215,26 @@ async function enviarConvite(req, res, papelUsuario, usuarioId) {
       remetente = await prisma.representante.findFirst({ where: { usuarioId } });
     }
     
-    if (!remetente) {
+    // Para usuários de desenvolvimento, criar dados temporários se não encontrar
+    if (!remetente && usuarioId.startsWith('user-')) {
+      console.log('🔍 Criando dados temporários para usuário de desenvolvimento');
+      remetente = {
+        id: `temp-${papelUsuario.toLowerCase()}-${usuarioId}`,
+        nome: `${papelUsuario} Desenvolvimento`,
+        usuarioId: usuarioId
+      };
+    } else if (!remetente) {
       return res.status(400).json({ message: `${papelUsuario.toLowerCase()} não encontrado.` });
     }
     
-    console.log('🔍 Usuários encontrados:', { remetente: remetente.nome, destinatario: usuarioDestinatario.nome });
+    console.log('🔍 Usuários encontrados:', { remetente: remetente.nome, destinatario: destinatarioReal.nome });
 
     // Verificar se já existe um convite pendente entre os mesmos usuários
     console.log('🔍 Verificando convite existente...');
     const conviteExistente = await prisma.convite.findFirst({
       where: {
         remetenteId: usuarioId,
-        destinatarioId: destinatarioId,
+        destinatarioId: destinatarioReal.id,
         status: 'PENDENTE'
       }
     });
@@ -209,13 +247,20 @@ async function enviarConvite(req, res, papelUsuario, usuarioId) {
     // Criar o convite no banco de dados
     const dadosConvite = {
       remetenteId: usuarioId,
-      destinatarioId,
+      destinatarioId: destinatarioReal.id,
       tipoRemetente: papelUsuario === 'FORNECEDOR' ? 'FORNECEDOR' : 'REPRESENTANTE',
       status: 'PENDENTE',
-      mensagem: mensagem || 'Convite para estabelecer parceria comercial.',
-      // Definir fornecedorId ou representanteId baseado no tipo
-      ...(papelUsuario === 'FORNECEDOR' ? { fornecedorId: remetente.id } : { representanteId: remetente.id })
+      mensagem: mensagem || 'Convite para estabelecer parceria comercial.'
     };
+    
+    // Adicionar fornecedorId ou representanteId apenas se não for usuário temporário
+    if (!remetente.id.startsWith('temp-')) {
+      if (papelUsuario === 'FORNECEDOR') {
+        dadosConvite.fornecedorId = remetente.id;
+      } else {
+        dadosConvite.representanteId = remetente.id;
+      }
+    }
     
     console.log('🔍 Criando convite com dados:', dadosConvite);
     const novoConvite = await prisma.convite.create({

@@ -10,13 +10,14 @@ export default function RepresentantesPage() {
   const [representantesDisponiveis, setRepresentantesDisponiveis] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [abaSelecionada, setAbaSelecionada] = useState('vinculacoes');
-  const [filtros, setFiltros] = useState({ busca: '', status: '' });
+  const [filtros, setFiltros] = useState({ busca: '', status: '', convitePendente: false });
   const [mostrarModalConvite, setMostrarModalConvite] = useState(false);
   const [representanteSelecionado, setRepresentanteSelecionado] = useState(null);
   const [mensagemConvite, setMensagemConvite] = useState('');
   const [servicoVinculacoes, setServicoVinculacoes] = useState(null);
   const [papelUsuario, setPapelUsuario] = useState(null);
   const [montado, setMontado] = useState(false);
+  const [convitesEnviados, setConvitesEnviados] = useState([]);
   
   const { classes } = usarCorTema();
 
@@ -62,6 +63,14 @@ export default function RepresentantesPage() {
         .catch(error => {
           console.error('Erro ao carregar representantes:', error);
           setRepresentantesDisponiveis([]);
+        }),
+      
+      // Carregar convites enviados
+      servico.obterConvitesEnviados(usuarioId)
+        .then(data => setConvitesEnviados(data))
+        .catch(error => {
+          console.error('Erro ao carregar convites enviados:', error);
+          setConvitesEnviados([]);
         })
     ];
     
@@ -75,9 +84,6 @@ export default function RepresentantesPage() {
     
     try {
       const dadosConvite = {
-        tipo: 'fornecedor_para_representante',
-        remetenteId: 'forn_001',
-        remetenteNome: 'Empresa ABC Ltda',
         destinatarioId: representante.id,
         destinatarioNome: representante.usuario?.nome || representante.nome,
         destinatarioEmail: representante.usuario?.email || representante.email,
@@ -146,8 +152,17 @@ export default function RepresentantesPage() {
       email.toLowerCase().includes(filtros.busca.toLowerCase()) ||
       regiao.toLowerCase().includes(filtros.busca.toLowerCase());
     
-    return matchBusca;
+    const matchConvitePendente = !filtros.convitePendente || temConvitePendente(representante.id);
+    
+    return matchBusca && matchConvitePendente;
   });
+
+  // Função para verificar se existe convite pendente para um representante
+  const temConvitePendente = (representanteId) => {
+    return convitesEnviados.some(convite => 
+      convite.destinatarioId === representanteId && convite.status === 'PENDENTE'
+    );
+  };
 
   // Mostrar loading enquanto não montou no cliente
   if (!montado) {
@@ -304,6 +319,19 @@ export default function RepresentantesPage() {
                 </select>
               </div>
             )}
+            {abaSelecionada === 'buscar' && (
+              <div className="flex items-center gap-2">
+                <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <input
+                    type="checkbox"
+                    checked={filtros.convitePendente}
+                    onChange={(e) => setFiltros(prev => ({ ...prev, convitePendente: e.target.checked }))}
+                    className="rounded border-gray-300 text-purple-600 focus:ring-purple-500 dark:border-gray-600 dark:bg-gray-700"
+                  />
+                  Apenas com convites pendentes
+                </label>
+              </div>
+            )}
           </div>
         </div>
 
@@ -321,7 +349,7 @@ export default function RepresentantesPage() {
                   {vinculacoesFiltradas.length === 0 ? (
                     <div className="text-center py-12">
                       <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 919.288 0M15 7a3 3 0 11-6 0 3 3 0 616 0zm6 3a2 2 0 11-4 0 2 2 0 414 0zM6 8a2 2 0 11-4 0 2 2 0 414 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                       </svg>
                       <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">Nenhum representante vinculado</h3>
                       <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -389,7 +417,7 @@ export default function RepresentantesPage() {
                             </button>
                           </div>
                         </div>
-                      </div>
+                      )
                     ))
                   )}
                 </div>
@@ -452,8 +480,8 @@ export default function RepresentantesPage() {
                             </button>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      )
+                    })
                   )}
                 </div>
               )}
@@ -472,23 +500,37 @@ export default function RepresentantesPage() {
                       </p>
                     </div>
                   ) : (
-                    representantesFiltrados.map(representante => (
-                      <div key={representante.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                {representante.usuario?.nome || representante.nome}
-                              </h3>
-                              <div className="flex items-center gap-1">
-                                <svg className="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                <span className="text-sm text-gray-600 dark:text-gray-300">
-                                  {representante.avaliacaoMedia}
-                                </span>
+                    representantesFiltrados.map(representante => {
+                      const temConvite = temConvitePendente(representante.id);
+                      return (
+                        <div key={representante.id} className={`rounded-lg p-6 ${
+                          temConvite 
+                            ? 'bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400' 
+                            : 'bg-gray-50 dark:bg-gray-700'
+                        }`}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                  {representante.usuario?.nome || representante.nome}
+                                </h3>
+                                {temConvite && (
+                                  <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full text-xs font-medium">
+                                    <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                    Convite Pendente
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-1">
+                                  <svg className="h-4 w-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                                    {representante.avaliacaoMedia}
+                                  </span>
+                                </div>
                               </div>
-                            </div>
                             <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                               {representante.usuario?.email || representante.email} • {representante.telefone}
                             </p>
@@ -510,19 +552,28 @@ export default function RepresentantesPage() {
                           </div>
                           
                           <div>
-                            <button
-                              onClick={() => {
-                                setRepresentanteSelecionado(representante);
-                                setMostrarModalConvite(true);
-                              }}
-                              className={`px-4 py-2 text-sm font-medium text-white ${classes.bg} ${classes.bgHover} rounded-lg transition-colors`}
-                            >
-                              Enviar Convite
-                            </button>
+                            {temConvitePendente(representante.id) ? (
+                              <button
+                                disabled
+                                className="px-4 py-2 text-sm font-medium text-gray-500 bg-gray-300 dark:bg-gray-600 dark:text-gray-400 rounded-lg cursor-not-allowed"
+                              >
+                                Convite Pendente
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setRepresentanteSelecionado(representante);
+                                  setMostrarModalConvite(true);
+                                }}
+                                className={`px-4 py-2 text-sm font-medium text-white ${classes.bg} ${classes.bgHover} rounded-lg transition-colors`}
+                              >
+                                Enviar Convite
+                              </button>
+                            )}
                           </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               )}
